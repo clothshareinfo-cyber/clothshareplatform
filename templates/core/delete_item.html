@@ -1,0 +1,462 @@
+{% extends 'core/base.html' %}
+{% block title %}Delete {{ item.title }}{% endblock %}
+
+{% block content %}
+<section class="delete-item section">
+    <div class="container">
+        <div class="delete-confirmation">
+            <!-- Back Button -->
+            <div style="margin-bottom: 2rem;">
+                <a href="{% url 'core:item_detail' item.id %}" class="btn btn--outline">
+                    <i class="fas fa-arrow-left"></i> Back to Item
+                </a>
+            </div>
+
+            <!-- Confirmation Card -->
+            <div class="confirmation-card">
+                <div class="confirmation-header">
+                    <div class="warning-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <h2 class="confirmation-title">Delete Item</h2>
+                    <p class="confirmation-subtitle">Are you sure you want to delete this item?</p>
+                </div>
+
+                <!-- Item Preview -->
+                <div class="item-preview">
+                    <div class="preview-image">
+                        {% if item.primary_image %}
+                            <img src="{{ item.primary_image.image.url }}" alt="{{ item.title }}">
+                        {% else %}
+                            <div class="no-image">
+                                <i class="fas fa-tshirt"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="preview-details">
+                        <h3 class="item-title">{{ item.title }}</h3>
+                        <div class="item-meta">
+                            <span class="category">{{ item.category.display_name }}</span>
+                            <span class="condition">{{ item.condition.name }}</span>
+                            <span class="mode {{ item.mode }}">
+                                {% if item.mode == 'donation' %}Free Donation{% else %}Exchange{% endif %}
+                            </span>
+                        </div>
+                        <p class="item-description">{{ item.description|truncatewords:30 }}</p>
+                        <div class="item-stats">
+                            <div class="stat">
+                                <i class="fas fa-calendar"></i>
+                                <span>Listed {{ item.created_at|timesince }} ago</span>
+                            </div>
+                            {% if item.images.count > 0 %}
+                            <div class="stat">
+                                <i class="fas fa-images"></i>
+                                <span>{{ item.images.count }} photo{{ item.images.count|pluralize }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Warning Message -->
+                <div class="warning-message">
+                    <h4><i class="fas fa-info-circle"></i> Please Note</h4>
+                    <ul>
+                        <li>This action cannot be undone</li>
+                        <li>The item will be permanently removed from the platform</li>
+                        <li>Any ongoing exchange requests will be cancelled</li>
+                        <li>This will affect your donation statistics</li>
+                    </ul>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="confirmation-actions">
+                    <form method="post" class="delete-form">
+                        {% csrf_token %}
+                        <div class="actions-grid">
+                            <a href="{% url 'core:item_detail' item.id %}" class="btn btn--outline">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                            <button type="submit" class="btn btn--danger" id="deleteButton">
+                                <i class="fas fa-trash"></i> Yes, Delete Item
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Alternative Options -->
+                <div class="alternative-options">
+                    <h5>Not ready to delete?</h5>
+                    <div class="options-grid">
+                        <a href="{% url 'core:edit_item' item.id %}" class="option-link">
+                            <i class="fas fa-edit"></i>
+                            <span>Edit Item Instead</span>
+                        </a>
+                        <a href="{% url 'core:profile' %}" class="option-link">
+                            <i class="fas fa-user"></i>
+                            <span>Back to Profile</span>
+                        </a>
+                        <button type="button" class="option-link" onclick="markAsTaken()">
+                            <i class="fas fa-check-circle"></i>
+                            <span>Mark as Taken</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .delete-confirmation {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .confirmation-card {
+        background: white;
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--box-shadow-lg);
+        overflow: hidden;
+    }
+    
+    .confirmation-header {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        padding: 2rem;
+        text-align: center;
+        border-bottom: 1px solid #f5c6cb;
+    }
+    
+    .warning-icon {
+        font-size: 3rem;
+        color: #dc3545;
+        margin-bottom: 1rem;
+    }
+    
+    .confirmation-title {
+        color: #721c24;
+        margin-bottom: 0.5rem;
+        font-size: 1.75rem;
+    }
+    
+    .confirmation-subtitle {
+        color: #856404;
+        font-size: 1.1rem;
+        margin-bottom: 0;
+    }
+    
+    .item-preview {
+        display: flex;
+        gap: 1.5rem;
+        padding: 2rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .preview-image {
+        flex-shrink: 0;
+        width: 120px;
+        height: 120px;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+    }
+    
+    .preview-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .no-image {
+        width: 100%;
+        height: 100%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+        font-size: 2rem;
+    }
+    
+    .preview-details {
+        flex: 1;
+    }
+    
+    .item-title {
+        font-size: 1.25rem;
+        color: var(--dark-color);
+        margin-bottom: 0.75rem;
+    }
+    
+    .item-meta {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .item-meta span {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+    
+    .category {
+        background: var(--light-color);
+        color: var(--primary-color);
+    }
+    
+    .condition {
+        background: #e7f3ff;
+        color: var(--info-color);
+    }
+    
+    .mode.donation {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .mode.exchange {
+        background: #fff3cd;
+        color: #856404;
+    }
+    
+    .item-description {
+        color: var(--gray-color);
+        line-height: 1.5;
+        margin-bottom: 1rem;
+    }
+    
+    .item-stats {
+        display: flex;
+        gap: 1rem;
+        font-size: 0.875rem;
+        color: var(--gray-color);
+    }
+    
+    .stat {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .warning-message {
+        padding: 2rem;
+        background: #fff3cd;
+        border-left: 4px solid #ffc107;
+    }
+    
+    .warning-message h4 {
+        color: #856404;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .warning-message ul {
+        list-style: none;
+        color: #856404;
+    }
+    
+    .warning-message li {
+        padding: 0.5rem 0;
+        position: relative;
+        padding-left: 1.5rem;
+    }
+    
+    .warning-message li::before {
+        content: '•';
+        color: #856404;
+        font-weight: bold;
+        position: absolute;
+        left: 0;
+    }
+    
+    .confirmation-actions {
+        padding: 2rem;
+    }
+    
+    .actions-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    .btn--danger {
+        background: #dc3545;
+        color: white;
+        border: 2px solid #dc3545;
+        box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);
+    }
+    
+    .btn--danger:hover {
+        background: #c82333;
+        border-color: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4);
+    }
+    
+    .alternative-options {
+        padding: 1.5rem 2rem 2rem;
+        background: #f8f9fa;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .alternative-options h5 {
+        text-align: center;
+        color: var(--gray-color);
+        margin-bottom: 1rem;
+        font-weight: 500;
+    }
+    
+    .options-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+    }
+    
+    .option-link {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 1rem;
+        background: white;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        color: var(--primary-color);
+        text-decoration: none;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        text-align: center;
+    }
+    
+    .option-link:hover {
+        background: var(--primary-color);
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: var(--box-shadow);
+        border-color: var(--primary-color);
+    }
+    
+    .option-link i {
+        font-size: 1.25rem;
+    }
+    
+    .option-link span {
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    
+    @media (max-width: 768px) {
+        .item-preview {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .preview-image {
+            width: 100%;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        
+        .item-meta {
+            justify-content: center;
+        }
+        
+        .item-stats {
+            justify-content: center;
+        }
+        
+        .actions-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .options-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .confirmation-header {
+            padding: 1.5rem;
+        }
+        
+        .item-preview {
+            padding: 1.5rem;
+        }
+        
+        .warning-message {
+            padding: 1.5rem;
+        }
+        
+        .confirmation-actions {
+            padding: 1.5rem;
+        }
+        
+        .alternative-options {
+            padding: 1.5rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteButton = document.getElementById('deleteButton');
+        const deleteForm = document.querySelector('.delete-form');
+        let isDeleting = false;
+        
+        // Delete button confirmation
+        if (deleteButton) {
+            deleteButton.addEventListener('click', function(e) {
+                if (!isDeleting) {
+                    e.preventDefault();
+                    
+                    // Show final confirmation
+                    if (confirm('⚠️ FINAL WARNING: This will permanently delete your item and cannot be undone. Are you absolutely sure?')) {
+                        isDeleting = true;
+                        
+                        // Update button state
+                        deleteButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+                        deleteButton.disabled = true;
+                        
+                        // Submit the form
+                        deleteForm.submit();
+                    }
+                }
+            });
+        }
+        
+        // Add loading state to all buttons to prevent multiple submissions
+        const allButtons = document.querySelectorAll('.btn');
+        allButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                if (this.classList.contains('btn--danger') && !isDeleting) {
+                    return; // Let the delete handler manage this
+                }
+                
+                // For other buttons, prevent multiple clicks
+                if (this.getAttribute('data-loading') === 'true') {
+                    e.preventDefault();
+                    return;
+                }
+                
+                this.setAttribute('data-loading', 'true');
+                setTimeout(() => {
+                    this.setAttribute('data-loading', 'false');
+                }, 2000);
+            });
+        });
+    });
+    
+    function markAsTaken() {
+        if (confirm('Mark this item as "Taken" instead of deleting it? This will keep it in your history but remove it from public browsing.')) {
+            // You would typically make an AJAX call here to update the status
+            // For now, redirect to edit page with a parameter
+            window.location.href = "{% url 'core:edit_item' item.id %}";
+        }
+    }
+</script>
+{% endblock %}

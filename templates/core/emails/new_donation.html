@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClothShare Admin Notification</title>
+    <style>
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px 0;
+        }
+        
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .header::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .header h1 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .header p {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        /* Content */
+        .content {
+            padding: 30px;
+        }
+        
+        .subject {
+            font-size: 20px;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eaeaea;
+        }
+        
+        /* Info Section */
+        .info-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid #4CAF50;
+        }
+        
+        .info-section h3 {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 18px;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        
+        .info-item {
+            display: flex;
+            margin: 12px 0;
+            align-items: flex-start;
+        }
+        
+        .label {
+            font-weight: 600;
+            color: #555;
+            min-width: 120px;
+            flex-shrink: 0;
+        }
+        
+        .value {
+            flex: 1;
+        }
+        
+        .notification-badge {
+            background: #4CAF50;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        /* Item Preview Section */
+        .item-preview {
+            background: #fff;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 1px solid #e0e0e0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .item-preview h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .item-details {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .item-image {
+            flex: 0 0 150px;
+            height: 150px;
+            background: #f5f5f5;
+            border-radius: 6px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+            font-size: 14px;
+            border: 1px solid #e0e0e0;
+        }
+        
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .item-info {
+            flex: 1;
+            min-width: 250px;
+        }
+        
+        .item-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .item-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .meta-item {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .meta-label {
+            font-size: 12px;
+            color: #777;
+            margin-bottom: 4px;
+        }
+        
+        .meta-value {
+            font-weight: 500;
+            color: #333;
+        }
+        
+        .item-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        /* Action Section */
+        .action-section {
+            background: linear-gradient(to right, #e8f5e8, #f0f9f0);
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 25px;
+            text-align: center;
+            border: 1px solid #d4edda;
+        }
+        
+        .action-section p {
+            margin-bottom: 15px;
+            color: #155724;
+            font-weight: 500;
+        }
+        
+        .action-button {
+            background: #4CAF50;
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            border-radius: 6px;
+            display: inline-block;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 5px rgba(76, 175, 80, 0.3);
+            margin: 5px;
+        }
+        
+        .secondary-button {
+            background: #6c757d;
+            box-shadow: 0 2px 5px rgba(108, 117, 125, 0.3);
+        }
+        
+        .secondary-button:hover {
+            background: #5a6268;
+            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.4);
+        }
+        
+        .action-button:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(76, 175, 80, 0.4);
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 25px 20px;
+            font-size: 13px;
+            color: #6c757d;
+            background: #f1f3f4;
+            border-top: 1px solid #eaeaea;
+        }
+        
+        .footer p {
+            margin: 8px 0;
+        }
+        
+        .footer-logo {
+            font-weight: bold;
+            color: #4CAF50;
+        }
+        
+        /* List Styles */
+        ul {
+            padding-left: 20px;
+            margin: 8px 0;
+        }
+        
+        li {
+            margin: 5px 0;
+        }
+        
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                margin: 0 10px;
+                border-radius: 8px;
+            }
+            
+            .content {
+                padding: 20px 15px;
+            }
+            
+            .header h1 {
+                font-size: 20px;
+            }
+            
+            .subject {
+                font-size: 18px;
+            }
+            
+            .info-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .label {
+                margin-bottom: 5px;
+            }
+            
+            .item-details {
+                flex-direction: column;
+            }
+            
+            .item-image {
+                width: 100%;
+                max-width: 200px;
+                margin: 0 auto;
+            }
+            
+            .item-actions {
+                flex-direction: column;
+            }
+            
+            .action-button {
+                width: 100%;
+                text-align: center;
+            }
+        }
+        
+        /* Notification Type Colors */
+        .notification-badge.urgent {
+            background: #e74c3c;
+        }
+        
+        .notification-badge.warning {
+            background: #f39c12;
+        }
+        
+        .notification-badge.info {
+            background: #3498db;
+        }
+        
+        .status-active {
+            color: #28a745;
+            font-weight: 600;
+        }
+        
+        .status-pending {
+            color: #ffc107;
+            font-weight: 600;
+        }
+        
+        .status-inactive {
+            color: #6c757d;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔔 ClothShare Admin Notification</h1>
+            <p>Platform Activity Alert</p>
+        </div>
+        
+        <div class="content">
+            <h2 class="subject">{{ subject }}</h2>
+            
+            <div class="info-section">
+                <h3>📋 Notification Details</h3>
+                <div class="info-item">
+                    <span class="label">Type:</span> 
+                    <span class="value">
+                        <span class="notification-badge {{ notification_type|lower }}">{{ notification_type }}</span>
+                    </span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Time:</span> 
+                    <span class="value">{{ timestamp }}</span>
+                </div>
+                
+                <!-- Dynamic content based on notification type -->
+                {% if user %}
+                <div class="info-item">
+                    <span class="label">User:</span> 
+                    <span class="value">{{ user.username }} ({{ user.email }})</span>
+                </div>
+                {% endif %}
+                
+                {% if item %}
+                <div class="info-item">
+                    <span class="label">Item:</span> 
+                    <span class="value">{{ item.title }}</span>
+                </div>
+                {% endif %}
+                
+                {% if exchange %}
+                <div class="info-item">
+                    <span class="label">Exchange:</span> 
+                    <span class="value">{{ exchange.requester.username }} → {{ exchange.item.title }}</span>
+                </div>
+                {% endif %}
+                
+                {% if contact_name %}
+                <div class="info-item">
+                    <span class="label">From:</span> 
+                    <span class="value">{{ contact_name }} ({{ contact_email }})</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Subject:</span> 
+                    <span class="value">{{ message_subject }}</span>
+                </div>
+                <div class="info-item">
+                    <span class="label">Message:</span> 
+                    <span class="value">{{ message_content }}</span>
+                </div>
+                {% endif %}
+                
+                {% if subscriber %}
+                <div class="info-item">
+                    <span class="label">Subscriber:</span> 
+                    <span class="value">{{ subscriber.email }}</span>
+                </div>
+                {% endif %}
+                
+                {% if changes_made %}
+                <div class="info-item">
+                    <span class="label">Changes:</span>
+                    <span class="value">
+                        <ul>
+                            {% for field, change in changes_made.items %}
+                                <li><strong>{{ field }}:</strong> {{ change }}</li>
+                            {% endfor %}
+                        </ul>
+                    </span>
+                </div>
+                {% endif %}
+                
+                {% if report_reason %}
+                <div class="info-item">
+                    <span class="label">Report Reason:</span> 
+                    <span class="value">{{ report_reason }}</span>
+                </div>
+                {% endif %}
+            </div>
+            
+            <!-- Item Preview Section -->
+            {% if item %}
+            <div class="item-preview">
+                <h3>👕 Item Details</h3>
+                <div class="item-details">
+                    <div class="item-image">
+                        {% if item.image %}
+                        <img src="{{ item.image.url }}" alt="{{ item.title }}">
+                        {% else %}
+                        <span>No Image Available</span>
+                        {% endif %}
+                    </div>
+                    <div class="item-info">
+                        <div class="item-title">{{ item.title }}</div>
+                        <p>{{ item.description|truncatewords:30 }}</p>
+                        
+                        <div class="item-meta">
+                            <div class="meta-item">
+                                <span class="meta-label">Category</span>
+                                <span class="meta-value">{{ item.category }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Size</span>
+                                <span class="meta-value">{{ item.size }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Condition</span>
+                                <span class="meta-value">{{ item.condition }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Status</span>
+                                <span class="meta-value status-{{ item.status|lower }}">{{ item.status }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Owner</span>
+                                <span class="meta-value">{{ item.owner.username }}</span>
+                            </div>
+                            <div class="meta-item">
+                                <span class="meta-label">Date Added</span>
+                                <span class="meta-value">{{ item.created_at|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                        
+                        <div class="item-actions">
+                            <a href="{{ site_url }}/admin/items/{{ item.id }}/" class="action-button">View Full Details</a>
+                            <a href="{{ site_url }}/admin/items/{{ item.id }}/change/" class="action-button secondary-button">Edit Item</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <div class="action-section">
+                <p><strong>Action Required:</strong> Please review this activity in the admin panel.</p>
+                <a href="{{ site_url }}/admin/" class="action-button">Go to Admin Panel</a>
+                {% if exchange %}
+                <a href="{{ site_url }}/admin/exchanges/{{ exchange.id }}/" class="action-button secondary-button">View Exchange Details</a>
+                {% endif %}
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>This is an automated notification from <span class="footer-logo">ClothShare</span> Admin System.</p>
+            <p>You are receiving this because you are listed as an administrator.</p>
+            <p>&copy; {{ current_year }} ClothShare. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

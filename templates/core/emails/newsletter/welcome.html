@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { 
+            font-family: 'Arial', sans-serif; 
+            line-height: 1.6; 
+            color: #333; 
+            margin: 0; 
+            padding: 0; 
+            background: #f9f9f9;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            background: white;
+        }
+        .header { 
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white; 
+            padding: 30px 20px; 
+            text-align: center; 
+        }
+        .content { 
+            padding: 30px; 
+        }
+        .welcome-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 25px 0;
+        }
+        .feature-item {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border: 1px solid #e9ecef;
+        }
+        .feature-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        .button { 
+            background: linear-gradient(135deg, #4CAF50, #45a049);
+            color: white; 
+            padding: 12px 30px; 
+            text-decoration: none; 
+            border-radius: 25px; 
+            display: inline-block; 
+            margin: 10px 5px;
+            font-weight: bold;
+            text-align: center;
+        }
+        .footer { 
+            text-align: center; 
+            padding: 25px; 
+            font-size: 12px; 
+            color: #666; 
+            background: #f1f1f1;
+            border-top: 1px solid #ddd;
+        }
+        .social-links {
+            margin: 20px 0;
+        }
+        .social-links a {
+            margin: 0 10px;
+            color: #4CAF50;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>👋 Welcome to ClothShare!</h1>
+            <p>Join our community of sustainable fashion enthusiasts</p>
+        </div>
+        
+        <div class="content">
+            <div class="welcome-section">
+                <h2>Hello {{ user.username }}! 🎉</h2>
+                <p>We're thrilled to welcome you to ClothShare - your new destination for sustainable fashion and clothing exchange.</p>
+                <p>Your account has been successfully created on <strong>{{ user.date_joined|date:"F j, Y" }}</strong>.</p>
+            </div>
+
+            <h3>🚀 Get Started Today</h3>
+            <p>Here's what you can do on ClothShare:</p>
+            
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">👕</div>
+                    <h4>Donate Clothes</h4>
+                    <p>Give your pre-loved clothes a new home</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔄</div>
+                    <h4>Exchange Items</h4>
+                    <p>Trade clothes with other community members</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🔍</div>
+                    <h4>Find Treasures</h4>
+                    <p>Discover unique clothing items for free</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">🌱</div>
+                    <h4>Save the Planet</h4>
+                    <p>Reduce waste and promote sustainability</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin: 30px 0;">
+                <a href="{{ site_url }}/items/" class="button">Browse Available Items</a>
+                <a href="{{ site_url }}/items/add/" class="button" style="background: linear-gradient(135deg, #2196F3, #1976D2);">Donate Your First Item</a>
+            </div>
+
+            <div style="background: #e8f5e8; padding: 20px; border-radius: 8px; margin: 25px 0;">
+                <h3>💚 Sustainable Impact</h3>
+                <p>By joining ClothShare, you're helping:</p>
+                <ul>
+                    <li>♻️ Reduce textile waste</li>
+                    <li>🌍 Lower carbon footprint</li>
+                    <li>🤝 Build a caring community</li>
+                    <li>💰 Save money on clothing</li>
+                </ul>
+            </div>
+
+            <div class="social-links" style="text-align: center;">
+                <p><strong>Stay Connected:</strong></p>
+                <a href="{{ site_url }}/blog/">📖 Blog</a> • 
+                <a href="{{ site_url }}/community/">👥 Community</a> • 
+                <a href="{{ site_url }}/help/">❓ Help Center</a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>Need Help?</strong></p>
+            <p>Email us at <a href="mailto:{{ support_email }}">{{ support_email }}</a> or visit our help center.</p>
+            <p>This is an automated welcome message from ClothShare.</p>
+            <p>&copy; {{ current_year }} ClothShare. All rights reserved.</p>
+            <p style="font-size: 11px; color: #888; margin-top: 15px;">
+                You received this email because you registered an account on ClothShare.<br>
+                If this wasn't you, please <a href="mailto:{{ support_email }}">contact us</a> immediately.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

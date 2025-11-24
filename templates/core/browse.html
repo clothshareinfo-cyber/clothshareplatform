@@ -1,0 +1,555 @@
+{% extends 'core/base.html' %}
+{% block title %}Browse Items{% endblock %}
+
+{% block content %}
+<section class="catalog section" id="catalog">
+    <div class="container">
+        <h2 class="section__title">Available Items</h2>
+        <p class="section__subtitle">Browse through community-donated clothing items</p>
+        
+        <!-- Search and Filters -->
+        <div class="catalog__filters">
+            <form method="get" action="{% url 'core:browse' %}" class="search-box" style="display: flex; flex: 1;">
+                <i class="fas fa-search"></i>
+                <input type="text" name="search" placeholder="Search items..." class="search-input" 
+                       id="searchInput" value="{{ search_query }}">
+                <button type="submit" class="search-btn" id="searchBtn">Search</button>
+            </form>
+            
+            <div class="filter-group">
+                <form method="get" id="filterForm" style="display: contents;">
+                    <!-- Preserve search query in hidden field -->
+                    {% if search_query %}
+                    <input type="hidden" name="search" value="{{ search_query }}">
+                    {% endif %}
+                    
+                    <div class="filter-select-wrapper">
+                        <select name="category" class="filter-select" id="categoryFilter">
+                            <option value="">All Categories</option>
+                            {% for category in categories %}
+                            <option value="{{ category.name }}" {% if active_filters.category == category.name %}selected{% endif %}>
+                                {{ category.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    
+                    <div class="filter-select-wrapper">
+                        <select name="size" class="filter-select" id="sizeFilter">
+                            <option value="">All Sizes</option>
+                            {% for size in sizes %}
+                            <option value="{{ size.name }}" {% if active_filters.size == size.name %}selected{% endif %}>
+                                {{ size.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    
+                    <div class="filter-select-wrapper">
+                        <select name="condition" class="filter-select" id="conditionFilter">
+                            <option value="">All Conditions</option>
+                            {% for condition in conditions %}
+                            <option value="{{ condition.name }}" {% if active_filters.condition == condition.name %}selected{% endif %}>
+                                {{ condition.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+
+                    <div class="filter-select-wrapper">
+                        <select name="gender" class="filter-select" id="genderFilter">
+                            <option value="">All Genders</option>
+                            {% for gender in genders %}
+                            <option value="{{ gender.name }}" {% if active_filters.gender == gender.name %}selected{% endif %}>
+                                {{ gender.name }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+
+                    <div class="filter-select-wrapper">
+                        <select name="mode" class="filter-select" id="modeFilter">
+                            <option value="">All Types</option>
+                            <option value="donation" {% if active_filters.mode == 'donation' %}selected{% endif %}>Donation</option>
+                            <option value="exchange" {% if active_filters.mode == 'exchange' %}selected{% endif %}>Exchange</option>
+                        </select>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                    
+                    <div class="filter-select-wrapper">
+                        <select name="sort" class="filter-select" id="sortFilter">
+                            <option value="-created_at" {% if active_filters.sort == '-created_at' %}selected{% endif %}>Newest First</option>
+                            <option value="created_at" {% if active_filters.sort == 'created_at' %}selected{% endif %}>Oldest First</option>
+                            <option value="title" {% if active_filters.sort == 'title' %}selected{% endif %}>Name A-Z</option>
+                        </select>
+                        <i class="fas fa-chevron-down"></i>
+                    </div>
+                </form>
+                
+                <a href="{% url 'core:browse' %}" class="btn btn--outline">
+                    <i class="fas fa-redo"></i> Reset
+                </a>
+            </div>
+        </div>
+
+        <!-- Items Count -->
+        <div style="margin-bottom: 1rem; color: #6c757d; font-size: 0.9rem;">
+            <span id="itemsCount">
+                Showing {{ page_obj.start_index }}-{{ page_obj.end_index }} of {{ page_obj.paginator.count }} items
+            </span>
+            {% if search_query or active_filters.category or active_filters.size or active_filters.condition or active_filters.gender or active_filters.mode %}
+            <span style="margin-left: 1rem;">
+                <a href="{% url 'core:browse' %}" style="color: #4a6fa5; text-decoration: none;">
+                    <i class="fas fa-times"></i> Clear filters
+                </a>
+            </span>
+            {% endif %}
+        </div>
+
+        <!-- Items Grid -->
+        <div class="items-grid" id="itemsGrid">
+            {% for item in page_obj %}
+            <div class="item-card" data-id="{{ item.id }}" 
+                 data-title="{{ item.title|lower }}" 
+                 data-description="{{ item.description|lower }}"
+                 data-category="{{ item.category.name|lower }}"
+                 data-size="{{ item.size.name|default:''|lower }}"
+                 data-condition="{{ item.condition.name|lower }}"
+                 data-gender="{{ item.gender.name|default:''|lower }}"
+                 data-mode="{{ item.mode|lower }}">
+                <div class="item-card__image">
+                    {% if item.images.all %}
+                        {% with item.images.all|first as first_image %}
+                        <img src="{{ first_image.image.url }}" alt="{{ item.title }}" style="width: 100%; height: 200px; object-fit: cover;">
+                        {% endwith %}
+                    {% else %}
+                        <div style="width: 100%; height: 200px; background: #e9ecef; display: flex; align-items: center; justify-content: center; color: #6c757d;">
+                            <i class="fas fa-tshirt" style="font-size: 3rem;"></i>
+                        </div>
+                    {% endif %}
+                    
+                    {% if item.mode == 'donation' %}
+                    <div class="item-badge donation" style="position: absolute; top: 10px; left: 10px; background: #28a745; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">
+                        Free
+                    </div>
+                    {% else %}
+                    <div class="item-badge exchange" style="position: absolute; top: 10px; left: 10px; background: #ff7e5f; color: white; padding: 4px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">
+                        Exchange
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="item-card__content">
+                    <h3 class="item-card__title">{{ item.title }}</h3>
+                    <p class="item-card__description" style="color: #6c757d; font-size: 0.9rem; margin-bottom: 0.5rem;">
+                        {{ item.description|truncatewords:15 }}
+                    </p>
+                    <div class="item-card__meta" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <span class="item-card__category" style="background: #e9ecef; color: #4a6fa5; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; font-weight: 500;">
+                            {{ item.category.name }}
+                        </span>
+                        <span class="item-card__condition" style="color: #6c757d; font-size: 0.8rem;">
+                            {{ item.condition.name }}
+                        </span>
+                    </div>
+                    <div class="item-card__footer" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                        <span class="item-card__size" style="font-weight: 500; color: #343a40;">
+                            {{ item.size.name|default:"One Size" }}
+                        </span>
+                        <span class="item-card__gender" style="color: #6c757d; font-size: 0.8rem;">
+                            {{ item.gender.name|default:"Unisex" }}
+                        </span>
+                    </div>
+                    <div style="margin-top: auto;">
+                        <a href="{% url 'core:item_detail' item.id %}" class="btn btn--primary" style="width: 100%; text-align: center; display: block;">
+                            <i class="fas fa-eye"></i> View Details
+                        </a>
+                    </div>
+                    {% if user.is_authenticated and user != item.donor %}
+                    <div style="margin-top: 0.5rem;">
+                        <a href="{% url 'core:initiate_exchange' item.id %}" class="btn btn--secondary" style="width: 100%; text-align: center; display: block;">
+                            <i class="fas fa-exchange-alt"></i> Request Exchange
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div style="grid-column: 1 / -1; text-align: center; padding: 3rem;">
+                <i class="fas fa-tshirt" style="font-size: 4rem; color: #e9ecef; margin-bottom: 1rem;"></i>
+                <h3>No items found</h3>
+                <p style="color: #6c757d; margin-bottom: 1.5rem;">Try adjusting your search or filters</p>
+                <a href="{% url 'core:browse' %}" class="btn btn--primary">
+                    <i class="fas fa-redo"></i> Reset Filters
+                </a>
+                {% if user.is_authenticated %}
+                <a href="{% url 'core:donate' %}" class="btn btn--secondary" style="margin-left: 0.5rem;">
+                    <i class="fas fa-plus"></i> Donate First Item
+                </a>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        
+        <!-- Pagination -->
+        {% if page_obj.has_other_pages %}
+        <div class="pagination" style="display: flex; justify-content: center; align-items: center; gap: 1rem; margin-top: 2rem;">
+            {% if page_obj.has_previous %}
+            <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if active_filters.category %}category={{ active_filters.category }}&{% endif %}{% if active_filters.size %}size={{ active_filters.size }}&{% endif %}{% if active_filters.condition %}condition={{ active_filters.condition }}&{% endif %}{% if active_filters.gender %}gender={{ active_filters.gender }}&{% endif %}{% if active_filters.mode %}mode={{ active_filters.mode }}&{% endif %}{% if active_filters.sort %}sort={{ active_filters.sort }}&{% endif %}page={{ page_obj.previous_page_number }}" class="btn btn--outline">
+                <i class="fas fa-chevron-left"></i> Previous
+            </a>
+            {% endif %}
+            
+            <span style="color: #6c757d;">
+                Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+            </span>
+            
+            {% if page_obj.has_next %}
+            <a href="?{% if search_query %}search={{ search_query }}&{% endif %}{% if active_filters.category %}category={{ active_filters.category }}&{% endif %}{% if active_filters.size %}size={{ active_filters.size }}&{% endif %}{% if active_filters.condition %}condition={{ active_filters.condition }}&{% endif %}{% if active_filters.gender %}gender={{ active_filters.gender }}&{% endif %}{% if active_filters.mode %}mode={{ active_filters.mode }}&{% endif %}{% if active_filters.sort %}sort={{ active_filters.sort }}&{% endif %}page={{ page_obj.next_page_number }}" class="btn btn--outline">
+                Next <i class="fas fa-chevron-right"></i>
+            </a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        {% if user.is_authenticated %}
+        <div class="catalog__actions" style="text-align: center; margin-top: 3rem;">
+            <a href="{% url 'core:donate' %}" class="btn btn--primary">
+                <i class="fas fa-plus"></i> Donate Your Items
+            </a>
+        </div>
+        {% else %}
+        <div class="catalog__actions" style="text-align: center; margin-top: 3rem; padding: 2rem; background: #f8f9fa; border-radius: 12px;">
+            <h3>Ready to join our community?</h3>
+            <p style="color: #6c757d; margin-bottom: 1.5rem;">Sign up to donate items and start exchanging!</p>
+            <a href="{% url 'userauths:sign-in' %}" class="btn btn--primary">
+                <i class="fas fa-user-plus"></i> Sign Up Now
+            </a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    .items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-bottom: 3rem;
+    }
+    
+    .item-card {
+        background: white;
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        transition: all 0.3s ease;
+        cursor: pointer;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+    
+    .item-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .item-card__content {
+        padding: 1.5rem;
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .item-card__title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #343a40;
+    }
+    
+    .catalog__filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        margin-bottom: 2rem;
+        align-items: center;
+        justify-content: space-between;
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    }
+    
+    .search-box {
+        position: relative;
+        flex: 1;
+        min-width: 300px;
+        display: flex;
+    }
+    
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        z-index: 1;
+    }
+    
+    .search-input {
+        width: 100%;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px 0 0 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        border-right: none;
+    }
+    
+    .search-input:focus {
+        outline: none;
+        border-color: #4a6fa5;
+    }
+    
+    .search-btn {
+        padding: 0.75rem 1.5rem;
+        background: #4a6fa5;
+        color: white;
+        border: 2px solid #4a6fa5;
+        border-radius: 0 8px 8px 0;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+    }
+    
+    .search-btn:hover {
+        background: #3a5982;
+        border-color: #3a5982;
+    }
+    
+    .filter-group {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    
+    .filter-select-wrapper {
+        position: relative;
+    }
+    
+    .filter-select {
+        padding: 0.75rem 2.5rem 0.75rem 1rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        background: white;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        appearance: none;
+        min-width: 150px;
+    }
+    
+    .filter-select:focus {
+        outline: none;
+        border-color: #4a6fa5;
+    }
+    
+    .filter-select-wrapper i {
+        position: absolute;
+        right: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+        pointer-events: none;
+    }
+    
+    .item-hidden {
+        display: none;
+    }
+    
+    .loading-spinner {
+        display: none;
+        text-align: center;
+        padding: 2rem;
+        color: #4a6fa5;
+    }
+    
+    .loading-spinner i {
+        font-size: 2rem;
+        margin-bottom: 1rem;
+    }
+    
+    @media (max-width: 768px) {
+        .catalog__filters {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .search-box {
+            min-width: auto;
+        }
+        
+        .filter-group {
+            justify-content: center;
+        }
+        
+        .items-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get DOM elements
+        const searchInput = document.getElementById('searchInput');
+        const itemsGrid = document.getElementById('itemsGrid');
+        const itemsCount = document.getElementById('itemsCount');
+        const itemCards = document.querySelectorAll('.item-card');
+        const filterSelects = document.querySelectorAll('.filter-select');
+        const loadingSpinner = document.createElement('div');
+        
+        // Create loading spinner
+        loadingSpinner.className = 'loading-spinner';
+        loadingSpinner.innerHTML = '<i class="fas fa-spinner fa-spin"></i><p>Filtering items...</p>';
+        itemsGrid.parentNode.insertBefore(loadingSpinner, itemsGrid);
+        
+        // Debounce function to limit how often the filter function is called
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+        
+        // Filter items based on search and filter criteria
+        function filterItems() {
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            const categoryFilter = document.getElementById('categoryFilter').value.toLowerCase();
+            const sizeFilter = document.getElementById('sizeFilter').value.toLowerCase();
+            const conditionFilter = document.getElementById('conditionFilter').value.toLowerCase();
+            const genderFilter = document.getElementById('genderFilter').value.toLowerCase();
+            const modeFilter = document.getElementById('modeFilter').value.toLowerCase();
+            
+            // Show loading spinner
+            loadingSpinner.style.display = 'block';
+            
+            // Use setTimeout to allow the UI to update with the loading spinner
+            setTimeout(() => {
+                let visibleCount = 0;
+                
+                itemCards.forEach(card => {
+                    const title = card.getAttribute('data-title');
+                    const description = card.getAttribute('data-description');
+                    const category = card.getAttribute('data-category');
+                    const size = card.getAttribute('data-size');
+                    const condition = card.getAttribute('data-condition');
+                    const gender = card.getAttribute('data-gender');
+                    const mode = card.getAttribute('data-mode');
+                    
+                    // Check if item matches search term
+                    const matchesSearch = searchTerm === '' || 
+                        title.includes(searchTerm) || 
+                        description.includes(searchTerm);
+                    
+                    // Check if item matches filters
+                    const matchesCategory = categoryFilter === '' || category === categoryFilter;
+                    const matchesSize = sizeFilter === '' || size === sizeFilter;
+                    const matchesCondition = conditionFilter === '' || condition === conditionFilter;
+                    const matchesGender = genderFilter === '' || gender === genderFilter;
+                    const matchesMode = modeFilter === '' || mode === modeFilter;
+                    
+                    // Show or hide item based on all criteria
+                    if (matchesSearch && matchesCategory && matchesSize && 
+                        matchesCondition && matchesGender && matchesMode) {
+                        card.style.display = 'block';
+                        visibleCount++;
+                    } else {
+                        card.style.display = 'none';
+                    }
+                });
+                
+                // Update items count
+                itemsCount.textContent = `Showing ${visibleCount} of ${itemCards.length} items`;
+                
+                // Hide loading spinner
+                loadingSpinner.style.display = 'none';
+                
+                // Show message if no items match
+                if (visibleCount === 0) {
+                    const noResults = document.createElement('div');
+                    noResults.style.gridColumn = '1 / -1';
+                    noResults.style.textAlign = 'center';
+                    noResults.style.padding = '3rem';
+                    noResults.innerHTML = `
+                        <i class="fas fa-tshirt" style="font-size: 4rem; color: #e9ecef; margin-bottom: 1rem;"></i>
+                        <h3>No items found</h3>
+                        <p style="color: #6c757d; margin-bottom: 1.5rem;">Try adjusting your search or filters</p>
+                        <button class="btn btn--primary" onclick="resetFilters()">
+                            <i class="fas fa-redo"></i> Reset Filters
+                        </button>
+                    `;
+                    
+                    // Check if no results message already exists
+                    const existingNoResults = itemsGrid.querySelector('[style*="grid-column: 1 / -1"]');
+                    if (!existingNoResults) {
+                        itemsGrid.appendChild(noResults);
+                    }
+                } else {
+                    // Remove no results message if it exists
+                    const noResults = itemsGrid.querySelector('[style*="grid-column: 1 / -1"]');
+                    if (noResults) {
+                        noResults.remove();
+                    }
+                }
+            }, 100);
+        }
+        
+        // Reset all filters
+        function resetFilters() {
+            searchInput.value = '';
+            document.getElementById('categoryFilter').value = '';
+            document.getElementById('sizeFilter').value = '';
+            document.getElementById('conditionFilter').value = '';
+            document.getElementById('genderFilter').value = '';
+            document.getElementById('modeFilter').value = '';
+            document.getElementById('sortFilter').value = '-created_at';
+            
+            filterItems();
+        }
+        
+        // Add event listeners
+        searchInput.addEventListener('input', debounce(filterItems, 300));
+        
+        filterSelects.forEach(select => {
+            select.addEventListener('change', filterItems);
+        });
+        
+        // Item card click (for accessibility)
+        document.querySelectorAll('.item-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                // Don't trigger if clicking on a button or link
+                if (!e.target.closest('a') && !e.target.closest('button')) {
+                    const itemId = this.getAttribute('data-id');
+                    window.location.href = '/item/' + itemId + '/';
+                }
+            });
+        });
+        
+        // Initial filter to handle any pre-filled values
+        filterItems();
+    });
+</script>
+{% endblock %}

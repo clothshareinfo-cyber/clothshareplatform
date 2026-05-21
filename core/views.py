@@ -181,7 +181,7 @@ def donate_item(request):
                 formset.instance = item
                 formset.save()
                 
-                # ✅ ADMIN + NEWSLETTER SUBSCRIBERS (public activity)
+                #  ADMIN + NEWSLETTER SUBSCRIBERS (public activity)
                 NotificationService.notify_new_item_posted(item)  # Admin only
                 NotificationService.send_new_item_newsletter(item)  # Newsletter subscribers
                 
@@ -249,7 +249,7 @@ def edit_item(request, item_id):
                         is_primary=is_primary
                     )
                 
-                # ✅ ADMIN ONLY (private action)
+                #  ADMIN ONLY (private action)
                 if changes:
                     NotificationService.notify_user_edited_item(item, request.user, changes)
                 
@@ -281,7 +281,7 @@ def delete_item(request, item_id):
         item.is_active = False
         item.save()
         
-        # ✅ ADMIN ONLY (private action)
+        #  ADMIN ONLY (private action)
         NotificationService.notify_user_removed_item(item, request.user)
         
         messages.success(request, 'Item deleted successfully!')
@@ -304,7 +304,7 @@ def request_clothing(request):
             clothing_request.requester = request.user
             clothing_request.save()
             
-            # ✅ ADMIN + NEWSLETTER SUBSCRIBERS (public activity)
+            #  ADMIN + NEWSLETTER SUBSCRIBERS (public activity)
             NotificationService.notify_new_clothing_request(clothing_request)  # Admin only
             NotificationService.send_request_newsletter(clothing_request)  # Newsletter subscribers
             
@@ -492,11 +492,11 @@ def edit_profile(request):
         elif form_type == 'newsletter':
             # FIXED: Get the action from the submitted button
             action = request.POST.get('action')
-            print(f"🔍 Newsletter action received: {action}")  # Debug print
+            print(f" Newsletter action received: {action}")  # Debug print
             
             if action == 'subscribe_newsletter':
-                print("🔍 Processing newsletter subscription...")
-                # ✅ USER EXPLICITLY CLICKS SUBSCRIBE
+                print(" Processing newsletter subscription...")
+                #  USER EXPLICITLY CLICKS SUBSCRIBE
                 if not newsletter_subscription:
                     # Create new subscription with user's explicit consent
                     newsletter_subscription = NewsletterSubscriber.objects.create(
@@ -509,31 +509,31 @@ def edit_profile(request):
                         receive_exchange_notifications=True,
                         receive_request_updates=True
                     )
-                    print(f"✅ Created new subscription for: {request.user.email}")
+                    print(f" Created new subscription for: {request.user.email}")
                 else:
                     # Reactivate existing subscription
                     newsletter_subscription.is_active = True
                     newsletter_subscription.save()
-                    print(f"✅ Reactivated subscription for: {request.user.email}")
+                    print(f" Reactivated subscription for: {request.user.email}")
                 
-                # ✅ Send welcome email to subscriber
+                #  Send welcome email to subscriber
                 try:
                     NotificationService.send_newsletter_welcome_email(newsletter_subscription)
-                    print(f"✅ Welcome email sent to {request.user.email}")
+                    print(f" Welcome email sent to {request.user.email}")
                 except Exception as e:
-                    print(f"❌ Failed to send welcome email: {e}")
+                    print(f" Failed to send welcome email: {e}")
                 
-                # ✅ Notify admin about new subscription
+                #  Notify admin about new subscription
                 try:
                     NotificationService.notify_new_newsletter_subscriber(newsletter_subscription)
-                    print(f"✅ Admin notified about new subscriber: {request.user.email}")
+                    print(f" Admin notified about new subscriber: {request.user.email}")
                 except Exception as e:
-                    print(f"❌ Failed to notify admin about new subscriber: {e}")
+                    print(f" Failed to notify admin about new subscriber: {e}")
                 
                 messages.success(request, 'Successfully subscribed to newsletter! Welcome email sent.')
                 
             elif action == 'unsubscribe_newsletter':
-                print("🔍 Processing newsletter unsubscribe...")
+                print(" Processing newsletter unsubscribe...")
                 # Unsubscribe from newsletter
                 if newsletter_subscription:
                     email = newsletter_subscription.email
@@ -545,21 +545,21 @@ def edit_profile(request):
                     newsletter_subscription.receive_request_updates = False
                     newsletter_subscription.save()
                     
-                    print(f"✅ Unsubscribed: {email}")
+                    print(f" Unsubscribed: {email}")
                     
-                    # ✅ NOTIFY ADMIN ABOUT UNSUBSCRIBE
+                    #  NOTIFY ADMIN ABOUT UNSUBSCRIBE
                     try:
                         NotificationService.notify_newsletter_unsubscribe_admin(newsletter_subscription)
-                        print(f"✅ Admin notified about unsubscribe: {email}")
+                        print(f" Admin notified about unsubscribe: {email}")
                     except Exception as e:
-                        print(f"❌ Failed to notify admin about unsubscribe: {e}")
+                        print(f" Failed to notify admin about unsubscribe: {e}")
                     
-                    # ✅ SEND CONFIRMATION EMAIL TO USER
+                    #  SEND CONFIRMATION EMAIL TO USER
                     try:
                         NotificationService.send_unsubscribe_confirmation_email(newsletter_subscription)
-                        print(f"✅ Unsubscribe confirmation sent to: {email}")
+                        print(f" Unsubscribe confirmation sent to: {email}")
                     except Exception as e:
-                        print(f"❌ Failed to send unsubscribe confirmation to {email}: {e}")
+                        print(f" Failed to send unsubscribe confirmation to {email}: {e}")
                     
                     messages.success(request, 'You have been unsubscribed from all newsletter emails. A confirmation email has been sent to you.')
                 else:
@@ -577,7 +577,7 @@ def edit_profile(request):
                     newsletter_subscription.receive_request_updates = 'receive_request_updates' in request.POST
                     newsletter_subscription.save()
                     
-                    print(f"✅ Updated preferences for: {request.user.email}")
+                    print(f" Updated preferences for: {request.user.email}")
                     print(f"   Donation updates: {newsletter_subscription.receive_donation_updates}")
                     print(f"   Community news: {newsletter_subscription.receive_community_news}")
                     print(f"   New items alerts: {newsletter_subscription.receive_new_items_alerts}")
@@ -587,7 +587,7 @@ def edit_profile(request):
                     messages.success(request, 'Your newsletter preferences have been updated!')
                 else:
                     messages.error(request, 'Please subscribe to the newsletter first to update preferences.')
-                    print("❌ Cannot update preferences - no active subscription")
+                    print(" Cannot update preferences - no active subscription")
             
             return redirect('core:edit_profile')
     
@@ -617,7 +617,7 @@ def delete_account(request):
             
             print(f"🔧 DATABASE DELETION STARTED: {username} (ID: {user_id})")
             
-            # ✅ STEP 1: Handle all related objects in correct order
+            #  STEP 1: Handle all related objects in correct order
             from django.db import transaction
             
             try:
@@ -629,9 +629,9 @@ def delete_account(request):
                             cancelled_at=timezone.now(),
                             cancellation_reason='user_deletion'
                         )
-                        print("✅ User's exchange requests cancelled")
+                        print(" User's exchange requests cancelled")
                     except Exception as e:
-                        print(f"⚠️ Exchange requester cleanup: {e}")
+                        print(f" Exchange requester cleanup: {e}")
                     
                     # 1B: Handle exchanges where user is donor  
                     try:
@@ -640,9 +640,9 @@ def delete_account(request):
                             cancelled_at=timezone.now(),
                             cancellation_reason='user_deletion'
                         )
-                        print("✅ User's donor exchanges cancelled")
+                        print(" User's donor exchanges cancelled")
                     except Exception as e:
-                        print(f"⚠️ Exchange donor cleanup: {e}")
+                        print(f" Exchange donor cleanup: {e}")
                     
                     # 1C: Deactivate clothing items (soft delete)
                     try:
@@ -652,9 +652,9 @@ def delete_account(request):
                             deactivated_at=timezone.now(),
                             deactivation_reason='user_deletion'
                         )
-                        print("✅ User's clothing items deactivated")
+                        print(" User's clothing items deactivated")
                     except Exception as e:
-                        print(f"⚠️ Clothing items cleanup: {e}")
+                        print(f" Clothing items cleanup: {e}")
                     
                     # 1D: Cancel clothing requests
                     try:
@@ -663,41 +663,41 @@ def delete_account(request):
                             cancelled_at=timezone.now(),
                             cancellation_reason='user_deletion'
                         )
-                        print("✅ User's clothing requests cancelled")
+                        print(" User's clothing requests cancelled")
                     except Exception as e:
-                        print(f"⚠️ Clothing requests cleanup: {e}")
+                        print(f" Clothing requests cleanup: {e}")
                     
                     # 1E: Delete notifications
                     try:
                         Notification.objects.filter(user=user).delete()
-                        print("✅ User's notifications deleted")
+                        print(" User's notifications deleted")
                     except Exception as e:
-                        print(f"⚠️ Notifications cleanup: {e}")
+                        print(f" Notifications cleanup: {e}")
                     
                     # 1F: Delete user badges
                     try:
                         UserBadge.objects.filter(user=user).delete()
-                        print("✅ User's badges deleted")
+                        print(" User's badges deleted")
                     except Exception as e:
-                        print(f"⚠️ Badges cleanup: {e}")
+                        print(f" Badges cleanup: {e}")
             except Exception as e:
-                print(f"⚠️ Transaction cleanup failed: {e}")
+                print(f" Transaction cleanup failed: {e}")
                 raise e
             
-            # ✅ STEP 2: Handle newsletter subscription
+            #  STEP 2: Handle newsletter subscription
             try:
                 NewsletterSubscriber.objects.filter(
                     Q(user=user) | Q(email=user_email)
                 ).delete()
-                print("✅ Newsletter subscription deleted")
+                print(" Newsletter subscription deleted")
             except Exception as e:
-                print(f"⚠️ Newsletter cleanup: {e}")
+                print(f" Newsletter cleanup: {e}")
             
-            # ✅ STEP 3: Logout user BEFORE deletion
+            #  STEP 3: Logout user BEFORE deletion
             logout(request)
-            print("✅ User logged out")
+            print(" User logged out")
             
-            # ✅ STEP 4: Get fresh user instance and delete
+            # STEP 4: Get fresh user instance and delete
             from django.contrib.auth import get_user_model
             User = get_user_model()
             
@@ -707,31 +707,31 @@ def delete_account(request):
                 # Delete user profile first (if exists)
                 try:
                     UserProfile.objects.filter(user=fresh_user).delete()
-                    print("✅ User profile deleted")
+                    print(" User profile deleted")
                 except Exception as e:
-                    print(f"⚠️ Profile deletion: {e}")
+                    print(f" Profile deletion: {e}")
                 
                 # Finally delete the user
                 fresh_user.delete()
-                print("🎉 USER ACCOUNT DELETED SUCCESSFULLY!")
+                print(" USER ACCOUNT DELETED SUCCESSFULLY!")
                 
             except User.DoesNotExist:
-                print("ℹ️ User already deleted")
+                print(" User already deleted")
             
-            # ✅ STEP 5: Send admin notification
+            #  STEP 5: Send admin notification
             try:
                 NotificationService.notify_account_deletion(user_email, username)
-                print("✅ Admin notification sent")
+                print(" Admin notification sent")
             except Exception as e:
-                print(f"⚠️ Notification failed: {e}")
+                print(f" Notification failed: {e}")
             
             messages.success(request, 'Your account has been permanently deleted successfully!')
             return redirect('core:index')
             
         except Exception as e:
-            print(f"❌ CRITICAL ERROR: {str(e)}")
+            print(f" CRITICAL ERROR: {str(e)}")
             import traceback
-            print(f"❌ TRACEBACK: {traceback.format_exc()}")
+            print(f" TRACEBACK: {traceback.format_exc()}")
             messages.error(request, 'We encountered a system error. Please contact support.')
             return redirect('core:profile')
     
@@ -846,7 +846,7 @@ def initiate_exchange(request, item_id):
                 related_item=item
             )
             
-            # ✅ ADMIN + ITEM OWNER ONLY (private exchange)
+            #  ADMIN + ITEM OWNER ONLY (private exchange)
             NotificationService.notify_exchange_initiated(exchange)  # Admin only
             NotificationService.notify_exchange_request_received(exchange)  # Item owner only
             
@@ -942,7 +942,7 @@ def manage_exchange(request, exchange_id):
                 related_item=exchange.item
             )
             
-            # ✅ ADMIN + REQUESTER ONLY (private exchange)
+            #  ADMIN + REQUESTER ONLY (private exchange)
             NotificationService.notify_exchange_confirmed(exchange)  # Admin only
             NotificationService.notify_exchange_request_accepted(exchange)  # Requester only
             
@@ -957,7 +957,7 @@ def manage_exchange(request, exchange_id):
                 exchange.item.save()
                 exchange.save()
                 
-                # ✅ BOTH PARTIES ONLY (private exchange completion)
+                #  BOTH PARTIES ONLY (private exchange completion)
                 NotificationService.notify_exchange_completed(exchange)  # Both parties only
                 
                 messages.success(request, 'Exchange completed successfully!')
@@ -966,7 +966,7 @@ def manage_exchange(request, exchange_id):
             exchange.status = 'cancelled'
             exchange.save()
             
-            # ✅ ADMIN + BOTH PARTIES ONLY (private exchange cancellation)
+            #  ADMIN + BOTH PARTIES ONLY (private exchange cancellation)
             NotificationService.notify_exchange_cancelled_admin(exchange)  # Admin only
             NotificationService.notify_exchange_cancelled(exchange, request.user)  # Both parties only
             
@@ -1095,12 +1095,12 @@ def google_callback(request):
         
         request.session['google_picture'] = picture
         
-        # ✅ CHANGED: Only send welcome email, NO auto-newsletter subscription
+        #  CHANGED: Only send welcome email, NO auto-newsletter subscription
         if created:
             NotificationService.send_user_welcome_email(user)
             messages.success(request, f'Welcome {first_name}! Your account has been created successfully.')
             
-            # ✅ OPTIONAL: Show newsletter opt-in suggestion (but don't auto-subscribe)
+            #  OPTIONAL: Show newsletter opt-in suggestion (but don't auto-subscribe)
             messages.info(request, 'Want to stay updated? Subscribe to our newsletter in your profile settings!')
         else:
             messages.success(request, f'Welcome back {first_name}!')
@@ -1148,8 +1148,7 @@ def get_or_create_google_user(google_id, email, first_name, last_name, picture):
                     avatar=picture if picture else ''
                 )
             
-            # ✅ CHANGED: Don't auto-create newsletter subscription
-            # User must manually subscribe in profile settings
+           
             
             created = True
     
@@ -1241,19 +1240,18 @@ def subscribe_newsletter(request):
         
         subscriber.save()
         
-        # ✅ FIXED: Send welcome email to new subscriber FIRST
         try:
             NotificationService.send_newsletter_welcome_email(subscriber)
-            print(f"✅ Welcome email sent to {email}")
+            print(f" Welcome email sent to {email}")
         except Exception as e:
-            print(f"❌ Failed to send welcome email to {email}: {e}")
+            print(f" Failed to send welcome email to {email}: {e}")
         
-        # ✅ FIXED: Then notify admin about new subscriber
+       
         try:
             NotificationService.notify_new_newsletter_subscriber(subscriber)
-            print(f"✅ Admin notified about new subscriber: {email}")
+            print(f" Admin notified about new subscriber: {email}")
         except Exception as e:
-            print(f"❌ Failed to notify admin about new subscriber {email}: {e}")
+            print(f" Failed to notify admin about new subscriber {email}: {e}")
         
         return JsonResponse({
             'success': True,
@@ -1277,7 +1275,7 @@ def subscribe_newsletter(request):
             'message': str(e)
         })
     except Exception as e:
-        print(f"❌ Newsletter subscription error for {email}: {e}")
+        print(f" Newsletter subscription error for {email}: {e}")
         return JsonResponse({
             'success': False,
             'message': 'An error occurred. Please try again later.'
@@ -1294,17 +1292,17 @@ def unsubscribe_newsletter(request, token=None):
             subscriber.is_active = False
             subscriber.save()
             
-            # ✅ NOTIFY ADMIN ABOUT UNSUBSCRIBE
+            #  NOTIFY ADMIN ABOUT UNSUBSCRIBE
             try:
                 NotificationService.notify_newsletter_unsubscribe_admin(subscriber)
             except Exception as e:
-                print(f"❌ Failed to notify admin about unsubscribe: {e}")
+                print(f" Failed to notify admin about unsubscribe: {e}")
             
-            # ✅ SEND CONFIRMATION EMAIL TO USER
+            #  SEND CONFIRMATION EMAIL TO USER
             try:
                 NotificationService.send_unsubscribe_confirmation_email(subscriber)
             except Exception as e:
-                print(f"❌ Failed to send unsubscribe confirmation to {email}: {e}")
+                print(f" Failed to send unsubscribe confirmation to {email}: {e}")
             
             messages.success(request, f'You have been unsubscribed from our newsletter. We\'re sorry to see you go!')
             
@@ -1326,17 +1324,17 @@ def unsubscribe_newsletter(request, token=None):
             subscriber.is_active = False
             subscriber.save()
             
-            # ✅ NOTIFY ADMIN ABOUT UNSUBSCRIBE
+            #  NOTIFY ADMIN ABOUT UNSUBSCRIBE
             try:
                 NotificationService.notify_newsletter_unsubscribe_admin(subscriber)
             except Exception as e:
-                print(f"❌ Failed to notify admin about unsubscribe: {e}")
+                print(f" Failed to notify admin about unsubscribe: {e}")
             
-            # ✅ SEND CONFIRMATION EMAIL TO USER
+            #  SEND CONFIRMATION EMAIL TO USER
             try:
                 NotificationService.send_unsubscribe_confirmation_email(subscriber)
             except Exception as e:
-                print(f"❌ Failed to send unsubscribe confirmation to {email}: {e}")
+                print(f" Failed to send unsubscribe confirmation to {email}: {e}")
             
             messages.success(request, f'You have been unsubscribed from our newsletter. A confirmation email has been sent to {email}.')
             
@@ -1371,7 +1369,7 @@ def manage_newsletter_preferences(request):
 
     if request.method == 'POST':
         if 'subscribe' in request.POST:
-            # ✅ USER EXPLICITLY CLICKS SUBSCRIBE
+            #  USER EXPLICITLY CLICKS SUBSCRIBE
             if not newsletter_subscription:
                 # Create new subscription with explicit consent
                 newsletter_subscription = NewsletterSubscriber.objects.create(
@@ -1387,14 +1385,14 @@ def manage_newsletter_preferences(request):
                 newsletter_subscription.is_active = True
                 newsletter_subscription.save()
             
-            # ✅ FIXED: Send welcome email to subscriber
+            #  FIXED: Send welcome email to subscriber
             try:
                 NotificationService.send_newsletter_welcome_email(newsletter_subscription)
                 print(f"✅ Welcome email sent to {request.user.email}")
             except Exception as e:
-                print(f"❌ Failed to send welcome email: {e}")
+                print(f" Failed to send welcome email: {e}")
             
-            # ✅ FIXED: Notify admin about new subscription
+            #  FIXED: Notify admin about new subscription
             try:
                 NotificationService.notify_new_newsletter_subscriber(newsletter_subscription)
                 print(f"✅ Admin notified about new subscriber: {request.user.email}")
@@ -1413,17 +1411,17 @@ def manage_newsletter_preferences(request):
                 newsletter_subscription.receive_new_items_alerts = False
                 newsletter_subscription.save()
                 
-                # ✅ NOTIFY ADMIN ABOUT UNSUBSCRIBE
+                #  NOTIFY ADMIN ABOUT UNSUBSCRIBE
                 try:
                     NotificationService.notify_newsletter_unsubscribe_admin(newsletter_subscription)
                 except Exception as e:
-                    print(f"❌ Failed to notify admin about unsubscribe: {e}")
+                    print(f" Failed to notify admin about unsubscribe: {e}")
                 
-                # ✅ SEND CONFIRMATION EMAIL TO USER
+                # SEND CONFIRMATION EMAIL TO USER
                 try:
                     NotificationService.send_unsubscribe_confirmation_email(newsletter_subscription)
                 except Exception as e:
-                    print(f"❌ Failed to send unsubscribe confirmation to {email}: {e}")
+                    print(f" Failed to send unsubscribe confirmation to {email}: {e}")
                 
                 messages.success(request, 'You have been unsubscribed from all newsletter emails. A confirmation email has been sent to you.')
             else:
@@ -1620,16 +1618,16 @@ def newsletter_subscribe_api(request):
         # Send welcome email
         try:
             NotificationService.send_newsletter_welcome_email(subscriber)
-            print(f"✅ Welcome email sent to {email}")
+            print(f" Welcome email sent to {email}")
         except Exception as e:
-            print(f"❌ Failed to send welcome email to {email}: {e}")
+            print(f" Failed to send welcome email to {email}: {e}")
         
         # Notify admin about new subscription
         try:
             NotificationService.notify_new_newsletter_subscriber(subscriber)
-            print(f"✅ Admin notified about new subscriber: {email}")
+            print(f" Admin notified about new subscriber: {email}")
         except Exception as e:
-            print(f"❌ Failed to notify admin about new subscriber {email}: {e}")
+            print(f" Failed to notify admin about new subscriber {email}: {e}")
         
         return JsonResponse({
             'success': True,
@@ -1642,7 +1640,7 @@ def newsletter_subscribe_api(request):
             'message': 'Subscription error. Please try again.'
         })
     except Exception as e:
-        print(f"❌ Newsletter subscription API error: {e}")
+        print(f" Newsletter subscription API error: {e}")
         return JsonResponse({
             'success': False,
             'message': 'An error occurred. Please try again later.'
@@ -1683,16 +1681,16 @@ def newsletter_unsubscribe_api(request):
             # Notify admin about unsubscribe
             try:
                 NotificationService.notify_newsletter_unsubscribe_admin(subscriber)
-                print(f"✅ Admin notified about unsubscribe: {email}")
+                print(f" Admin notified about unsubscribe: {email}")
             except Exception as e:
-                print(f"❌ Failed to notify admin about unsubscribe: {e}")
+                print(f" Failed to notify admin about unsubscribe: {e}")
             
             # Send confirmation email to user
             try:
                 NotificationService.send_unsubscribe_confirmation_email(subscriber)
-                print(f"✅ Unsubscribe confirmation sent to: {email}")
+                print(f" Unsubscribe confirmation sent to: {email}")
             except Exception as e:
-                print(f"❌ Failed to send unsubscribe confirmation to {email}: {e}")
+                print(f" Failed to send unsubscribe confirmation to {email}: {e}")
             
             return JsonResponse({
                 'success': True,
@@ -1706,7 +1704,7 @@ def newsletter_unsubscribe_api(request):
             })
             
     except Exception as e:
-        print(f"❌ Newsletter unsubscribe API error: {e}")
+        print(f" Newsletter unsubscribe API error: {e}")
         return JsonResponse({
             'success': False,
             'message': 'An error occurred. Please try again later.'

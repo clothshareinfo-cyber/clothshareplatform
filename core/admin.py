@@ -9,13 +9,13 @@ from django.http import HttpResponseRedirect
 from .models import (
     Category, Size, Condition, Gender, ClothingItem, ItemImage,
     ClothingRequest, Exchange, UserProfile, Badge, UserBadge,
-    CommunityImpact, Notification, NewsletterSubscriber  # ADDED NewsletterSubscriber
+    CommunityImpact, Notification, NewsletterSubscriber
 )
 
 class CategoryAdminForm(forms.ModelForm):
     class Meta:
         model = Category
-        fields = "__all__"  # ✅ This is correct
+        fields = "__all__"  
 
         widgets = {
             'description': forms.Textarea(attrs={'rows': 3}),
@@ -81,7 +81,7 @@ class ItemImageInline(admin.TabularInline):
 class ClothingItemAdminForm(forms.ModelForm):
     class Meta:
         model = ClothingItem
-        fields = '__all__'  # ✅ FIXED: Changed from '_all_' to '__all__'
+        fields = '__all__'  
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
             'tags': forms.TextInput(attrs={'placeholder': 'jacket, denim, casual'}),
@@ -133,7 +133,7 @@ class ClothingItemAdmin(admin.ModelAdmin):
 class ClothingRequestAdminForm(forms.ModelForm):
     class Meta:
         model = ClothingRequest
-        fields = '__all__'  # ✅ FIXED: Changed from '_all_' to '__all__'
+        fields = '__all__'  
         widgets = {
             'description': forms.Textarea(attrs={'rows': 4}),
         }
@@ -198,7 +198,7 @@ class ExchangeAdmin(admin.ModelAdmin):
 class UserProfileAdminForm(forms.ModelForm):
     class Meta:
         model = UserProfile
-        fields = '__all__'  # ✅ FIXED: Changed from '_all_' to '__all__'
+        fields = '__all__'  
         widgets = {
             'bio': forms.Textarea(attrs={'rows': 3}),
         }
@@ -389,13 +389,12 @@ class NewsletterSubscriberAdmin(admin.ModelAdmin):
     deactivate_subscribers.short_description = "Deactivate selected subscribers"
     
     def send_test_newsletter(self, request, queryset):
-        # This is a placeholder for sending test newsletters
-        # You would integrate with your email service here
+      
         count = queryset.count()
         self.message_user(request, f'Test newsletter would be sent to {count} subscribers. (Email integration required)')
     send_test_newsletter.short_description = "Send test newsletter to selected subscribers"
 
-# NEW: Custom Admin View for Newsletter Statistics
+
 class NewsletterStatsAdmin(admin.AdminSite):
     def get_urls(self):
         urls = super().get_urls()
@@ -416,16 +415,14 @@ class NewsletterStatsAdmin(admin.AdminSite):
         }
         return render(request, 'admin/newsletter_stats.html', context)
 
-# Add newsletter stats to admin index if needed
+
 def newsletter_stats_link(request):
     return {
         'newsletter_stats_url': '/admin/newsletter-stats/',
     }
 
-# Custom admin site header and title
+
 admin.site.site_header = 'ClothShare Administration'
 admin.site.site_title = 'ClothShare Admin'
 admin.site.index_title = 'Welcome to ClothShare Administration'
 
-# Optional: If you want to add newsletter stats to the main admin index
-# You can customize the admin index template to include this link

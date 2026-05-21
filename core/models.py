@@ -11,7 +11,7 @@ from django.db.models import Q
 
 def validate_image_size(value):
     filesize = value.size
-    if filesize > 5 * 1024 * 1024:  # 5MB limit
+    if filesize > 5 * 1024 * 1024: 
         raise ValidationError(_("The maximum file size that can be uploaded is 5MB"))
     return value
 
@@ -124,7 +124,7 @@ class ClothingItem(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     expiry_date = models.DateTimeField(null=True, blank=True)
     
-    # ADDED: For account deletion tracking
+  
     deactivated_at = models.DateTimeField(null=True, blank=True)
     deactivation_reason = models.CharField(max_length=50, blank=True, choices=[
         ('user_deletion', 'User Account Deleted'),
@@ -197,7 +197,7 @@ class ItemImage(models.Model):
         return f"Image for {self.item.title}"
     
     def save(self, *args, **kwargs):
-        # If this image is set as primary, ensure no other images for this item are primary
+       
         if self.is_primary:
             ItemImage.objects.filter(item=self.item, is_primary=True).update(is_primary=False)
         super().save(*args, **kwargs)
@@ -233,7 +233,7 @@ class ClothingRequest(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     expiry_date = models.DateTimeField(null=True, blank=True)
     
-    # ADDED: For account deletion tracking
+    
     cancelled_at = models.DateTimeField(null=True, blank=True)
     cancellation_reason = models.CharField(max_length=50, blank=True, choices=[
         ('user_deletion', 'User Account Deleted'),
@@ -272,7 +272,7 @@ class ClothingRequest(models.Model):
     
     def save(self, *args, **kwargs):
         if not self.expiry_date and self.status == 'open':
-            # Set expiry date based on urgency
+           
             if self.urgency == 'high':
                 days = 7
             elif self.urgency == 'medium':
@@ -299,17 +299,17 @@ class Exchange(models.Model):
     requester = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='requested_exchanges')
     donor = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='donated_exchanges')
     
-    # Exchange Details
+
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='pending')
     message = models.TextField(blank=True)
     
-    # Timestamps
+    
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     scheduled_date = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     
-    # ADDED: For account deletion tracking
+   
     cancelled_at = models.DateTimeField(null=True, blank=True)
     cancellation_reason = models.CharField(max_length=50, blank=True, choices=[
         ('user_deletion', 'User Account Deleted'),
@@ -317,11 +317,11 @@ class Exchange(models.Model):
         ('agreement', 'Mutual Agreement'),
     ])
     
-    # Location
+   
     exchange_location = models.CharField(max_length=200, blank=True)
     exchange_notes = models.TextField(blank=True)
     
-    # Ratings
+   
     donor_rating = models.PositiveSmallIntegerField(
         null=True, 
         blank=True, 
@@ -354,13 +354,13 @@ class UserProfile(models.Model):
     
     user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='profile')
     
-    # Personal Information
+    
     phone = models.CharField(max_length=20, blank=True)
     location = models.CharField(max_length=100, blank=True)
     affiliation = models.CharField(max_length=20, choices=AFFILIATION_CHOICES, blank=True)
     bio = models.TextField(blank=True)
     
-    # Profile Image
+  
     avatar = models.ImageField(
         upload_to='avatars/%Y/%m/%d/', 
         null=True, 
@@ -368,7 +368,7 @@ class UserProfile(models.Model):
         validators=[validate_image_size]
     )
     
-    # Statistics (denormalized for performance)
+   
     items_donated = models.PositiveIntegerField(default=0)
     items_received = models.PositiveIntegerField(default=0)
     exchanges_completed = models.PositiveIntegerField(default=0)
@@ -447,9 +447,9 @@ class CommunityImpact(models.Model):
         return f"Community Impact Stats - {self.last_updated.date()}"
     
     def save(self, *args, **kwargs):
-        # Ensure only one instance exists
+     
         if not self.pk and CommunityImpact.objects.exists():
-            # Update the existing instance instead of creating a new one
+            
             existing = CommunityImpact.objects.first()
             existing.total_items_donated = self.total_items_donated
             existing.total_items_exchanged = self.total_items_exchanged
@@ -488,7 +488,7 @@ class Notification(models.Model):
     def __str__(self):
         return f"{self.type} - {self.user.username}"
 
-# Newsletter Subscriber Manager - UPDATED
+
 class NewsletterSubscriberManager(models.Manager):
     def get_subscribers_for_notification(self, notification_type):
         """Get subscribers who want to receive specific notification types"""
@@ -504,10 +504,10 @@ class NewsletterSubscriberManager(models.Manager):
         if not field_name:
             return self.none()
             
-        # Check if the field exists in the model
+    
         if not hasattr(NewsletterSubscriber, field_name):
             print(f"⚠️ Field {field_name} not found in NewsletterSubscriber, using fallback")
-            # Use community_news as fallback for request_updates
+           
             if notification_type == 'request_updates':
                 field_name = 'receive_community_news'
             else:
@@ -519,14 +519,14 @@ class NewsletterSubscriberManager(models.Manager):
         }
         return self.filter(**filter_kwargs)
 
-# Newsletter Subscriber - UPDATED WITH MISSING FIELD
+
 class NewsletterSubscriber(models.Model):
     email = models.EmailField(unique=True)
     subscribed_at = models.DateTimeField(auto_now_add=True)
     is_active = models.BooleanField(default=True)
     unsubscribe_token = models.CharField(max_length=100, unique=True, blank=True)
     
-    # Optional: Link to user if they have an account
+  
     user = models.OneToOneField(
         settings.AUTH_USER_MODEL, 
         on_delete=models.SET_NULL, 
@@ -535,14 +535,14 @@ class NewsletterSubscriber(models.Model):
         related_name='newsletter_subscription'
     )
     
-    # Notification Preferences - ADDED THE MISSING FIELD
+   
     receive_donation_updates = models.BooleanField(default=True, verbose_name="Donation Updates")
     receive_community_news = models.BooleanField(default=True, verbose_name="Community News")
     receive_new_items_alerts = models.BooleanField(default=True, verbose_name="New Items Alerts")
     receive_exchange_notifications = models.BooleanField(default=True, verbose_name="Exchange Notifications")
     receive_request_updates = models.BooleanField(default=True, verbose_name="Clothing Request Updates")  # ADDED THIS LINE
     
-    # Removed unused fields to match NotificationService
+   
     last_notification_sent = models.DateTimeField(null=True, blank=True)
     
     objects = NewsletterSubscriberManager()
@@ -568,7 +568,7 @@ class NewsletterSubscriber(models.Model):
             self.receive_community_news or 
             self.receive_new_items_alerts or
             self.receive_exchange_notifications or
-            self.receive_request_updates  # ADDED THIS LINE
+            self.receive_request_updates 
         )
     
     def get_unsubscribe_url(self):
@@ -581,7 +581,7 @@ class NewsletterSubscriber(models.Model):
         """Get all subscribers who want to receive specific notification types via Gmail"""
         return cls.objects.get_subscribers_for_notification(notification_type)
 
-# Helper function for community statistics
+
 def get_community_stats():
     """
     Get community statistics for homepage and impact section
@@ -655,7 +655,6 @@ def get_newsletter_stats():
             'request_updates': 0,
         }
 
-# FIXED: Signal handlers that won't interfere with account deletion
 from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 from django.contrib.auth import get_user_model
@@ -670,18 +669,18 @@ def save_user_profile(sender, instance, **kwargs):
     if hasattr(instance, 'profile'):
         instance.profile.save()
 
-# FIXED: Only update statistics for active users and completed exchanges
+
 @receiver(post_save, sender=Exchange)
 @receiver(post_delete, sender=Exchange)
 def update_user_statistics(sender, instance, **kwargs):
-    # Skip if user is being deleted (instance might be None during cascade deletion)
+    
     if not instance or not hasattr(instance, 'donor') or not hasattr(instance, 'requester'):
         return
         
-    # Only update for completed exchanges with active users
+    
     if instance.status == 'completed':
         try:
-            # Update donor's items_donated count
+            
             if instance.donor.is_active and hasattr(instance.donor, 'profile'):
                 donor_profile = instance.donor.profile
                 donor_profile.items_donated = Exchange.objects.filter(
@@ -705,7 +704,7 @@ def update_user_statistics(sender, instance, **kwargs):
         except Exception as e:
             print(f"Error updating requester stats: {e}")
 
-# FIXED: Community impact update that handles user deletion
+
 @receiver(post_save, sender=ClothingItem)
 @receiver(post_delete, sender=ClothingItem)
 def update_community_impact(sender, instance, **kwargs):
@@ -723,7 +722,7 @@ def update_community_impact(sender, instance, **kwargs):
     except Exception as e:
         print(f"Error updating community impact: {e}")
 
-# FIXED: Newsletter linking that handles user deletion gracefully - UPDATED
+
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def link_newsletter_subscriber(sender, instance, created, **kwargs):
     """

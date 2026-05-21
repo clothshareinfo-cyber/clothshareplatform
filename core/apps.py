@@ -9,14 +9,14 @@ class CoreConfig(AppConfig):
         This method is called when the Django app is fully loaded and ready.
         This is where we connect our signals for automatic notifications.
         """
-        # Import inside the method to avoid circular imports
+       
         try:
-            # Import and register our signals
+           
             import core.signals
-            print("✅ ClothShare Core app loaded successfully!")
-            print("🎯 All notification signals connected and ready!")
-            print("📧 Admin will now receive automatic email notifications!")
+            print(" ClothShare Core app loaded successfully!")
+            print(" All notification signals connected and ready!")
+            print(" Admin will now receive automatic email notifications!")
         except ImportError as e:
-            print(f"⚠️ Could not import signals: {e}")
+            print(f" Could not import signals: {e}")
         except Exception as e:
-            print(f"❌ Error loading Core app: {e}")
+            print(f" Error loading Core app: {e}")

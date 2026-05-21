@@ -7,7 +7,7 @@ from .models import (
 )
 
 class ClothingItemForm(forms.ModelForm):
-    # REMOVED the problematic images field - images will be handled via formset
+
     
     class Meta:
         model = ClothingItem
@@ -42,7 +42,7 @@ class ClothingItemForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Make certain fields optional
+        
         self.fields['size'].required = False
         self.fields['gender'].required = False
         self.fields['location'].required = False
@@ -66,7 +66,7 @@ class ItemImageForm(forms.ModelForm):
             }),
         }
 
-# Formset for multiple image uploads
+
 ItemImageFormSet = inlineformset_factory(
     ClothingItem, ItemImage,
     form=ItemImageForm,
@@ -94,7 +94,7 @@ class ClothingRequestForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Make size and gender optional
+       
         self.fields['size'].required = False
         self.fields['gender'].required = False
 
@@ -166,7 +166,7 @@ class NewsletterSubscriptionForm(forms.ModelForm):
         if '@' not in email or '.' not in email:
             raise ValidationError('Please enter a valid email address.')
         
-        # Check if already actively subscribed
+        
         existing_subscriber = NewsletterSubscriber.objects.filter(
             email=email, 
             is_active=True
@@ -180,7 +180,7 @@ class NewsletterSubscriptionForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         
-        # Link to user if authenticated
+       
         if self.request and self.request.user.is_authenticated:
             instance.user = self.request.user
         
@@ -189,7 +189,7 @@ class NewsletterSubscriptionForm(forms.ModelForm):
         
         return instance
 
-# Newsletter Preferences Form
+
 class NewsletterPreferencesForm(forms.ModelForm):
     class Meta:
         model = NewsletterSubscriber
@@ -212,7 +212,7 @@ class NewsletterPreferencesForm(forms.ModelForm):
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        # Add labels with descriptions
+        
         self.fields['receive_donation_updates'].label = 'Donation Updates'
         self.fields['receive_community_news'].label = 'Community News'
         self.fields['receive_new_items_alerts'].label = 'New Item Alerts'
@@ -220,7 +220,7 @@ class NewsletterPreferencesForm(forms.ModelForm):
     def save(self, commit=True):
         instance = super().save(commit=False)
         
-        # Auto-set is_active based on preferences
+       
         instance.is_active = any([
             instance.receive_donation_updates,
             instance.receive_community_news,
@@ -232,7 +232,7 @@ class NewsletterPreferencesForm(forms.ModelForm):
         
         return instance
 
-# Quick Newsletter Form (for footer usage)
+
 class QuickNewsletterForm(forms.Form):
     email = forms.EmailField(
         max_length=254,
@@ -250,7 +250,7 @@ class QuickNewsletterForm(forms.Form):
     def clean_email(self):
         email = self.cleaned_data.get('email').strip().lower()
         
-        # Basic email validation
+       
         if not email:
             raise ValidationError('Please enter an email address.')
         

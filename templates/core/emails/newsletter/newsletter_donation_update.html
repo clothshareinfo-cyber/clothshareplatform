@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .header { background: #4a6fa5; color: white; padding: 20px; }
+        .content { padding: 20px; }
+        .footer { background: #f5f5f5; padding: 15px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h2>New Donation Available!</h2>
+    </div>
+    <div class="content">
+        <p>Hello {{ subscriber_email }},</p>
+        <p>A new clothing item has been donated: <strong>{{ item_title }}</strong></p>
+        <p>{{ item_description }}</p>
+        <a href="{{ site_url }}/items/{{ item_id }}/" style="background: #4a6fa5; color: white; padding: 10px 20px; text-decoration: none;">View Item</a>
+    </div>
+    <div class="footer">
+        <p><a href="{{ unsubscribe_url }}">Unsubscribe from these notifications</a></p>
+    </div>
+</body>
+</html>

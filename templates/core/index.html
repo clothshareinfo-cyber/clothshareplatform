@@ -1,0 +1,769 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block content %}
+
+<main class="main">
+    <!-- Hero Section -->
+    <section class="hero section" id="home">
+        <div class="hero__container container">
+            <div class="hero__content">
+                <div class="hero__badge">Sustainable Fashion Community</div>
+                <h1 class="hero__title">Share Clothes, <span class="highlight">Build Community</span></h1>
+                <p class="hero__description">
+                    Join our sustainable clothing exchange platform. Donate items you no longer need, 
+                    find new favorites, and connect with your community while reducing fashion waste.
+                </p>
+                <div class="hero__buttons">
+                    <!-- Temporary fix: Use direct URL -->
+                    <a href="/browse/" class="btn btn--primary">
+                        <i class="fas fa-search"></i> Browse Items
+                    </a>
+                    {% if request.user.is_authenticated %}
+                    <a href="/donate/" class="btn btn--secondary">
+                        <i class="fas fa-hands-helping"></i> Donate Now
+                    </a>
+                    {% else %}
+                    <a href="{% url 'userauths:sign-in' %}" class="btn btn--secondary">
+                        <i class="fas fa-hands-helping"></i> Donate Now
+                    </a>
+                    {% endif %}
+                </div>
+                <div class="hero__stats">
+                    <div class="stat">
+                        <span class="stat__number">{{ impact_stats.items_donated|default:"0" }}+</span>
+                        <span class="stat__label">Items Shared</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat__number">{{ impact_stats.community_members|default:"0" }}+</span>
+                        <span class="stat__label">Community Members</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat__number">{{ impact_stats.successful_exchanges|default:"0" }}+</span>
+                        <span class="stat__label">Successful Exchanges</span>
+                    </div>
+                </div>
+            </div>
+            <div class="hero__image">
+                <div class="hero__img-placeholder">
+                    <div class="floating-card card-1">
+                        <i class="fas fa-tshirt"></i>
+                        <span>Donate</span>
+                    </div>
+                    <div class="floating-card card-2">
+                        <i class="fas fa-exchange-alt"></i>
+                        <span>Exchange</span>
+                    </div>
+                    <div class="floating-card card-3">
+                        <i class="fas fa-users"></i>
+                        <span>Connect</span>
+                    </div>
+                    <div class="hero__circle"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features section">
+        <div class="container">
+            <h2 class="section__title">How ClothShare Works</h2>
+            <div class="features__grid">
+                <div class="feature">
+                    <div class="feature__icon">
+                        <i class="fas fa-user-plus"></i>
+                    </div>
+                    <h3>1. Join Community</h3>
+                    <p>Sign up and verify your account to join your local clothing exchange community.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature__icon">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <h3>2. List Items</h3>
+                    <p>Upload photos and details of clothes you'd like to donate or exchange.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature__icon">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <h3>3. Browse & Request</h3>
+                    <p>Find items you need and request them from other community members.</p>
+                </div>
+                <div class="feature">
+                    <div class="feature__icon">
+                        <i class="fas fa-handshake"></i>
+                    </div>
+                    <h3>4. Connect & Exchange</h3>
+                    <p>Arrange pickup or exchange locations within your community safely.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Items Section -->
+    <!<section class="featured section" id="featured">
+        <div class="container">
+            <h2 class="section__title">Featured Items</h2>
+            <p class="section__subtitle">Check out these amazing community contributions</p>
+            
+            <div class="items-grid">
+                {% for item in featured_items %}
+                <div class="item-card">
+                    {% if item.primary_image %}
+                    <img src="{{ item.primary_image.image.url }}" alt="{{ item.title }}" class="item-card__image">
+                    {% else %}
+                    <div class="item-card__image placeholder">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    {% endif %}
+                    <div class="item-card__content">
+                        <h3 class="item-card__title">{{ item.title }}</h3>
+                        <p class="item-card__category">{{ item.category.display_name }}</p>
+                        <p class="item-card__condition">{{ item.condition.name }}</p>
+                        <div class="item-card__meta">
+                            <span class="item-mode {{ item.mode }}">{{ item.mode|title }}</span>
+                        </div>
+                        
+                        <a href="/item/{{ item.id }}/" class="btn btn--outline btn--small">View Details</a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <i class="fas fa-tshirt"></i>
+                    <p>No featured items available at the moment.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>-->
+
+    <!-- Recent Items Section -->
+    <section class="recent section" id="recent">
+        <div class="container">
+            <h2 class="section__title">Recently Added</h2>
+            <p class="section__subtitle">Fresh additions to our community catalog</p>
+            
+            <div class="items-grid">
+                {% for item in recent_items %}
+                <div class="item-card">
+                    {% if item.primary_image %}
+                    <img src="{{ item.primary_image.image.url }}" alt="{{ item.title }}" class="item-card__image">
+                    {% else %}
+                    <div class="item-card__image placeholder">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    {% endif %}
+                    <div class="item-card__content">
+                        <h3 class="item-card__title">{{ item.title }}</h3>
+                        <p class="item-card__category">{{ item.category.display_name }}</p>
+                        <p class="item-card__condition">{{ item.condition.name }}</p>
+                        <div class="item-card__meta">
+                            <span class="item-mode {{ item.mode }}">{{ item.mode|title }}</span>
+                        </div>
+                        <!-- Temporary fix: Use direct URL -->
+                        <a href="/item/{{ item.id }}/" class="btn btn--outline btn--small">View Details</a>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <i class="fas fa-tshirt"></i>
+                    <p>No recent items available.</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <div class="section__actions">
+                <a href="/browse/" class="btn btn--primary">
+                    <i class="fas fa-search"></i> Browse All Items
+                </a>
+            </div>
+        </div>
+    </section>
+
+<!-- Categories Section -->
+<section class="categories section">
+    <div class="container">
+        <h2 class="section__title">Browse by Category</h2>
+        <p class="section__subtitle">Find what you're looking for by category</p>
+        
+        <div class="categories-grid" style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.5rem;
+            margin-top: 2rem;
+        ">
+            {% for category in categories %}
+            <!-- Temporary fix: Use direct URL with query parameter -->
+            <a href="/browse/?category={{ category.name }}" class="category-card" style="
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 2.5rem 1.5rem;
+                border-radius: 16px;
+                background: white;
+                box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+                text-decoration: none;
+                color: inherit;
+                transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                position: relative;
+                overflow: hidden;
+                border: 1px solid rgba(0, 0, 0, 0.05);
+            " onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 12px 30px rgba(0, 0, 0, 0.15)'" 
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 6px 20px rgba(0, 0, 0, 0.08)'">
+                
+                <!-- Background gradient overlay -->
+                <div class="category-bg" style="
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    right: 0;
+                    height: 4px;
+                    {% if category.name == 'mens' or 'men' in category.name|lower %}
+                    background: linear-gradient(90deg, #4a6fa5, #6b8cc0);
+                    {% elif category.name == 'womens' or 'women' in category.name|lower %}
+                    background: linear-gradient(90deg, #e76f51, #f4a261);
+                    {% elif category.name == 'shoes' or 'footwear' in category.name|lower %}
+                    background: linear-gradient(90deg, #2a9d8f, #4db6ac);
+                    {% elif category.name == 'kids' or 'children' in category.name|lower %}
+                    background: linear-gradient(90deg, #9b59b6, #b07cc9);
+                    {% elif category.name == 'accessories' %}
+                    background: linear-gradient(90deg, #e74c3c, #ec7063);
+                    {% else %}
+                    background: linear-gradient(90deg, #f39c12, #f7b731);
+                    {% endif %}
+                "></div>
+                
+                <div class="category-icon" style="
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-bottom: 1.5rem;
+                    font-size: 2rem;
+                    color: white;
+                    transition: transform 0.3s ease;
+                    {% if category.name == 'mens' or 'men' in category.name|lower %}
+                    background: linear-gradient(135deg, #4a6fa5, #6b8cc0);
+                    box-shadow: 0 6px 15px rgba(74, 111, 165, 0.3);
+                    {% elif category.name == 'womens' or 'women' in category.name|lower %}
+                    background: linear-gradient(135deg, #e76f51, #f4a261);
+                    box-shadow: 0 6px 15px rgba(231, 111, 81, 0.3);
+                    {% elif category.name == 'shoes' or 'footwear' in category.name|lower %}
+                    background: linear-gradient(135deg, #2a9d8f, #4db6ac);
+                    box-shadow: 0 6px 15px rgba(42, 157, 143, 0.3);
+                    {% elif category.name == 'kids' or 'children' in category.name|lower %}
+                    background: linear-gradient(135deg, #9b59b6, #b07cc9);
+                    box-shadow: 0 6px 15px rgba(155, 89, 182, 0.3);
+                    {% elif category.name == 'accessories' %}
+                    background: linear-gradient(135deg, #e74c3c, #ec7063);
+                    box-shadow: 0 6px 15px rgba(231, 76, 60, 0.3);
+                    {% else %}
+                    background: linear-gradient(135deg, #f39c12, #f7b731);
+                    box-shadow: 0 6px 15px rgba(243, 156, 18, 0.3);
+                    {% endif %}
+                ">
+                    {% if category.name == 'shoes' or 'footwear' in category.name|lower %}
+                    <i class="fas fa-shoe-prints"></i>
+                    {% elif category.name == 'accessories' %}
+                    <i class="fas fa-gem"></i>
+                    {% elif category.name == 'kids' or 'children' in category.name|lower %}
+                    <i class="fas fa-child"></i>
+                    {% else %}
+                    <i class="fas fa-tshirt"></i>
+                    {% endif %}
+                </div>
+                
+                <h3 style="
+                    margin: 0.5rem 0;
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                    text-align: center;
+                    color: #2d3748;
+                    transition: color 0.3s ease;
+                ">{{ category.display_name }}</h3>
+                
+                <p style="
+                    margin: 0.5rem 0 1.5rem 0;
+                    font-size: 0.95rem;
+                    color: #718096;
+                    text-align: center;
+                    line-height: 1.4;
+                ">Browse available items</p>
+                
+                <div class="item-count-badge" style="
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%;
+                    background: #f7fafc;
+                    border: 2px solid #e2e8f0;
+                    font-weight: 700;
+                    font-size: 1.1rem;
+                    color: #4a5568;
+                    transition: all 0.3s ease;
+                    position: relative;
+                    overflow: hidden;
+                ">
+                    <span class="item-count" style="
+                        position: relative;
+                        z-index: 2;
+                    ">{{ category.item_count }}</span>
+                    <div class="count-bg" style="
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                        bottom: 0;
+                        opacity: 0.1;
+                        {% if category.name == 'mens' or 'men' in category.name|lower %}
+                        background: #4a6fa5;
+                        {% elif category.name == 'womens' or 'women' in category.name|lower %}
+                        background: #e76f51;
+                        {% elif category.name == 'shoes' or 'footwear' in category.name|lower %}
+                        background: #2a9d8f;
+                        {% elif category.name == 'kids' or 'children' in category.name|lower %}
+                        background: #9b59b6;
+                        {% elif category.name == 'accessories' %}
+                        background: #e74c3c;
+                        {% else %}
+                        background: #f39c12;
+                        {% endif %}
+                    "></div>
+                </div>
+                
+                <!-- Hover arrow -->
+                <div class="category-arrow" style="
+                    position: absolute;
+                    bottom: 1.5rem;
+                    right: 1.5rem;
+                    width: 30px;
+                    height: 30px;
+                    border-radius: 50%;
+                    background: rgba(0, 0, 0, 0.05);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    opacity: 0;
+                    transform: translateX(-10px);
+                    transition: all 0.3s ease;
+                ">
+                    <i class="fas fa-arrow-right" style="font-size: 0.8rem; color: #718096;"></i>
+                </div>
+            </a>
+            {% empty %}
+            <div class="empty-state" style="
+                grid-column: 1 / -1;
+                text-align: center;
+                padding: 3rem;
+                color: #666;
+            ">
+                <i class="fas fa-folder-open" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                <p style="font-size: 1.1rem; margin-bottom: 0.5rem;">No categories available yet.</p>
+                <p style="font-size: 0.95rem; opacity: 0.7;">Categories will appear here once items are added to the platform.</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+  <!-- Quick Actions Section -->
+<section class="quick-actions section">
+    <div class="container">
+        <h2 class="section__title">Get Started</h2>
+        <div class="actions-grid" style="
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        ">
+            {% if request.user.is_authenticated %}
+            <a href="/donate/" class="action-card" style="
+                display: block;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 2.5rem 2rem;
+                border-radius: 16px;
+                text-decoration: none;
+                transition: all 0.4s ease;
+                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+                position: relative;
+                overflow: hidden;
+            " onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 35px rgba(102, 126, 234, 0.3)'" 
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(102, 126, 234, 0.2)'">
+                <div class="action-icon" style="
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-bottom: 1.5rem;
+                    font-size: 2rem;
+                    backdrop-filter: blur(10px);
+                ">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+                <h3 style="
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                    margin-bottom: 1rem;
+                    color: white;
+                ">Donate Items</h3>
+                <p style="
+                    font-size: 1.1rem;
+                    line-height: 1.6;
+                    margin-bottom: 2rem;
+                    opacity: 0.9;
+                ">Share clothes you no longer need with your community</p>
+                <span class="action-link" style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                    color: white;
+                    text-decoration: none;
+                ">Start Donating <i class="fas fa-arrow-right" style="transition: transform 0.3s ease;"></i></span>
+            </a>
+            
+            <a href="/request/" class="action-card" style="
+                display: block;
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                color: white;
+                padding: 2.5rem 2rem;
+                border-radius: 16px;
+                text-decoration: none;
+                transition: all 0.4s ease;
+                box-shadow: 0 8px 25px rgba(245, 87, 108, 0.2);
+                position: relative;
+                overflow: hidden;
+            " onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 35px rgba(245, 87, 108, 0.3)'" 
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(245, 87, 108, 0.2)'">
+                <div class="action-icon" style="
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-bottom: 1.5rem;
+                    font-size: 2rem;
+                    backdrop-filter: blur(10px);
+                ">
+                    <i class="fas fa-hands-helping"></i>
+                </div>
+                <h3 style="
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                    margin-bottom: 1rem;
+                    color: white;
+                ">Request Items</h3>
+                <p style="
+                    font-size: 1.1rem;
+                    line-height: 1.6;
+                    margin-bottom: 2rem;
+                    opacity: 0.9;
+                ">Let the community know what clothing items you need</p>
+                <span class="action-link" style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                    color: white;
+                    text-decoration: none;
+                ">Make Request <i class="fas fa-arrow-right" style="transition: transform 0.3s ease;"></i></span>
+            </a>
+            
+            <a href="/requests/" class="action-card" style="
+                display: block;
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                color: white;
+                padding: 2.5rem 2rem;
+                border-radius: 16px;
+                text-decoration: none;
+                transition: all 0.4s ease;
+                box-shadow: 0 8px 25px rgba(79, 172, 254, 0.2);
+                position: relative;
+                overflow: hidden;
+            " onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 35px rgba(79, 172, 254, 0.3)'" 
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(79, 172, 254, 0.2)'">
+                <div class="action-icon" style="
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-bottom: 1.5rem;
+                    font-size: 2rem;
+                    backdrop-filter: blur(10px);
+                ">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 style="
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                    margin-bottom: 1rem;
+                    color: white;
+                ">Help Others</h3>
+                <p style="
+                    font-size: 1.1rem;
+                    line-height: 1.6;
+                    margin-bottom: 2rem;
+                    opacity: 0.9;
+                ">Browse requests and help community members in need</p>
+                <span class="action-link" style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                    color: white;
+                    text-decoration: none;
+                ">View Requests <i class="fas fa-arrow-right" style="transition: transform 0.3s ease;"></i></span>
+            </a>
+            {% else %}
+            <a href="{% url 'userauths:sign-up' %}" class="action-card" style="
+                display: block;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 2.5rem 2rem;
+                border-radius: 16px;
+                text-decoration: none;
+                transition: all 0.4s ease;
+                box-shadow: 0 8px 25px rgba(102, 126, 234, 0.2);
+                position: relative;
+                overflow: hidden;
+            " onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 35px rgba(102, 126, 234, 0.3)'" 
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(102, 126, 234, 0.2)'">
+                <div class="action-icon" style="
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-bottom: 1.5rem;
+                    font-size: 2rem;
+                    backdrop-filter: blur(10px);
+                ">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <h3 style="
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                    margin-bottom: 1rem;
+                    color: white;
+                ">Join Community</h3>
+                <p style="
+                    font-size: 1.1rem;
+                    line-height: 1.6;
+                    margin-bottom: 2rem;
+                    opacity: 0.9;
+                ">Create an account to start sharing and requesting items</p>
+                <span class="action-link" style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                    color: white;
+                    text-decoration: none;
+                ">Sign Up <i class="fas fa-arrow-right" style="transition: transform 0.3s ease;"></i></span>
+            </a>
+            
+            <a href="/browse/" class="action-card" style="
+                display: block;
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                color: white;
+                padding: 2.5rem 2rem;
+                border-radius: 16px;
+                text-decoration: none;
+                transition: all 0.4s ease;
+                box-shadow: 0 8px 25px rgba(245, 87, 108, 0.2);
+                position: relative;
+                overflow: hidden;
+            " onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 35px rgba(245, 87, 108, 0.3)'" 
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(245, 87, 108, 0.2)'">
+                <div class="action-icon" style="
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-bottom: 1.5rem;
+                    font-size: 2rem;
+                    backdrop-filter: blur(10px);
+                ">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 style="
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                    margin-bottom: 1rem;
+                    color: white;
+                ">Browse Items</h3>
+                <p style="
+                    font-size: 1.1rem;
+                    line-height: 1.6;
+                    margin-bottom: 2rem;
+                    opacity: 0.9;
+                ">Explore available clothing items in our community</p>
+                <span class="action-link" style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                    color: white;
+                    text-decoration: none;
+                ">Start Browsing <i class="fas fa-arrow-right" style="transition: transform 0.3s ease;"></i></span>
+            </a>
+            
+            <a href="/impact/" class="action-card" style="
+                display: block;
+                background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+                color: white;
+                padding: 2.5rem 2rem;
+                border-radius: 16px;
+                text-decoration: none;
+                transition: all 0.4s ease;
+                box-shadow: 0 8px 25px rgba(79, 172, 254, 0.2);
+                position: relative;
+                overflow: hidden;
+            " onmouseover="this.style.transform='translateY(-8px)'; this.style.boxShadow='0 15px 35px rgba(79, 172, 254, 0.3)'" 
+               onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 8px 25px rgba(79, 172, 254, 0.2)'">
+                <div class="action-icon" style="
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    background: rgba(255, 255, 255, 0.2);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    margin-bottom: 1.5rem;
+                    font-size: 2rem;
+                    backdrop-filter: blur(10px);
+                ">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <h3 style="
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                    margin-bottom: 1rem;
+                    color: white;
+                ">See Impact</h3>
+                <p style="
+                    font-size: 1.1rem;
+                    line-height: 1.6;
+                    margin-bottom: 2rem;
+                    opacity: 0.9;
+                ">Discover how our community is making a difference</p>
+                <span class="action-link" style="
+                    display: inline-flex;
+                    align-items: center;
+                    gap: 0.5rem;
+                    font-weight: 600;
+                    font-size: 1.1rem;
+                    color: white;
+                    text-decoration: none;
+                ">View Impact <i class="fas fa-arrow-right" style="transition: transform 0.3s ease;"></i></span>
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+    <!-- Impact Section -->
+    <section class="impact section">
+        <div class="container">
+            <h2 class="section__title">Community Impact</h2>
+            <p class="section__subtitle">Together we're making a difference</p>
+            
+            <div class="impact-stats">
+                <div class="impact-stat">
+                    <div class="impact-icon">
+                        <i class="fas fa-tshirt"></i>
+                    </div>
+                    <div class="impact-number">{{ impact_stats.items_donated|default:"0" }}</div>
+                    <div class="impact-label">Items Donated</div>
+                </div>
+                <div class="impact-stat">
+                    <div class="impact-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="impact-number">{{ impact_stats.successful_exchanges|default:"0" }}</div>
+                    <div class="impact-label">Items Exchanged</div>
+                </div>
+                <div class="impact-stat">
+                    <div class="impact-icon">
+                        <i class="fas fa-recycle"></i>
+                    </div>
+                    <div class="impact-number">{{ impact_stats.waste_prevented_kg|default:"0" }}</div>
+                    <div class="impact-label">Kg Waste Prevented</div>
+                </div>
+                <div class="impact-stat">
+                    <div class="impact-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <div class="impact-number">{{ impact_stats.community_members|default:"0" }}</div>
+                    <div class="impact-label">Community Members</div>
+                </div>
+            </div>
+            
+            <div class="impact-cta">
+                <h3>Join Our Community Today</h3>
+                <p>Be part of the sustainable fashion movement and make a difference in your community</p>
+                {% if request.user.is_authenticated %}
+                    {% if user_donation_count > 0 %}
+                    <a href="/donate/" class="btn btn--primary">
+                        <i class="fas fa-hands-helping"></i> Donate More Items
+                    </a>
+                    {% else %}
+                    <a href="/donate/" class="btn btn--primary">
+                        <i class="fas fa-hands-helping"></i> Donate Your First Item
+                    </a>
+                    {% endif %}
+                {% else %}
+                <a href="{% url 'userauths:sign-up' %}" class="btn btn--primary">
+                    <i class="fas fa-user-plus"></i> Join Now
+                </a>
+                {% endif %}
+            </div>
+        </div>
+    </section>
+</main>
+
+<style>
+    /* Add some smooth hover effects for categories */
+    .category-card:hover .category-icon {
+        transform: scale(1.1);
+    }
+    
+    .category-card:hover .item-count-badge {
+        transform: scale(1.05);
+        border-color: #cbd5e0;
+    }
+    
+    .category-card:hover .category-arrow {
+        opacity: 1;
+        transform: translateX(0);
+    }
+    
+    .category-card:hover h3 {
+        color: #4a5568;
+    }
+</style>
+
+{% endblock content %}

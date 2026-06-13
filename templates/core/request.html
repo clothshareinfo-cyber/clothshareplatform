@@ -1,0 +1,912 @@
+{% extends 'core/base.html' %}
+{% block title %}Request Clothing - ClothShare{% endblock %}
+
+{% block content %}
+<section class="request-section section">
+    <div class="container">
+        <div class="request-header">
+            <h1 class="request-title">Request Clothing</h1>
+            <p class="request-subtitle">Let the community know what clothing items you need</p>
+        </div>
+
+        <div class="request-form-container">
+            <form method="POST" class="request-form" id="requestForm">
+                {% csrf_token %}
+                
+                <div class="form-grid">
+                  <!-- Category Field - Django Automatic -->
+<div class="form-group">
+    <label for="id_category" class="form-label required">Category Needed *</label>
+    <div class="select-wrapper">
+        {{ form.category }}
+        <i class="fas fa-chevron-down select-arrow"></i>
+    </div>
+    {% if form.category.errors %}
+    <span class="error-message show">{{ form.category.errors.0 }}</span>
+    {% endif %}
+</div>
+
+                    <!-- Size Field -->
+                    <div class="form-group">
+                        <label for="size" class="form-label">Size Needed</label>
+                        <div class="select-wrapper">
+                            <select id="size" name="size" class="form-input">
+                                <option value="">Select Size</option>
+                                <option value="xs" {% if form.size.value == 'xs' %}selected{% endif %}>XS (Extra Small)</option>
+                                <option value="s" {% if form.size.value == 's' %}selected{% endif %}>S (Small)</option>
+                                <option value="m" {% if form.size.value == 'm' %}selected{% endif %}>M (Medium)</option>
+                                <option value="l" {% if form.size.value == 'l' %}selected{% endif %}>L (Large)</option>
+                                <option value="xl" {% if form.size.value == 'xl' %}selected{% endif %}>XL (Extra Large)</option>
+                                <option value="xxl" {% if form.size.value == 'xxl' %}selected{% endif %}>XXL (Double Extra Large)</option>
+                                <option value="one_size" {% if form.size.value == 'one_size' %}selected{% endif %}>One Size Fits All</option>
+                                <option value="2t" {% if form.size.value == '2t' %}selected{% endif %}>2T (Toddler)</option>
+                                <option value="3t" {% if form.size.value == '3t' %}selected{% endif %}>3T (Toddler)</option>
+                                <option value="4t" {% if form.size.value == '4t' %}selected{% endif %}>4T (Toddler)</option>
+                                <option value="5t" {% if form.size.value == '5t' %}selected{% endif %}>5T (Toddler)</option>
+                                <option value="6" {% if form.size.value == '6' %}selected{% endif %}>6 (Kids)</option>
+                                <option value="8" {% if form.size.value == '8' %}selected{% endif %}>8 (Kids)</option>
+                                <option value="10" {% if form.size.value == '10' %}selected{% endif %}>10 (Kids)</option>
+                                <option value="12" {% if form.size.value == '12' %}selected{% endif %}>12 (Kids)</option>
+                                <option value="14" {% if form.size.value == '14' %}selected{% endif %}>14 (Kids)</option>
+                                <option value="16" {% if form.size.value == '16' %}selected{% endif %}>16 (Kids)</option>
+                            </select>
+                            <i class="fas fa-chevron-down select-arrow"></i>
+                        </div>
+                        {% if form.size.errors %}
+                        <span class="error-message show">{{ form.size.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Gender Field -->
+                    <div class="form-group">
+                        <label for="gender" class="form-label">Gender</label>
+                        <div class="select-wrapper">
+                            <select id="gender" name="gender" class="form-input">
+                                <option value="">Select Gender</option>
+                                <option value="men" {% if form.gender.value == 'men' %}selected{% endif %}>Men</option>
+                                <option value="women" {% if form.gender.value == 'women' %}selected{% endif %}>Women</option>
+                                <option value="unisex" {% if form.gender.value == 'unisex' %}selected{% endif %}>Unisex</option>
+                                <option value="kids" {% if form.gender.value == 'kids' %}selected{% endif %}>Kids</option>
+                                <option value="boys" {% if form.gender.value == 'boys' %}selected{% endif %}>Boys</option>
+                                <option value="girls" {% if form.gender.value == 'girls' %}selected{% endif %}>Girls</option>
+                                <option value="baby_boy" {% if form.gender.value == 'baby_boy' %}selected{% endif %}>Baby Boy</option>
+                                <option value="baby_girl" {% if form.gender.value == 'baby_girl' %}selected{% endif %}>Baby Girl</option>
+                            </select>
+                            <i class="fas fa-chevron-down select-arrow"></i>
+                        </div>
+                        {% if form.gender.errors %}
+                        <span class="error-message show">{{ form.gender.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Condition Field -->
+                    <div class="form-group">
+                        <label for="condition" class="form-label">Preferred Condition</label>
+                        <div class="select-wrapper">
+                            <select id="condition" name="condition" class="form-input">
+                                <option value="">Any Condition</option>
+                                <option value="new" {% if form.condition.value == 'new' %}selected{% endif %}>New - Never worn with tags</option>
+                                <option value="like_new" {% if form.condition.value == 'like_new' %}selected{% endif %}>Like New - Gently used, excellent condition</option>
+                                <option value="good" {% if form.condition.value == 'good' %}selected{% endif %}>Good - Normal wear, minor signs of use</option>
+                                <option value="fair" {% if form.condition.value == 'fair' %}selected{% endif %}>Fair - Visible wear but still functional</option>
+                                <option value="any" {% if form.condition.value == 'any' %}selected{% endif %}>Any Condition - I'm not picky</option>
+                            </select>
+                            <i class="fas fa-chevron-down select-arrow"></i>
+                        </div>
+                        {% if form.condition.errors %}
+                        <span class="error-message show">{{ form.condition.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Urgency Field -->
+                    <div class="form-group">
+                        <label for="urgency" class="form-label">Urgency Level</label>
+                        <div class="select-wrapper">
+                            <select id="urgency" name="urgency" class="form-input">
+                                <option value="low" {% if form.urgency.value == 'low' %}selected{% endif %}>
+                                    Low - Whenever available
+                                </option>
+                                <option value="medium" {% if form.urgency.value == 'medium' %}selected{% endif %}>
+                                    Medium - In the next few weeks
+                                </option>
+                                <option value="high" {% if form.urgency.value == 'high' %}selected{% endif %}>
+                                    High - As soon as possible
+                                </option>
+                            </select>
+                            <i class="fas fa-chevron-down select-arrow"></i>
+                        </div>
+                        {% if form.urgency.errors %}
+                        <span class="error-message show">{{ form.urgency.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Age Group Field -->
+                    <div class="form-group">
+                        <label for="age_group" class="form-label">Age Group</label>
+                        <div class="select-wrapper">
+                            <select id="age_group" name="age_group" class="form-input">
+                                <option value="">Any Age</option>
+                                <option value="newborn" {% if form.age_group.value == 'newborn' %}selected{% endif %}>Newborn (0-3 months)</option>
+                                <option value="infant" {% if form.age_group.value == 'infant' %}selected{% endif %}>Infant (3-12 months)</option>
+                                <option value="toddler" {% if form.age_group.value == 'toddler' %}selected{% endif %}>Toddler (1-4 years)</option>
+                                <option value="child" {% if form.age_group.value == 'child' %}selected{% endif %}>Child (5-12 years)</option>
+                                <option value="teen" {% if form.age_group.value == 'teen' %}selected{% endif %}>Teen (13-17 years)</option>
+                                <option value="adult" {% if form.age_group.value == 'adult' %}selected{% endif %}>Adult (18-64 years)</option>
+                                <option value="senior" {% if form.age_group.value == 'senior' %}selected{% endif %}>Senior (65+ years)</option>
+                            </select>
+                            <i class="fas fa-chevron-down select-arrow"></i>
+                        </div>
+                        {% if form.age_group.errors %}
+                        <span class="error-message show">{{ form.age_group.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Season Field -->
+                    <div class="form-group">
+                        <label for="season" class="form-label">Season</label>
+                        <div class="select-wrapper">
+                            <select id="season" name="season" class="form-input">
+                                <option value="">Any Season</option>
+                                <option value="spring" {% if form.season.value == 'spring' %}selected{% endif %}>Spring</option>
+                                <option value="summer" {% if form.season.value == 'summer' %}selected{% endif %}>Summer</option>
+                                <option value="fall" {% if form.season.value == 'fall' %}selected{% endif %}>Fall/Autumn</option>
+                                <option value="winter" {% if form.season.value == 'winter' %}selected{% endif %}>Winter</option>
+                                <option value="all_season" {% if form.season.value == 'all_season' %}selected{% endif %}>All Season</option>
+                            </select>
+                            <i class="fas fa-chevron-down select-arrow"></i>
+                        </div>
+                        {% if form.season.errors %}
+                        <span class="error-message show">{{ form.season.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Item Type Field -->
+                    <div class="form-group">
+                        <label for="item_type" class="form-label">Item Type</label>
+                        <div class="select-wrapper">
+                            <select id="item_type" name="item_type" class="form-input">
+                                <option value="">Any Type</option>
+                                <option value="t_shirt" {% if form.item_type.value == 't_shirt' %}selected{% endif %}>T-Shirt</option>
+                                <option value="shirt" {% if form.item_type.value == 'shirt' %}selected{% endif %}>Shirt/Blouse</option>
+                                <option value="pants" {% if form.item_type.value == 'pants' %}selected{% endif %}>Pants/Trousers</option>
+                                <option value="jeans" {% if form.item_type.value == 'jeans' %}selected{% endif %}>Jeans</option>
+                                <option value="shorts" {% if form.item_type.value == 'shorts' %}selected{% endif %}>Shorts</option>
+                                <option value="skirt" {% if form.item_type.value == 'skirt' %}selected{% endif %}>Skirt</option>
+                                <option value="dress" {% if form.item_type.value == 'dress' %}selected{% endif %}>Dress</option>
+                                <option value="jacket" {% if form.item_type.value == 'jacket' %}selected{% endif %}>Jacket</option>
+                                <option value="coat" {% if form.item_type.value == 'coat' %}selected{% endif %}>Coat</option>
+                                <option value="sweater" {% if form.item_type.value == 'sweater' %}selected{% endif %}>Sweater/Hoodie</option>
+                                <option value="shoes" {% if form.item_type.value == 'shoes' %}selected{% endif %}>Shoes</option>
+                                <option value="boots" {% if form.item_type.value == 'boots' %}selected{% endif %}>Boots</option>
+                                <option value="accessories" {% if form.item_type.value == 'accessories' %}selected{% endif %}>Accessories</option>
+                                <option value="underwear" {% if form.item_type.value == 'underwear' %}selected{% endif %}>Underwear</option>
+                                <option value="socks" {% if form.item_type.value == 'socks' %}selected{% endif %}>Socks</option>
+                                <option value="sportswear" {% if form.item_type.value == 'sportswear' %}selected{% endif %}>Sportswear</option>
+                                <option value="formal" {% if form.item_type.value == 'formal' %}selected{% endif %}>Formal Wear</option>
+                                <option value="swimwear" {% if form.item_type.value == 'swimwear' %}selected{% endif %}>Swimwear</option>
+                            </select>
+                            <i class="fas fa-chevron-down select-arrow"></i>
+                        </div>
+                        {% if form.item_type.errors %}
+                        <span class="error-message show">{{ form.item_type.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Title Field -->
+                    <div class="form-group full-width">
+                        <label for="title" class="form-label required">Request Title *</label>
+                        <input type="text" id="title" name="title" class="form-input" 
+                               placeholder="e.g., Winter Jacket for cold weather, School uniform for child" 
+                               value="{{ form.title.value|default:'' }}" required maxlength="200">
+                        {% if form.title.errors %}
+                        <span class="error-message show">{{ form.title.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Description Field -->
+                    <div class="form-group full-width">
+                        <label for="description" class="form-label required">Specific Needs *</label>
+                        <textarea id="description" name="description" class="form-input form-textarea" 
+                                  rows="6" placeholder="Describe what you're looking for and why you need it. Include details like preferred colors, materials, specific needs, or any special circumstances..." 
+                                  required>{{ form.description.value|default:'' }}</textarea>
+                        <div class="char-counter">
+                            <span id="charCount">0</span>/500 characters
+                        </div>
+                        {% if form.description.errors %}
+                        <span class="error-message show">{{ form.description.errors.0 }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Special Requirements -->
+                    <div class="form-group full-width">
+                        <label class="form-label">Special Requirements (Optional)</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="allergy_friendly" value="true" 
+                                       {% if form.allergy_friendly.value %}checked{% endif %}>
+                                <span class="checkmark"></span>
+                                Hypoallergenic materials preferred
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="eco_friendly" value="true"
+                                       {% if form.eco_friendly.value %}checked{% endif %}>
+                                <span class="checkmark"></span>
+                                Prefer eco-friendly/sustainable materials
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="new_only" value="true"
+                                       {% if form.new_only.value %}checked{% endif %}>
+                                <span class="checkmark"></span>
+                                Only accept new items
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="local_only" value="true"
+                                       {% if form.local_only.value %}checked{% endif %}>
+                                <span class="checkmark"></span>
+                                Prefer local pickup only
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Form Actions -->
+                <div class="form-actions">
+                    <a href="{% url 'core:view_requests' %}" class="btn btn--outline">
+                        <i class="fas fa-arrow-left"></i> Back to Requests
+                    </a>
+                    <button type="submit" class="btn btn--primary" id="submitBtn">
+                        <i class="fas fa-paper-plane"></i> Submit Request
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Help Section -->
+        <div class="help-section">
+            <div class="help-card">
+                <div class="help-icon">
+                    <i class="fas fa-lightbulb"></i>
+                </div>
+                <div class="help-content">
+                    <h3>Tips for Better Requests</h3>
+                    <ul class="help-tips">
+                        <li><strong>Be specific:</strong> Include sizes, colors, and preferred styles</li>
+                        <li><strong>Explain your need:</strong> Help donors understand your situation</li>
+                        <li><strong>Set realistic urgency:</strong> Choose the appropriate urgency level</li>
+                        <li><strong>Consider all options:</strong> Be open to different colors and styles</li>
+                        <li><strong>Include special requirements:</strong> Mention allergies or material preferences</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Request Section Styling */
+    .request-section {
+        padding: var(--section-padding);
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+        min-height: calc(100vh - 200px);
+    }
+
+    .request-header {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+
+    .request-title {
+        font-size: 2.5rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        position: relative;
+    }
+
+    .request-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 80px;
+        height: 4px;
+        background: var(--accent-color);
+        border-radius: 2px;
+    }
+
+    .request-subtitle {
+        font-size: 1.2rem;
+        color: var(--gray-color);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* Form Container */
+    .request-form-container {
+        max-width: 1000px;
+        margin: 0 auto 3rem;
+    }
+
+    .request-form {
+        background: white;
+        padding: 2.5rem;
+        border-radius: var(--border-radius-lg);
+        box-shadow: var(--box-shadow-lg);
+        border: 1px solid var(--border-color);
+    }
+
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--dark-color);
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+    }
+
+    .form-label.required::after {
+        content: '*';
+        color: var(--danger-color);
+    }
+
+    /* Select Wrapper Styling */
+    .select-wrapper {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+
+    .select-wrapper select {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--light-gray);
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        font-family: inherit;
+        transition: var(--transition);
+        background: white;
+        appearance: none;
+        cursor: pointer;
+    }
+
+    .select-arrow {
+        position: absolute;
+        right: 1rem;
+        color: var(--gray-color);
+        pointer-events: none;
+        transition: var(--transition);
+    }
+
+    .select-wrapper select:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+    }
+
+    .select-wrapper select:focus + .select-arrow {
+        color: var(--primary-color);
+        transform: rotate(180deg);
+    }
+
+    .select-wrapper select:hover {
+        border-color: var(--medium-gray);
+    }
+
+    /* Input and Textarea Styling */
+    .form-input,
+    .form-textarea {
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--light-gray);
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        font-family: inherit;
+        transition: var(--transition);
+        background: white;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+    }
+
+    .form-textarea {
+        resize: vertical;
+        min-height: 150px;
+        line-height: 1.5;
+    }
+
+    .form-input:invalid:not(:focus):not(:placeholder-shown) {
+        border-color: var(--danger-color);
+    }
+
+    .form-input:valid:not(:focus):not(:placeholder-shown) {
+        border-color: var(--success-color);
+    }
+
+    /* Checkbox Group Styling */
+    .checkbox-group {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        background: var(--light-color);
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+        border: 1px solid var(--border-color);
+    }
+
+    .checkbox-label {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        cursor: pointer;
+        font-weight: 500;
+        color: var(--dark-color);
+        transition: var(--transition);
+    }
+
+    .checkbox-label:hover {
+        color: var(--primary-color);
+    }
+
+    .checkbox-label input[type="checkbox"] {
+        display: none;
+    }
+
+    .checkmark {
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--medium-gray);
+        border-radius: 4px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: var(--transition);
+        flex-shrink: 0;
+    }
+
+    .checkmark::after {
+        content: '✓';
+        color: white;
+        font-size: 12px;
+        font-weight: bold;
+        opacity: 0;
+        transition: var(--transition);
+    }
+
+    .checkbox-label input[type="checkbox"]:checked + .checkmark {
+        background: var(--primary-color);
+        border-color: var(--primary-color);
+    }
+
+    .checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+        opacity: 1;
+    }
+
+    /* Character Counter */
+    .char-counter {
+        text-align: right;
+        font-size: 0.875rem;
+        color: var(--gray-color);
+        margin-top: 0.5rem;
+    }
+
+    .char-counter.warning {
+        color: var(--warning-color);
+    }
+
+    .char-counter.error {
+        color: var(--danger-color);
+    }
+
+    /* Error Message Styling */
+    .error-message {
+        color: var(--danger-color);
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: none;
+    }
+
+    .error-message.show {
+        display: block;
+    }
+
+    /* Form Actions */
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 2rem;
+        border-top: 1px solid var(--border-color);
+        gap: 1rem;
+    }
+
+    /* Help Section */
+    .help-section {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .help-card {
+        background: white;
+        padding: 2rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        border-left: 4px solid var(--accent-color);
+        display: flex;
+        gap: 1.5rem;
+        align-items: flex-start;
+    }
+
+    .help-icon {
+        background: var(--accent-color);
+        color: white;
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .help-content h3 {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .help-tips {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .help-tips li {
+        padding: 0.5rem 0;
+        color: var(--gray-color);
+        position: relative;
+        padding-left: 0;
+        line-height: 1.5;
+    }
+
+    .help-tips li strong {
+        color: var(--dark-color);
+    }
+
+    /* Loading State */
+    .btn--loading {
+        position: relative;
+        color: transparent;
+    }
+
+    .btn--loading::after {
+        content: '';
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        top: 50%;
+        left: 50%;
+        margin-left: -10px;
+        margin-top: -10px;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        border-top-color: transparent;
+        animation: spin 1s ease-in-out infinite;
+    }
+
+    @keyframes spin {
+        to { transform: rotate(360deg); }
+    }
+
+    /* Success Message */
+    .success-message {
+        background: var(--success-color);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 2rem;
+        text-align: center;
+        animation: slideDown 0.3s ease;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .request-title {
+            font-size: 2rem;
+        }
+
+        .form-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .request-form {
+            padding: 1.5rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .help-card {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        .help-icon {
+            align-self: center;
+        }
+
+        .checkbox-group {
+            padding: 1rem;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .request-section {
+            padding: 2rem 0;
+        }
+
+        .request-title {
+            font-size: 1.8rem;
+        }
+
+        .request-form {
+            padding: 1rem;
+        }
+    }
+
+    /* Focus states for accessibility */
+    .form-input:focus,
+    .form-textarea:focus,
+    select:focus {
+        outline: 2px solid var(--primary-color);
+        outline-offset: 2px;
+    }
+
+    /* Hover effects */
+    .form-input:hover,
+    .form-textarea:hover,
+    select:hover {
+        border-color: var(--medium-gray);
+    }
+
+    /* Custom scrollbar for select elements */
+    select::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    select::-webkit-scrollbar-track {
+        background: var(--light-gray);
+        border-radius: 4px;
+    }
+
+    select::-webkit-scrollbar-thumb {
+        background: var(--medium-gray);
+        border-radius: 4px;
+    }
+
+    select::-webkit-scrollbar-thumb:hover {
+        background: var(--gray-color);
+    }
+
+    /* Group labels for better organization */
+    .select-wrapper select option {
+        padding: 0.5rem;
+    }
+
+    .select-wrapper select optgroup {
+        font-weight: 600;
+        color: var(--primary-color);
+        background: var(--light-color);
+    }
+
+    .select-wrapper select optgroup option {
+        padding-left: 1rem;
+        font-weight: normal;
+        color: var(--dark-color);
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('requestForm');
+        const description = document.getElementById('description');
+        const charCount = document.getElementById('charCount');
+        const charCounter = charCount.parentElement;
+        const submitBtn = document.getElementById('submitBtn');
+        const selectElements = document.querySelectorAll('select');
+
+        // Character counter for description
+        description.addEventListener('input', function() {
+            const length = this.value.length;
+            charCount.textContent = length;
+
+            // Update counter color based on length
+            if (length > 450) {
+                charCounter.classList.add('error');
+                charCounter.classList.remove('warning');
+            } else if (length > 400) {
+                charCounter.classList.add('warning');
+                charCounter.classList.remove('error');
+            } else {
+                charCounter.classList.remove('warning', 'error');
+            }
+        });
+
+        // Initialize character count
+        charCount.textContent = description.value.length;
+
+        // Enhance select elements
+        selectElements.forEach(select => {
+            // Add custom styling based on selection
+            select.addEventListener('change', function() {
+                if (this.value) {
+                    this.style.borderColor = 'var(--success-color)';
+                    this.style.color = 'var(--dark-color)';
+                } else {
+                    this.style.borderColor = 'var(--light-gray)';
+                    this.style.color = 'var(--gray-color)';
+                }
+            });
+
+            // Initialize select styling
+            if (select.value) {
+                select.style.borderColor = 'var(--success-color)';
+                select.style.color = 'var(--dark-color)';
+            }
+        });
+
+        // Form validation and submission
+        form.addEventListener('submit', function(e) {
+            let isValid = true;
+            const requiredFields = form.querySelectorAll('[required]');
+
+            // Clear previous errors
+            form.querySelectorAll('.error-message').forEach(error => {
+                error.classList.remove('show');
+            });
+
+            // Validate required fields
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.style.borderColor = 'var(--danger-color)';
+                    
+                    // Show error message
+                    let errorElement = field.parentElement.querySelector('.error-message');
+                    if (!errorElement) {
+                        errorElement = document.createElement('span');
+                        errorElement.className = 'error-message show';
+                        errorElement.textContent = 'This field is required';
+                        field.parentElement.appendChild(errorElement);
+                    } else {
+                        errorElement.classList.add('show');
+                    }
+                } else {
+                    if (field.type !== 'select-one') {
+                        field.style.borderColor = 'var(--success-color)';
+                    }
+                }
+            });
+
+            // Validate description length
+            if (description.value.length > 500) {
+                isValid = false;
+                description.style.borderColor = 'var(--danger-color)';
+                charCounter.classList.add('error');
+                
+                let errorElement = description.parentElement.querySelector('.error-message');
+                if (!errorElement) {
+                    errorElement = document.createElement('span');
+                    errorElement.className = 'error-message show';
+                    errorElement.textContent = 'Description must be 500 characters or less';
+                    description.parentElement.appendChild(errorElement);
+                } else {
+                    errorElement.textContent = 'Description must be 500 characters or less';
+                    errorElement.classList.add('show');
+                }
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+                
+                // Scroll to first error
+                const firstError = form.querySelector('.error-message.show');
+                if (firstError) {
+                    firstError.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                }
+            } else {
+                // Show loading state
+                submitBtn.disabled = true;
+                submitBtn.classList.add('btn--loading');
+                submitBtn.innerHTML = 'Submitting...';
+            }
+        });
+
+        // Real-time validation for required fields
+        form.querySelectorAll('[required]').forEach(field => {
+            field.addEventListener('blur', function() {
+                if (!this.value.trim()) {
+                    this.style.borderColor = 'var(--danger-color)';
+                } else {
+                    if (this.type !== 'select-one') {
+                        this.style.borderColor = 'var(--success-color)';
+                    }
+                }
+            });
+
+            field.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    if (this.type !== 'select-one') {
+                        this.style.borderColor = 'var(--success-color)';
+                    }
+                    const errorElement = this.parentElement.querySelector('.error-message');
+                    if (errorElement) {
+                        errorElement.classList.remove('show');
+                    }
+                }
+            });
+        });
+
+        // Description specific validation
+        description.addEventListener('blur', function() {
+            if (this.value.length > 500) {
+                this.style.borderColor = 'var(--danger-color)';
+                charCounter.classList.add('error');
+            } else if (this.value.trim()) {
+                this.style.borderColor = 'var(--success-color)';
+            }
+        });
+
+        // Auto-resize textarea
+        description.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = (this.scrollHeight) + 'px';
+        });
+
+        // Initialize textarea height
+        description.style.height = 'auto';
+        description.style.height = (description.scrollHeight) + 'px';
+
+        // Add smooth focus for form elements
+        form.querySelectorAll('.form-input, .form-textarea, select').forEach(element => {
+            element.addEventListener('focus', function() {
+                this.parentElement.style.transform = 'translateY(-2px)';
+            });
+
+            element.addEventListener('blur', function() {
+                this.parentElement.style.transform = 'translateY(0)';
+            });
+        });
+    });
+
+    // Handle page refresh - don't show form resubmission warning
+    if (window.history.replaceState) {
+        window.history.replaceState(null, null, window.location.href);
+    }
+</script>
+{% endblock %}

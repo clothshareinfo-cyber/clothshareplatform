@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exchange Cancellation Notification</title>
+    <style>
+        body { 
+            font-family: 'Arial', sans-serif; 
+            line-height: 1.6; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f9f9f9;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header { 
+            background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+            padding: 20px; 
+            text-align: center; 
+            border-radius: 8px 8px 0 0;
+            color: white;
+        }
+        .content { 
+            padding: 25px; 
+        }
+        .item-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #ff6b6b;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 15px 0;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+        .highlight {
+            color: #ff6b6b;
+            font-weight: bold;
+        }
+        .reason-box {
+            background: #fff3f3;
+            border: 1px solid #ffcdd2;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            background-color: #ff6b6b;
+            color: white;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .item-card {
+            display: flex;
+            background: white;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid #eee;
+        }
+        .item-image {
+            width: 80px;
+            height: 80px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: #999;
+            font-size: 12px;
+        }
+        .item-info {
+            flex: 1;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: #6c757d;
+            font-weight: bold;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .encouragement {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            text-align: center;
+            margin: 20px 0;
+            border-left: 4px solid #6c757d;
+        }
+        .cancellation-details {
+            background: #fff9f9;
+            border: 1px solid #ffcdd2;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        .next-steps {
+            background: #f0f7ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #4A90E2;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .item-card {
+                flex-direction: column;
+            }
+            .item-image {
+                margin-right: 0;
+                margin-bottom: 10px;
+                width: 100%;
+                height: 120px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>❌ Exchange Cancelled</h2>
+        </div>
+        
+        <div class="content">
+            <p>Hello <strong>{% if exchange.requester == user %}{{ exchange.requester.username }}{% else %}{{ exchange.donor.username }}{% endif %}</strong>,</p>
+            
+            <p>We're writing to inform you that the exchange request has been <span class="highlight">cancelled</span>.</p>
+            
+            <div class="cancellation-details">
+                <h3>Cancellation Details:</h3>
+                <div class="user-info">
+                    <div class="user-avatar">
+                        {% if exchange.status == 'cancelled_by_requester' %}
+                            {{ exchange.requester.username|first|upper }}
+                        {% elif exchange.status == 'cancelled_by_donor' %}
+                            {{ exchange.donor.username|first|upper }}
+                        {% else %}
+                            S
+                        {% endif %}
+                    </div>
+                    <div>
+                        <p><strong>Cancelled By:</strong> 
+                            {% if exchange.status == 'cancelled_by_requester' %}
+                                {{ exchange.requester.username }} (Requester)
+                            {% elif exchange.status == 'cancelled_by_donor' %}
+                                {{ exchange.donor.username }} (Donor)
+                            {% else %}
+                                System
+                            {% endif %}
+                        </p>
+                        <p><strong>Cancelled On:</strong> {{ exchange.updated_at|date:"F j, Y" }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="item-details">
+                <h3>Exchange Details:</h3>
+                <div class="item-card">
+                    <div class="item-image">
+                        [Item Image]
+                    </div>
+                    <div class="item-info">
+                        <h4>{{ exchange.item.title }}</h4>
+                        <p><strong>Category:</strong> {{ exchange.item.category.name }}</p>
+                        <p><strong>Condition:</strong> {{ exchange.item.condition }}</p>
+                        <p><strong>Requester:</strong> {{ exchange.requester.username }}</p>
+                        <p><strong>Donor:</strong> {{ exchange.donor.username }}</p>
+                    </div>
+                </div>
+            </div>
+
+            {% if exchange.cancellation_reason %}
+            <div class="reason-box">
+                <p><strong>Cancellation Reason:</strong></p>
+                <p><em>"{{ exchange.cancellation_reason }}"</em></p>
+            </div>
+            {% endif %}
+
+            <div class="next-steps">
+                <h3>What happens next?</h3>
+                <ul>
+                    <li>The exchange will no longer proceed</li>
+                    <li>The item will be available for other requests</li>
+                    <li>You can explore other options in our catalog</li>
+                    <li>No further action is required from you</li>
+                </ul>
+            </div>
+
+            <div class="encouragement">
+                <p><strong>Don't be discouraged!</strong> There are plenty of other items available. Keep exploring to find your perfect match.</p>
+            </div>
+
+            <div class="action-buttons">
+                <a href="{{ protocol }}://{{ domain }}{% url 'core:browse_items' %}" class="button">
+                    Browse More Items
+                </a>
+                <a href="{{ protocol }}://{{ domain }}{% url 'core:my_exchanges' %}" class="button" style="background-color: #ff6b6b;">
+                    View My Exchanges
+                </a>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>Thank you for your understanding and continued participation in the ClothShare community! 🌱</p>
+            <p>We're here to help you find what you're looking for.</p>
+            <p><small>This is an automated message. Please do not reply to this email.</small></p>
+            <p><small>If you have any questions, please visit our <a href="#" style="color: #ff6b6b;">Help Center</a>.</small></p>
+        </div>
+    </div>
+</body>
+</html>

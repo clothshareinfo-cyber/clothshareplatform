@@ -1,0 +1,909 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}My Requests | ClothShare{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Page Header */
+    .page-header {
+        background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+        text-align: center;
+        padding: 4rem 0;
+        margin-top: 70px;
+    }
+
+    .page-header__title {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .page-header__subtitle {
+        font-size: 1.2rem;
+        color: var(--gray-color);
+        max-width: 600px;
+        margin: 0 auto 2rem;
+    }
+
+    .page-header__actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* Requests List */
+    .requests-container {
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .requests-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .request-item {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        padding: 2rem;
+        border-left: 4px solid var(--accent-color);
+        transition: var(--transition);
+    }
+
+    .request-item:hover {
+        transform: translateX(5px);
+        box-shadow: var(--box-shadow-hover);
+    }
+
+    .request-item__header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .request-item__title {
+        font-size: 1.3rem;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .request-meta {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .request-category {
+        background: var(--light-color);
+        color: var(--primary-color);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-weight: 500;
+        font-size: 0.9rem;
+    }
+
+    .request-urgency, .request-status {
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    .urgency-high {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .urgency-medium {
+        background: #fff3cd;
+        color: #856404;
+    }
+
+    .urgency-low {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-open {
+        background: #d1ecf1;
+        color: #0c5460;
+    }
+
+    .status-fulfilled {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .status-cancelled {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .request-item__body {
+        margin-bottom: 1.5rem;
+    }
+
+    .request-description {
+        color: var(--gray-color);
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+
+    .request-details {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .detail-item {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .detail-item strong {
+        font-size: 0.8rem;
+        color: var(--gray-color);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .detail-item span {
+        font-weight: 500;
+        color: var(--dark-color);
+    }
+
+    .request-item__footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid var(--border-color);
+        flex-wrap: wrap;
+        gap: 1rem;
+    }
+
+    .request-actions {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    /* No Results */
+    .no-results {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+    }
+
+    .no-results__icon {
+        font-size: 4rem;
+        color: var(--light-gray);
+        margin-bottom: 1.5rem;
+    }
+
+    .no-results__title {
+        color: var(--dark-color);
+        margin-bottom: 1rem;
+        font-size: 1.8rem;
+    }
+
+    .no-results__message {
+        color: var(--gray-color);
+        max-width: 500px;
+        margin: 0 auto 2rem;
+        line-height: 1.6;
+        font-size: 1.1rem;
+    }
+
+    .no-results__actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* Status Filter */
+    .status-filter {
+        background: white;
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        margin-bottom: 2rem;
+    }
+
+    .status-filter__title {
+        margin-bottom: 1rem;
+        color: var(--primary-color);
+    }
+
+    .status-filter__options {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .status-filter__option {
+        padding: 0.5rem 1rem;
+        border: 2px solid var(--light-gray);
+        border-radius: var(--border-radius);
+        background: white;
+        cursor: pointer;
+        transition: var(--transition);
+        font-weight: 500;
+    }
+
+    .status-filter__option.active {
+        background: var(--primary-color);
+        color: white;
+        border-color: var(--primary-color);
+    }
+
+    .status-filter__option:hover:not(.active) {
+        border-color: var(--primary-color);
+    }
+
+    /* Modal Styling */
+    .modal {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 2000;
+        overflow-y: auto;
+        padding: 1rem;
+    }
+
+    .modal__content {
+        background: white;
+        margin: 2rem auto;
+        width: 90%;
+        max-width: 600px;
+        border-radius: var(--border-radius-lg);
+        position: relative;
+        animation: modalSlideIn 0.3s ease;
+        box-shadow: var(--box-shadow-lg);
+    }
+
+    @keyframes modalSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-50px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .modal__close {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: var(--gray-color);
+        z-index: 1;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        transition: var(--transition);
+    }
+
+    .modal__close:hover {
+        color: var(--dark-color);
+        background: var(--light-gray);
+    }
+
+    .modal__body {
+        padding: 2rem;
+    }
+
+    .modal__title {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: var(--dark-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .modal__description {
+        color: var(--gray-color);
+        margin-bottom: 2rem;
+        line-height: 1.6;
+    }
+
+    /* Form Elements */
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+
+    .form-input {
+        width: 100%;
+        padding: 0.75rem;
+        border: 2px solid var(--light-gray);
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        transition: var(--transition);
+    }
+
+    .form-input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+    }
+
+    .input-group {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .input-group .form-input {
+        flex: 1;
+    }
+
+    /* Share Options */
+    .share-options {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .social-buttons {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap;
+    }
+
+    /* Fulfillment Details */
+    .fulfillment-details {
+        padding: 1rem 0;
+    }
+
+    .fulfillment-info h4 {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+    }
+
+    .fulfillment-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin: 1.5rem 0;
+    }
+
+    .meta-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .meta-item strong {
+        color: var(--dark-color);
+    }
+
+    .meta-item span {
+        color: var(--gray-color);
+    }
+
+    .fulfillment-actions {
+        margin-top: 2rem;
+        text-align: center;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .page-header__title {
+            font-size: 2.5rem;
+        }
+        
+        .request-item__header {
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        
+        .request-meta {
+            width: 100%;
+        }
+        
+        .request-item__footer {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .request-actions {
+            justify-content: center;
+        }
+        
+        .status-filter__options {
+            flex-direction: column;
+        }
+
+        .modal__content {
+            margin: 10% auto;
+            width: 95%;
+        }
+
+        .social-buttons {
+            flex-direction: column;
+        }
+
+        .input-group {
+            flex-direction: column;
+        }
+    }
+
+    @media (max-width: 480px) {
+        .page-header__title {
+            font-size: 2rem;
+        }
+        
+        .request-item {
+            padding: 1.5rem;
+        }
+        
+        .request-details {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="page-header section">
+    <div class="container">
+        <div class="page-header__content">
+            <h1 class="page-header__title">My Requests</h1>
+            <p class="page-header__subtitle">
+                Manage your clothing requests and track their status.
+            </p>
+            <div class="page-header__actions">
+                <a href="{% url 'core:request' %}" class="btn btn--primary">
+                    <i class="fas fa-plus"></i> Create New Request
+                </a>
+                <a href="{% url 'core:view_requests' %}" class="btn btn--outline">
+                    <i class="fas fa-list"></i> Browse All Requests
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Status Filter -->
+<section class="section">
+    <div class="container">
+        <div class="status-filter">
+            <h3 class="status-filter__title">Filter by Status</h3>
+            <div class="status-filter__options">
+                <button class="status-filter__option active" data-status="all">
+                    All Requests ({{ requests|length }})
+                </button>
+                <button class="status-filter__option" data-status="open">
+                    Open ({{ requests|length }})
+                </button>
+                <button class="status-filter__option" data-status="fulfilled">
+                    Fulfilled (0)
+                </button>
+                <button class="status-filter__option" data-status="cancelled">
+                    Cancelled (0)
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Requests List Section -->
+<section class="section">
+    <div class="container">
+        <div class="requests-container">
+            {% if requests %}
+            <div class="requests-list" id="requestsList">
+                {% for clothing_request in requests %}
+                <div class="request-item" data-status="{{ clothing_request.status }}">
+                    <div class="request-item__header">
+                        <div>
+                            <h3 class="request-item__title">{{ clothing_request.title }}</h3>
+                            <div class="request-meta">
+                                <span class="request-category">
+                                    <i class="fas fa-tshirt"></i>
+                                    {{ clothing_request.category.name }}
+                                </span>
+                                <span class="request-urgency urgency-{{ clothing_request.urgency }}">
+                                    <i class="fas fa-clock"></i>
+                                    {{ clothing_request.get_urgency_display }}
+                                </span>
+                                <span class="request-status status-{{ clothing_request.status }}">
+                                    {{ clothing_request.get_status_display }}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="request-date">
+                            <small style="color: var(--gray-color);">
+                                {{ clothing_request.created_at|date:"M d, Y" }}
+                            </small>
+                        </div>
+                    </div>
+                    
+                    <div class="request-item__body">
+                        <p class="request-description">{{ clothing_request.description }}</p>
+                        
+                        <div class="request-details">
+                            {% if clothing_request.size %}
+                            <div class="detail-item">
+                                <strong>Size Needed:</strong>
+                                <span>{{ clothing_request.size }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            {% if clothing_request.gender %}
+                            <div class="detail-item">
+                                <strong>Gender:</strong>
+                                <span>{{ clothing_request.gender }}</span>
+                            </div>
+                            {% endif %}
+                            
+                            <div class="detail-item">
+                                <strong>Date Requested:</strong>
+                                <span>{{ clothing_request.created_at|date:"M d, Y" }}</span>
+                            </div>
+                            
+                            {% if clothing_request.updated_at != clothing_request.created_at %}
+                            <div class="detail-item">
+                                <strong>Last Updated:</strong>
+                                <span>{{ clothing_request.updated_at|date:"M d, Y" }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="request-item__footer">
+                        <div class="request-info">
+                            {% if clothing_request.status == 'open' %}
+                            <span style="color: var(--success-color);">
+                                <i class="fas fa-eye"></i>
+                                Active request
+                            </span>
+                            {% elif clothing_request.status == 'fulfilled' %}
+                            <span style="color: var(--success-color);">
+                                <i class="fas fa-check-circle"></i>
+                                Request fulfilled
+                            </span>
+                            {% elif clothing_request.status == 'cancelled' %}
+                            <span style="color: var(--danger-color);">
+                                <i class="fas fa-times-circle"></i>
+                                Request cancelled
+                            </span>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="request-actions">
+                            {% if clothing_request.status == 'open' %}
+                            <button class="btn btn--outline btn--small" onclick="editRequest('{{ clothing_request.id }}')">
+                                <i class="fas fa-edit"></i> Edit
+                            </button>
+                            <a href="{% url 'core:delete_request' clothing_request.id %}" 
+                               class="btn btn--outline btn--small"
+                               onclick="return confirm('Are you sure you want to delete this request?');">
+                                <i class="fas fa-trash"></i> Delete
+                            </a>
+                            {% elif clothing_request.status == 'fulfilled' %}
+                            <button class="btn btn--outline btn--small" onclick="showFulfillmentDetails('{{ clothing_request.id }}')">
+                                <i class="fas fa-info-circle"></i> Details
+                            </button>
+                            {% endif %}
+                            
+                            {% if clothing_request.status != 'cancelled' %}
+                            <button class="btn btn--primary btn--small" onclick="shareRequest('{{ clothing_request.id }}')">
+                                <i class="fas fa-share"></i> Share
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- No Results Message -->
+            {% else %}
+            <div class="no-results">
+                <div class="no-results__icon">
+                    <i class="fas fa-inbox"></i>
+                </div>
+                <h3 class="no-results__title">No Requests Yet</h3>
+                <p class="no-results__message">
+                    You haven't created any clothing requests yet. Start by creating your first request to get help from the community.
+                </p>
+                <div class="no-results__actions">
+                    <a href="{% url 'core:request' %}" class="btn btn--primary">
+                        <i class="fas fa-plus"></i> Create First Request
+                    </a>
+                    <a href="{% url 'core:view_requests' %}" class="btn btn--outline">
+                        <i class="fas fa-search"></i> Browse Requests
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Fulfillment Details Modal -->
+<div class="modal" id="fulfillmentModal">
+    <div class="modal__content">
+        <span class="modal__close" onclick="closeFulfillmentModal()">&times;</span>
+        <div class="modal__body">
+            <h2 class="modal__title">Request Fulfillment Details</h2>
+            <div id="fulfillmentContent">
+                <!-- Content will be populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal" id="shareModal">
+    <div class="modal__content">
+        <span class="modal__close" onclick="closeShareModal()">&times;</span>
+        <div class="modal__body">
+            <h2 class="modal__title">Share Request</h2>
+            <p class="modal__description">
+                Share this request with others to increase visibility and get help faster.
+            </p>
+            
+            <div class="share-options">
+                <div class="share-link">
+                    <label class="form-label">Shareable Link</label>
+                    <div class="input-group">
+                        <input type="text" id="shareLink" class="form-input" readonly>
+                        <button class="btn btn--primary" onclick="copyShareLink()">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="social-share">
+                    <label class="form-label">Share on Social Media</label>
+                    <div class="social-buttons">
+                        <button class="btn btn--outline btn--small" onclick="shareOnFacebook()">
+                            <i class="fab fa-facebook-f"></i> Facebook
+                        </button>
+                        <button class="btn btn--outline btn--small" onclick="shareOnTwitter()">
+                            <i class="fab fa-twitter"></i> Twitter
+                        </button>
+                        <button class="btn btn--outline btn--small" onclick="shareOnWhatsApp()">
+                            <i class="fab fa-whatsapp"></i> WhatsApp
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Status Filter Functionality
+    document.addEventListener('DOMContentLoaded', function() {
+        const filterOptions = document.querySelectorAll('.status-filter__option');
+        const requestItems = document.querySelectorAll('.request-item');
+        
+        filterOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const status = this.getAttribute('data-status');
+                
+                // Update active filter
+                filterOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Filter requests
+                requestItems.forEach(item => {
+                    if (status === 'all' || item.getAttribute('data-status') === status) {
+                        item.style.display = 'block';
+                    } else {
+                        item.style.display = 'none';
+                    }
+                });
+            });
+        });
+    });
+    
+    // Fulfillment Details Modal
+    function showFulfillmentDetails(requestId) {
+        const modal = document.getElementById('fulfillmentModal');
+        const content = document.getElementById('fulfillmentContent');
+        
+        // In a real implementation, this would fetch fulfillment details via AJAX
+        content.innerHTML = `
+            <div class="fulfillment-details">
+                <div class="fulfillment-info">
+                    <h4>Request Fulfilled Successfully</h4>
+                    <p>Your request was fulfilled by a community member. Here are the details:</p>
+                    
+                    <div class="fulfillment-meta">
+                        <div class="meta-item">
+                            <strong>Fulfilled by:</strong>
+                            <span>Community Member</span>
+                        </div>
+                        <div class="meta-item">
+                            <strong>Date Fulfilled:</strong>
+                            <span>${new Date().toLocaleDateString()}</span>
+                        </div>
+                        <div class="meta-item">
+                            <strong>Items Received:</strong>
+                            <span>Winter Coat, Warm Scarf</span>
+                        </div>
+                    </div>
+                    
+                    <div class="fulfillment-actions">
+                        <button class="btn btn--primary" onclick="rateFulfillment('${requestId}')">
+                            <i class="fas fa-star"></i> Rate Experience
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeFulfillmentModal() {
+        const modal = document.getElementById('fulfillmentModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Share Modal Functionality
+    function shareRequest(requestId) {
+        const modal = document.getElementById('shareModal');
+        const shareLink = document.getElementById('shareLink');
+        
+        // Generate shareable link (in real app, this would be a proper URL)
+        const baseUrl = window.location.origin;
+        const shareUrl = `${baseUrl}/requests/${requestId}`;
+        shareLink.value = shareUrl;
+        
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closeShareModal() {
+        const modal = document.getElementById('shareModal');
+        modal.style.display = 'none';
+        document.body.style.overflow = 'auto';
+    }
+    
+    function copyShareLink() {
+        const shareLink = document.getElementById('shareLink');
+        shareLink.select();
+        document.execCommand('copy');
+        
+        // Show success message
+        showToast('Link copied to clipboard!');
+    }
+    
+    function shareOnFacebook() {
+        const shareUrl = document.getElementById('shareLink').value;
+        window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, '_blank');
+    }
+    
+    function shareOnTwitter() {
+        const shareUrl = document.getElementById('shareLink').value;
+        const text = "Check out this clothing request on ClothShare!";
+        window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
+    }
+    
+    function shareOnWhatsApp() {
+        const shareUrl = document.getElementById('shareLink').value;
+        const text = "Check out this clothing request on ClothShare!";
+        window.open(`https://wa.me/?text=${encodeURIComponent(text + ' ' + shareUrl)}`, '_blank');
+    }
+    
+    // Edit Request (placeholder function)
+    function editRequest(requestId) {
+        // In a real implementation, this would redirect to an edit page
+        // For now, show a message
+        showToast('Edit functionality would redirect to edit page for request: ' + requestId);
+    }
+    
+    // Rate Fulfillment
+    function rateFulfillment(requestId) {
+        // In a real implementation, this would open a rating modal
+        showToast('Rating functionality would open for request: ' + requestId);
+        closeFulfillmentModal();
+    }
+    
+    // Utility Functions
+    function showToast(message) {
+        // Create a simple toast notification
+        const toast = document.createElement('div');
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: var(--success-color);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-lg);
+            z-index: 3000;
+            animation: slideIn 0.3s ease;
+        `;
+        toast.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <i class="fas fa-check-circle"></i>
+                <span>${message}</span>
+            </div>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.3s ease';
+            setTimeout(() => {
+                document.body.removeChild(toast);
+            }, 300);
+        }, 3000);
+    }
+    
+    // Add CSS for toast animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+        @keyframes slideOut {
+            from {
+                opacity: 1;
+                transform: translateX(0);
+            }
+            to {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+    
+    // Close modals when clicking outside
+    window.addEventListener('click', function(e) {
+        const fulfillmentModal = document.getElementById('fulfillmentModal');
+        const shareModal = document.getElementById('shareModal');
+        
+        if (e.target === fulfillmentModal) {
+            closeFulfillmentModal();
+        }
+        if (e.target === shareModal) {
+            closeShareModal();
+        }
+    });
+</script>
+{% endblock %}

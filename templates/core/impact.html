@@ -1,0 +1,444 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% block title %}Community Impact{% endblock %}
+
+{% block content %}
+<section class="impact section">
+    <div class="container">
+        <h2 class="section__title">Community Impact</h2>
+        <p class="section__subtitle">Together we're making a difference</p>
+        
+        <!-- Impact Statistics -->
+        <div class="impact-stats">
+            <div class="impact-stat">
+                <div class="impact-icon">
+                    <i class="fas fa-tshirt"></i>
+                </div>
+                <div class="impact-number" id="itemsDonated">{{ impact_stats.items_donated|default:0 }}</div>
+                <div class="impact-label">Items Donated</div>
+            </div>
+            <div class="impact-stat">
+                <div class="impact-icon">
+                    <i class="fas fa-exchange-alt"></i>
+                </div>
+                <div class="impact-number" id="itemsExchanged">{{ impact_stats.successful_exchanges|default:0 }}</div>
+                <div class="impact-label">Items Exchanged</div>
+            </div>
+            <div class="impact-stat">
+                <div class="impact-icon">
+                    <i class="fas fa-recycle"></i>
+                </div>
+                <div class="impact-number" id="wastePrevented">{{ impact_stats.waste_prevented_kg|default:0 }}kg</div>
+                <div class="impact-label">Waste Prevented</div>
+            </div>
+            <div class="impact-stat">
+                <div class="impact-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="impact-number" id="communityMembers">{{ impact_stats.community_members|default:0 }}</div>
+                <div class="impact-label">Community Members</div>
+            </div>
+        </div>
+        
+        <!-- Environmental Impact -->
+        <div class="environmental-impact" style="margin-top: 4rem;">
+            <h3 style="text-align: center; margin-bottom: 2rem; color: #4a6fa5;">Environmental Benefits</h3>
+            <div class="benefits-grid">
+                <div class="benefit-card">
+                    <div class="benefit-icon" style="background: #d4edda;">
+                        <i class="fas fa-tree" style="color: #155724;"></i>
+                    </div>
+                    <h4>Carbon Footprint Reduced</h4>
+                    <p>By extending the life of clothing, we've saved approximately <strong>{{ impact_stats.waste_prevented_kg|default:0 }}kg</strong> of CO2 emissions.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon" style="background: #d1ecf1;">
+                        <i class="fas fa-tint" style="color: #0c5460;"></i>
+                    </div>
+                    <h4>Water Conservation</h4>
+                    <p>Clothing exchange saves thousands of liters of water that would be used in manufacturing new garments.</p>
+                </div>
+                <div class="benefit-card">
+                    <div class="benefit-icon" style="background: #fff3cd;">
+                        <i class="fas fa-landmark" style="color: #856404;"></i>
+                    </div>
+                    <h4>Landfill Diversion</h4>
+                    <p>We've prevented <strong>{{ impact_stats.waste_prevented_kg|default:0 }}kg</strong> of clothing from ending up in landfills.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Top Contributors -->
+        <div class="top-contributors" style="margin-top: 4rem;">
+            <h3 style="text-align: center; margin-bottom: 2rem; color: #4a6fa5;">Top Contributors</h3>
+            <div class="contributors-list">
+                {% for donor in top_donors %}
+                <div class="contributor-card">
+                    <div class="contributor-avatar">
+                        {% if donor.avatar %}
+                            <img src="{{ donor.avatar.url }}" alt="{{ donor.user.username }}">
+                        {% else %}
+                            <i class="fas fa-user-circle"></i>
+                        {% endif %}
+                    </div>
+                    <div class="contributor-info">
+                        <h4>{{ donor.user.username }}</h4>
+                        <p>{{ donor.donation_count }} items donated</p>
+                        <div class="contributor-badges">
+                            {% if donor.donation_count >= 10 %}
+                            <span class="badge" style="background: #ff7e5f; color: white;">
+                                <i class="fas fa-star"></i> Super Donor
+                            </span>
+                            {% elif donor.donation_count >= 5 %}
+                            <span class="badge" style="background: #4a6fa5; color: white;">
+                                <i class="fas fa-heart"></i> Community Hero
+                            </span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% empty %}
+                <div style="text-align: center; padding: 2rem; color: #6c757d;">
+                    <i class="fas fa-users" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p>No contributor data available yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Recent Activity -->
+        <div class="recent-activity" style="margin-top: 4rem;">
+            <h3 style="text-align: center; margin-bottom: 2rem; color: #4a6fa5;">Recent Community Activity</h3>
+            <div class="activity-timeline">
+                {% for exchange in recent_exchanges %}
+                <div class="activity-item">
+                    <div class="activity-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="activity-content">
+                        <p>
+                            <strong>{{ exchange.requester.username }}</strong> received 
+                            <strong>"{{ exchange.item.title }}"</strong> from 
+                            <strong>{{ exchange.donor.username }}</strong>
+                        </p>
+                        <span class="activity-time">{{ exchange.completed_at|timesince }} ago</span>
+                    </div>
+                </div>
+                {% empty %}
+                <div style="text-align: center; padding: 2rem; color: #6c757d;">
+                    <i class="fas fa-exchange-alt" style="font-size: 3rem; margin-bottom: 1rem;"></i>
+                    <p>No recent exchanges yet.</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        
+        <!-- Call to Action -->
+        <div class="impact-cta" style="margin-top: 4rem; text-align: center; padding: 3rem; background: linear-gradient(135deg, #4a6fa5 0%, #6b8cbc 100%); color: white; border-radius: 16px;">
+            <h3 style="color: white; margin-bottom: 1rem;">Join Our Community Today</h3>
+            <p style="color: rgba(255, 255, 255, 0.9); margin-bottom: 2rem; max-width: 600px; margin-left: auto; margin-right: auto;">
+                Be part of the sustainable fashion movement and make a difference in your community
+            </p>
+            {% if user.is_authenticated %}
+            <a href="{% url 'core:donate' %}" class="btn" style="background: white; color: #4a6fa5; border: none;">
+                <i class="fas fa-tshirt"></i> Donate Your First Item
+            </a>
+            {% else %}
+            <a href="{% url 'userauths:sign-in' %}" class="btn" style="background: white; color: #4a6fa5; border: none;">
+                <i class="fas fa-user-plus"></i> Sign Up Now
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<style>
+    /* Your existing CSS styles remain the same */
+    .impact-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        text-align: center;
+    }
+    
+    .impact-stat {
+        padding: 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        transition: all 0.3s ease;
+    }
+    
+    .impact-stat:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    }
+    
+    .impact-icon {
+        font-size: 2.5rem;
+        margin-bottom: 1rem;
+        color: #4a6fa5;
+    }
+    
+    .impact-number {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        color: #4a6fa5;
+    }
+    
+    .impact-label {
+        font-size: 1.1rem;
+        color: #6c757d;
+        font-weight: 500;
+    }
+    
+    .benefits-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .benefit-card {
+        background: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        text-align: center;
+        transition: all 0.3s ease;
+    }
+    
+    .benefit-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .benefit-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+        font-size: 2rem;
+    }
+    
+    .benefit-card h4 {
+        color: #4a6fa5;
+        margin-bottom: 1rem;
+    }
+    
+    .benefit-card p {
+        color: #6c757d;
+        line-height: 1.6;
+    }
+    
+    .contributors-list {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+    
+    .contributor-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        transition: all 0.3s ease;
+    }
+    
+    .contributor-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .contributor-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: #e9ecef;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 2rem;
+        color: #6c757d;
+        overflow: hidden;
+    }
+    
+    .contributor-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .contributor-info {
+        flex: 1;
+    }
+    
+    .contributor-info h4 {
+        margin-bottom: 0.25rem;
+        color: #343a40;
+    }
+    
+    .contributor-info p {
+        color: #6c757d;
+        margin-bottom: 0.5rem;
+        font-size: 0.9rem;
+    }
+    
+    .activity-timeline {
+        max-width: 600px;
+        margin: 0 auto;
+    }
+    
+    .activity-item {
+        display: flex;
+        align-items: start;
+        gap: 1rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 12px;
+        margin-bottom: 1rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        transition: all 0.3s ease;
+    }
+    
+    .activity-item:hover {
+        transform: translateX(5px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .activity-icon {
+        width: 40px;
+        height: 40px;
+        background: #4a6fa5;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+    }
+    
+    .activity-content {
+        flex: 1;
+    }
+    
+    .activity-content p {
+        margin-bottom: 0.5rem;
+        color: #343a40;
+    }
+    
+    .activity-time {
+        color: #6c757d;
+        font-size: 0.875rem;
+    }
+    
+    @media (max-width: 768px) {
+        .impact-stats {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .benefits-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .contributors-list {
+            grid-template-columns: 1fr;
+        }
+        
+        .impact-number {
+            font-size: 2.5rem;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .impact-stats {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Animate statistics counting up
+        function animateValue(element, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const value = Math.floor(progress * (end - start) + start);
+                
+                // Format numbers with commas
+                element.textContent = value.toLocaleString();
+                
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+        
+        // Get elements and values
+        const itemsDonated = document.getElementById('itemsDonated');
+        const itemsExchanged = document.getElementById('itemsExchanged');
+        const wastePrevented = document.getElementById('wastePrevented');
+        const communityMembers = document.getElementById('communityMembers');
+        
+        // Get current values with fallbacks
+        const donatedValue = parseInt('{{ impact_stats.items_donated|default:0 }}') || 0;
+        const exchangedValue = parseInt('{{ impact_stats.successful_exchanges|default:0 }}') || 0;
+        const wasteValue = parseFloat('{{ impact_stats.waste_prevented_kg|default:0 }}') || 0;
+        const membersValue = parseInt('{{ impact_stats.community_members|default:0 }}') || 0;
+        
+        // Start animations with slight delays for visual effect
+        setTimeout(() => animateValue(itemsDonated, 0, donatedValue, 2000), 200);
+        setTimeout(() => animateValue(itemsExchanged, 0, exchangedValue, 2000), 400);
+        setTimeout(() => {
+            // For waste prevented, we need to handle decimal numbers differently
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / 2000, 1);
+                const value = (progress * wasteValue).toFixed(1);
+                wastePrevented.textContent = value + 'kg';
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                }
+            };
+            window.requestAnimationFrame(step);
+        }, 600);
+        setTimeout(() => animateValue(communityMembers, 0, membersValue, 2000), 800);
+        
+        // Add intersection observer for animations when scrolling
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        // Observe all impact cards for animation
+        document.querySelectorAll('.impact-stat, .benefit-card, .contributor-card, .activity-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'all 0.6s ease';
+            observer.observe(el);
+        });
+    });
+</script>
+{% endblock %}

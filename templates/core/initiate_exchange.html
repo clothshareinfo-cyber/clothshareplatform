@@ -1,0 +1,2138 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Exchange - {{ item.title }}{% endblock %}
+
+{% block content %}
+<div class="exchange-page">
+    <!-- Simple Animated Background -->
+    <div class="page-background">
+        <div class="bg-shape shape-1"></div>
+        <div class="bg-shape shape-2"></div>
+    </div>
+
+    <!-- Simple Header -->
+    <div class="page-header">
+        <h1>
+            <i class="fas fa-exchange-alt"></i>
+            Exchange Request
+        </h1>
+        <p>You're requesting: <strong>{{ item.title }}</strong></p>
+    </div>
+
+    <div class="exchange-content">
+        <!-- Left Side - Item Info -->
+        <div class="item-side">
+            <!-- Item Card -->
+            <div class="card item-card">
+                <div class="card-header">
+                    <h3>Item Details</h3>
+                </div>
+                <div class="card-body">
+                    <!-- Item Image -->
+                    <div class="item-image">
+                        {% if item.images.first %}
+                            <img src="{{ item.images.first.image.url }}" 
+                                 alt="{{ item.title }}" 
+                                 class="item-img">
+                            <button class="img-zoom" onclick="zoomImage(this)">
+                                <i class="fas fa-search-plus"></i>
+                            </button>
+                        {% else %}
+                            <div class="no-image">
+                                <i class="fas fa-tshirt"></i>
+                                <span>No Image</span>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Item Info -->
+                    <div class="item-info">
+                        <h4>{{ item.title }}</h4>
+                        
+                        <div class="item-meta">
+                            <span class="meta-item">
+                                <i class="fas fa-user"></i>
+                                @{{ item.donor.username }}
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-clock"></i>
+                                {{ item.created_at|timesince }} ago
+                            </span>
+                        </div>
+
+                        <!-- Quick Details -->
+                        <div class="item-details">
+                            <div class="detail-item">
+                                <label>Category:</label>
+                                <span>{{ item.get_category_display }}</span>
+                            </div>
+                            <div class="detail-item">
+                                <label>Condition:</label>
+                                <span>{{ item.get_condition_display }}</span>
+                            </div>
+                            {% if item.size %}
+                            <div class="detail-item">
+                                <label>Size:</label>
+                                <span>{{ item.size }}</span>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Exchange Type -->
+                        <div class="exchange-type">
+                            <span class="type-badge {% if item.mode == 'donation' %}donation{% else %}exchange{% endif %}">
+                                <i class="fas {% if item.mode == 'donation' %}fa-gift{% else %}fa-exchange-alt{% endif %}"></i>
+                                {{ item.get_mode_display }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Donor Info -->
+            <div class="card donor-card">
+                <div class="card-header">
+                    <h3>About Donor</h3>
+                </div>
+                <div class="card-body">
+                    <div class="donor-info">
+                        <div class="donor-avatar">
+                            {% if item.donor.avatar %}
+                                <img src="{{ item.donor.avatar.url }}" alt="{{ item.donor.username }}">
+                            {% else %}
+                                <div class="avatar-placeholder">
+                                    {{ item.donor.username|first|upper }}
+                                </div>
+                            {% endif %}
+                            <div class="online-status {% if item.donor.is_online %}online{% else %}offline{% endif %}">
+                                <i class="fas fa-circle"></i>
+                            </div>
+                        </div>
+                        <div class="donor-details">
+                            <h5>@{{ item.donor.username }}</h5>
+                            {% if item.donor.city %}
+                            <p class="donor-location">
+                                <i class="fas fa-map-marker-alt"></i> 
+                                {{ item.donor.city }}{% if item.donor.state %}, {{ item.donor.state }}{% endif %}
+                            </p>
+                            {% endif %}
+                            
+                            <!-- Donor Rating -->
+                            <div class="donor-rating">
+                                <div class="stars">
+                                    {% for i in "12345" %}
+                                        <i class="fas fa-star {% if i|add:0 <= item.donor.avg_rating %}filled{% endif %}"></i>
+                                    {% endfor %}
+                                </div>
+                                <span class="rating-text">
+                                    {{ item.donor.avg_rating|default:"0.0" }} ({{ item.donor.total_reviews|default:"0" }} reviews)
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+<!-- Comprehensive Statistics -->
+                    <div class="donor-statistics">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-gift"></i>
+                                </div>
+                                <div class="stat-info">
+                                      <span class="stat-number">{{ donor_stats.items_listed }}</span>
+                                    <span class="stat-label">Items Listed</span>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </div>
+                                <div class="stat-info">
+                                     <span class="stat-number">{{ donor_stats.successful_exchanges }}</span
+                                    <span class="stat-label">Successful Exchanges</span>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-heart"></i>
+                                </div>
+                                <div class="stat-info">
+                                   <span class="stat-number">{{ donor_stats.items_donated }}</span>
+                                    <span class="stat-label">Items Donated</span>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-item">
+                                <div class="stat-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stat-info">
+                                    <span class="stat-number">{{ donor_stats.response_rate }}%</span>
+                                    <span class="stat-label">Response Rate</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Additional Donor Metrics -->
+                    <div class="donor-metrics">
+                        <div class="metric-row">
+                            <div class="metric">
+                                <span class="metric-label">Member Since</span>
+                                <span class="metric-value">{{ item.donor.date_joined|date:"M Y"|default:"Recently" }}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Response Time</span>
+                                <span class="metric-value">{{ item.donor.avg_response_time|default:"Within 24h" }}</span>
+                            </div>
+                        </div>
+                        
+                        {% if item.donor.is_email_verified or item.donor.is_phone_verified or item.donor.is_identity_verified %}
+                        <div class="verification-badges">
+                            <span class="badge-label">Verified:</span>
+                            <div class="badges">
+                                {% if item.donor.is_email_verified %}
+                                <span class="verification-badge email-verified" title="Email Verified">
+                                    <i class="fas fa-envelope"></i>
+                                </span>
+                                {% endif %}
+                                {% if item.donor.is_phone_verified %}
+                                <span class="verification-badge phone-verified" title="Phone Verified">
+                                    <i class="fas fa-phone"></i>
+                                </span>
+                                {% endif %}
+                                {% if item.donor.is_identity_verified %}
+                                <span class="verification-badge identity-verified" title="Identity Verified">
+                                    <i class="fas fa-id-card"></i>
+                                </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="recent-activity">
+                        <h6>Recent Activity</h6>
+                        <div class="activity-list">
+                            {% if item.donor.last_active %}
+                            <div class="activity-item">
+                                <i class="fas fa-circle activity-dot"></i>
+                                <span>Last active {{ item.donor.last_active|timesince }} ago</span>
+                            </div>
+                            {% endif %}
+                            {% if item.donor.last_exchange %}
+                            <div class="activity-item">
+                                <i class="fas fa-exchange-alt activity-dot"></i>
+                                <span>Last exchange {{ item.donor.last_exchange|timesince }} ago</span>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Trust Indicators -->
+                    <div class="trust-indicators">
+                        <div class="trust-score">
+                            <div class="score-circle">
+                                <span class="score">{{ item.donor.trust_score|default:"80" }}</span>
+                            </div>
+                            <div class="score-info">
+                                <span class="score-label">Trust Score</span>
+                                <span class="score-desc">Based on community interactions</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Side - Exchange Form -->
+        <div class="form-side">
+            <!-- Main Form Card -->
+            <div class="card form-card">
+                <div class="card-header">
+                    <h2>Create Exchange Request</h2>
+                    <p>Fill out the form below to request this item</p>
+                </div>
+
+                <div class="card-body">
+                    <!-- Progress Indicator -->
+                    <div class="form-progress">
+                        <div class="progress-steps">
+                            <div class="step active" data-step="1">
+                                <div class="step-dot">1</div>
+                                <span>Message</span>
+                            </div>
+                            <div class="step" data-step="2">
+                                <div class="step-dot">2</div>
+                                <span>Details</span>
+                            </div>
+                            <div class="step" data-step="3">
+                                <div class="step-dot">3</div>
+                                <span>Review</span>
+                            </div>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: 33%"></div>
+                        </div>
+                    </div>
+
+                    <!-- Messages -->
+                    {% if messages %}
+                    <div class="messages">
+                        {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }}">
+                            <i class="fas 
+                                {% if message.tags == 'success' %}fa-check-circle
+                                {% elif message.tags == 'error' %}fa-exclamation-triangle
+                                {% else %}fa-info-circle{% endif %}">
+                            </i>
+                            {{ message }}
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    <form method="post" class="exchange-form" id="exchangeForm">
+                        {% csrf_token %}
+
+                        <!-- Step 1: Message -->
+                        <div class="form-step active" id="step-1">
+                            <div class="step-title">
+                                <h4><i class="fas fa-comment"></i> Your Message</h4>
+                                <p>Introduce yourself and what you're offering</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Message to Donor *</label>
+                                <textarea 
+                                    name="{{ form.message.name }}" 
+                                    class="form-control message-input" 
+                                    rows="5"
+                                    placeholder="Hi! I'm interested in your {{ item.title }}. I have [item details] to exchange..."
+                                    maxlength="500"
+                                >{% if form.message.value %}{{ form.message.value }}{% endif %}</textarea>
+                                
+                                <div class="input-helpers">
+                                    <div class="char-count">
+                                        <span id="charCount">0</span>/500
+                                    </div>
+                                    <div class="template-buttons">
+                                        <button type="button" onclick="useTemplate('friendly')" class="btn-template">
+                                            <i class="fas fa-smile"></i> Friendly
+                                        </button>
+                                        <button type="button" onclick="useTemplate('quick')" class="btn-template">
+                                            <i class="fas fa-bolt"></i> Quick
+                                        </button>
+                                    </div>
+                                </div>
+
+                                {% if form.message.errors %}
+                                <div class="error-text">
+                                    {% for error in form.message.errors %}
+                                        {{ error }}
+                                    {% endfor %}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Step 2: Details -->
+                        <div class="form-step" id="step-2">
+                            <div class="step-title">
+                                <h4><i class="fas fa-map-marker-alt"></i> Meeting Details</h4>
+                                <p>Where and when to meet</p>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Meeting Location</label>
+                                <div class="location-input">
+                                    <input 
+                                        type="text" 
+                                        name="{{ form.exchange_location.name }}" 
+                                        class="form-control" 
+                                        placeholder="e.g., Coffee shop, Library..."
+                                        value="{% if form.exchange_location.value %}{{ form.exchange_location.value }}{% endif %}"
+                                    >
+                                    <button type="button" onclick="suggestLocation()" class="btn-suggest">
+                                        <i class="fas fa-lightbulb"></i>
+                                    </button>
+                                </div>
+
+                                <!-- Quick Location Suggestions -->
+                                <div class="location-suggestions">
+                                    <span>Suggestions:</span>
+                                    <button type="button" onclick="setLocation('Coffee Shop')" class="suggestion-tag">
+                                        <i class="fas fa-coffee"></i> Coffee Shop
+                                    </button>
+                                    <button type="button" onclick="setLocation('Library')" class="suggestion-tag">
+                                        <i class="fas fa-book"></i> Library
+                                    </button>
+                                    <button type="button" onclick="setLocation('Shopping Mall')" class="suggestion-tag">
+                                        <i class="fas fa-shopping-bag"></i> Mall
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label>Your Availability</label>
+                                <div class="availability-options">
+                                    <label class="option-check">
+                                        <input type="checkbox" name="weekdays" value="weekdays">
+                                        <span>Weekdays</span>
+                                    </label>
+                                    <label class="option-check">
+                                        <input type="checkbox" name="weekends" value="weekends">
+                                        <span>Weekends</span>
+                                    </label>
+                                    <label class="option-check">
+                                        <input type="checkbox" name="flexible" value="flexible">
+                                        <span>Flexible</span>
+                                    </label>
+                                </div>
+                                <input type="text" 
+                                       class="form-control" 
+                                       placeholder="Specific times (optional)"
+                                       name="specific_times">
+                            </div>
+
+                            <div class="form-group">
+                                <label>What You're Offering</label>
+                                <textarea 
+                                    class="form-control" 
+                                    rows="3"
+                                    placeholder="Describe the item you want to exchange..."
+                                    name="offering_description"
+                                ></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Step 3: Review -->
+                        <div class="form-step" id="step-3">
+                            <div class="step-title">
+                                <h4><i class="fas fa-check-circle"></i> Review & Send</h4>
+                                <p>Check everything before sending</p>
+                            </div>
+
+                            <div class="review-section">
+                                <div class="review-item">
+                                    <h5>Your Message:</h5>
+                                    <div id="review-message" class="review-content">
+                                        <em>No message yet</em>
+                                    </div>
+                                </div>
+
+                                <div class="review-item">
+                                    <h5>Meeting Location:</h5>
+                                    <div id="review-location" class="review-content">
+                                        <em>No location set</em>
+                                    </div>
+                                </div>
+
+                                <div class="review-item">
+                                    <h5>Your Offering:</h5>
+                                    <div id="review-offering" class="review-content">
+                                        <em>No offering described</em>
+                                    </div>
+                                </div>
+
+                                <div class="terms-agreement">
+                                    <label class="checkbox-label">
+                                        <input type="checkbox" name="terms_agreed" required>
+                                        <span>I agree to the exchange terms and safety guidelines</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Navigation Buttons -->
+                        <div class="form-navigation">
+                            <button type="button" class="btn btn-prev" onclick="previousStep()" disabled>
+                                <i class="fas fa-arrow-left"></i> Back
+                            </button>
+                            
+                            <div class="step-indicator">
+                                Step <span id="current-step">1</span> of 3
+                            </div>
+                            
+                            <button type="button" class="btn btn-next" onclick="nextStep()">
+                                Next <i class="fas fa-arrow-right"></i>
+                            </button>
+                            
+                            <button type="submit" class="btn btn-submit" style="display: none;">
+                                <i class="fas fa-paper-plane"></i> Send Request
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Safety Tips -->
+            <div class="card tips-card">
+                <div class="card-header">
+                    <h3><i class="fas fa-shield-alt"></i> Safety Tips</h3>
+                </div>
+                <div class="card-body">
+                    <div class="tips-list">
+                        <div class="tip">
+                            <i class="fas fa-users"></i>
+                            <span>Meet in public places</span>
+                        </div>
+                        <div class="tip">
+                            <i class="fas fa-user-friends"></i>
+                            <span>Bring a friend if possible</span>
+                        </div>
+                        <div class="tip">
+                            <i class="fas fa-search"></i>
+                            <span>Inspect items before exchange</span>
+                        </div>
+                        <div class="tip">
+                            <i class="fas fa-heart"></i>
+                            <span>Trust your instincts</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Simple Image Zoom Modal -->
+<div class="modal" id="imageModal" style="display: none;">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img id="modalImage" src="" alt="Enlarged view">
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+/* Modern Clean CSS */
+:root {
+    --primary: #3b82f6;
+    --primary-dark: #2563eb;
+    --secondary: #f59e0b;
+    --success: #10b981;
+    --danger: #ef4444;
+    --background: #f8fafc;
+    --card-bg: #ffffff;
+    --text: #1e293b;
+    --text-light: #64748b;
+    --border: #e2e8f0;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: var(--background);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, sans-serif;
+    line-height: 1.6;
+}
+
+/* Layout */
+.exchange-page {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    position: relative;
+}
+
+.page-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    overflow: hidden;
+}
+
+.bg-shape {
+    position: absolute;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+    opacity: 0.05;
+}
+
+.shape-1 {
+    width: 300px;
+    height: 300px;
+    top: -100px;
+    right: -100px;
+}
+
+.shape-2 {
+    width: 200px;
+    height: 200px;
+    bottom: -50px;
+    left: -50px;
+}
+
+/* Header */
+.page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 2rem;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+}
+
+.page-header h1 i {
+    font-size: 2rem;
+}
+
+.page-header p {
+    font-size: 1.2rem;
+    color: var(--text-light);
+}
+
+/* Main Content Layout */
+.exchange-content {
+    display: grid;
+    grid-template-columns: 1fr 1.2fr;
+    gap: 2rem;
+    align-items: start;
+}
+
+/* Cards */
+.card {
+    background: var(--card-bg);
+    border-radius: 1rem;
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.card-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border);
+    background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+}
+
+.card-header h2, .card-header h3 {
+    color: var(--text);
+    margin: 0;
+}
+
+.card-header p {
+    color: var(--text-light);
+    margin: 0.5rem 0 0 0;
+}
+
+.card-body {
+    padding: 1.5rem;
+}
+
+/* Item Side */
+.item-image {
+    position: relative;
+    border-radius: 0.75rem;
+    overflow: hidden;
+    margin-bottom: 1.5rem;
+}
+
+.item-img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+}
+
+.item-image:hover .item-img {
+    transform: scale(1.05);
+}
+
+.img-zoom {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: rgba(255, 255, 255, 0.9);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.item-image:hover .img-zoom {
+    opacity: 1;
+}
+
+.no-image {
+    height: 200px;
+    background: #f1f5f9;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+}
+
+.no-image i {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+}
+
+/* Item Info */
+.item-info h4 {
+    color: var(--text);
+    margin-bottom: 1rem;
+    font-size: 1.3rem;
+}
+
+.item-meta {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.item-details {
+    margin-bottom: 1.5rem;
+}
+
+.detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-item label {
+    font-weight: 600;
+    color: var(--text-light);
+}
+
+.exchange-type {
+    text-align: center;
+    margin-top: 1rem;
+}
+
+.type-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border-radius: 2rem;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.type-badge.donation {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.type-badge.exchange {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+/* Enhanced Donor Info Styles */
+.donor-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.donor-avatar {
+    position: relative;
+    flex-shrink: 0;
+}
+
+.donor-avatar img, .avatar-placeholder {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--border);
+}
+
+.avatar-placeholder {
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 2rem;
+}
+
+.online-status {
+    position: absolute;
+    bottom: 5px;
+    right: 5px;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid white;
+}
+
+.online-status.online {
+    background: var(--success);
+}
+
+.online-status.offline {
+    background: var(--text-light);
+}
+
+.online-status i {
+    font-size: 0.6rem;
+    color: white;
+}
+
+.donor-details {
+    flex: 1;
+}
+
+.donor-details h5 {
+    margin-bottom: 0.5rem;
+    color: var(--text);
+    font-size: 1.2rem;
+}
+
+.donor-location {
+    color: var(--text-light);
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.donor-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+}
+
+.stars {
+    display: flex;
+    gap: 2px;
+}
+
+.stars i {
+    font-size: 0.9rem;
+    color: #e2e8f0;
+}
+
+.stars i.filled {
+    color: #f59e0b;
+}
+
+.rating-text {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+/* Statistics Grid */
+.donor-statistics {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background: var(--background);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+}
+
+.stat-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: white;
+    border-radius: 0.5rem;
+    border: 1px solid var(--border);
+    transition: transform 0.2s ease;
+}
+
+.stat-item:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+}
+
+.stat-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1rem;
+}
+
+.stat-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.stat-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    margin-top: 0.25rem;
+}
+
+/* Donor Metrics */
+.donor-metrics {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background: var(--background);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+}
+
+.metric-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.metric {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.metric-label {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.metric-value {
+    font-size: 1rem;
+    color: var(--text);
+    font-weight: 600;
+}
+
+.verification-badges {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+}
+
+.badge-label {
+    font-size: 0.8rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.badges {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.verification-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    border: 2px solid;
+    cursor: help;
+}
+
+.email-verified {
+    background: #dcfce7;
+    color: #166534;
+    border-color: #bbf7d0;
+}
+
+.phone-verified {
+    background: #dbeafe;
+    color: #1e40af;
+    border-color: #bfdbfe;
+}
+
+.identity-verified {
+    background: #fef3c7;
+    color: #92400e;
+    border-color: #fde68a;
+}
+
+/* Recent Activity */
+.recent-activity {
+    margin-bottom: 1.5rem;
+    padding: 1.5rem;
+    background: var(--background);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+}
+
+.recent-activity h6 {
+    color: var(--text);
+    margin-bottom: 1rem;
+    font-size: 1rem;
+}
+
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.activity-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.activity-dot {
+    font-size: 0.5rem;
+    color: var(--success);
+}
+
+/* Trust Indicators */
+.trust-indicators {
+    padding: 1.5rem;
+    background: var(--background);
+    border-radius: 0.75rem;
+    border: 1px solid var(--border);
+}
+
+.trust-score {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.score-circle {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: conic-gradient(var(--success) 0% 80%, #e2e8f0 80% 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+}
+
+.score-circle::before {
+    content: '';
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    background: white;
+    border-radius: 50%;
+}
+
+.score {
+    position: relative;
+    font-weight: 700;
+    font-size: 1.1rem;
+    color: var(--text);
+    z-index: 1;
+}
+
+.score-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.score-label {
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 0.25rem;
+}
+
+.score-desc {
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+/* Form Progress */
+.form-progress {
+    margin-bottom: 2rem;
+}
+
+.progress-steps {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+    position: relative;
+}
+
+.progress-steps::before {
+    content: '';
+    position: absolute;
+    top: 20px;
+    left: 25%;
+    right: 25%;
+    height: 2px;
+    background: var(--border);
+    z-index: 1;
+}
+
+.step {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    z-index: 2;
+    flex: 1;
+}
+
+.step-dot {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+    transition: all 0.3s ease;
+}
+
+.step.active .step-dot {
+    background: var(--primary);
+    color: white;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+}
+
+.step span {
+    font-size: 0.9rem;
+    font-weight: 500;
+    color: var(--text-light);
+}
+
+.step.active span {
+    color: var(--primary);
+}
+
+.progress-bar {
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: var(--primary);
+    border-radius: 3px;
+    transition: width 0.3s ease;
+}
+
+/* Form Styles */
+.form-step {
+    display: none;
+}
+
+.form-step.active {
+    display: block;
+    animation: fadeIn 0.5s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.step-title {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.step-title h4 {
+    color: var(--text);
+    margin-bottom: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.step-title p {
+    color: var(--text-light);
+    margin: 0;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border);
+    border-radius: 0.5rem;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.message-input {
+    resize: vertical;
+    min-height: 120px;
+}
+
+.input-helpers {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+}
+
+.char-count {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.template-buttons {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.btn-template {
+    padding: 0.5rem 1rem;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 0.5rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-template:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* Location Input */
+.location-input {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.location-input .form-control {
+    flex: 1;
+}
+
+.btn-suggest {
+    padding: 0.75rem 1rem;
+    background: var(--background);
+    border: 2px solid var(--border);
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-suggest:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+.location-suggestions {
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.location-suggestions span {
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+.suggestion-tag {
+    padding: 0.25rem 0.75rem;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 1rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.suggestion-tag:hover {
+    background: var(--primary);
+    color: white;
+    border-color: var(--primary);
+}
+
+/* Availability */
+.availability-options {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    flex-wrap: wrap;
+}
+
+.option-check {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.option-check input {
+    margin: 0;
+}
+
+/* Review Section */
+.review-section {
+    space-y: 1.5rem;
+}
+
+.review-item {
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border);
+}
+
+.review-item:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+.review-item h5 {
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.review-content {
+    background: var(--background);
+    padding: 1rem;
+    border-radius: 0.5rem;
+    border-left: 4px solid var(--primary);
+}
+
+.review-content em {
+    color: var(--text-light);
+    font-style: italic;
+}
+
+.terms-agreement {
+    margin-top: 2rem;
+    padding: 1rem;
+    background: var(--background);
+    border-radius: 0.5rem;
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    cursor: pointer;
+}
+
+.checkbox-label input {
+    margin-top: 0.25rem;
+}
+
+/* Form Navigation */
+.form-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.btn-prev {
+    background: var(--background);
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.btn-prev:hover:not(:disabled) {
+    background: #e2e8f0;
+}
+
+.btn-next, .btn-submit {
+    background: var(--primary);
+    color: white;
+}
+
+.btn-next:hover, .btn-submit:hover {
+    background: var(--primary-dark);
+    transform: translateY(-1px);
+}
+
+.step-indicator {
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+/* Tips Card */
+.tips-list {
+    display: grid;
+    gap: 1rem;
+}
+
+.tip {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: var(--background);
+    border-radius: 0.5rem;
+    border-left: 4px solid var(--success);
+}
+
+.tip i {
+    color: var(--success);
+    font-size: 1.2rem;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    position: relative;
+    max-width: 90%;
+    max-height: 90%;
+}
+
+.modal-content img {
+    max-width: 100%;
+    max-height: 90vh;
+    border-radius: 0.5rem;
+}
+
+.close {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+}
+
+/* Alerts */
+.alert {
+    padding: 1rem;
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.alert-success {
+    background: #dcfce7;
+    color: #166534;
+    border-left: 4px solid #10b981;
+}
+
+.alert-error {
+    background: #fee2e2;
+    color: #991b1b;
+    border-left: 4px solid #ef4444;
+}
+
+.alert-info {
+    background: #dbeafe;
+    color: #1e40af;
+    border-left: 4px solid #3b82f6;
+}
+
+.error-text {
+    color: var(--danger);
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .exchange-content {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .page-header {
+        padding: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .page-header h1 {
+        font-size: 2rem;
+    }
+    
+    .progress-steps::before {
+        display: none;
+    }
+    
+    .step {
+        text-align: center;
+    }
+    
+    .form-navigation {
+        flex-direction: column;
+        gap: 1rem;
+    }
+    
+    .btn {
+        width: 100%;
+        justify-content: center;
+    }
+    
+    .step-indicator {
+        order: -1;
+    }
+    
+    .availability-options {
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    
+    .location-suggestions {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .donor-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+    }
+    
+    .donor-avatar {
+        align-self: center;
+    }
+    
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .metric-row {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+    
+    .trust-score {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.75rem;
+    }
+    
+    .verification-badges {
+        flex-direction: column;
+        gap: 0.75rem;
+        text-align: center;
+    }
+}
+</style>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Simple JavaScript for Exchange Page
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Exchange page loaded');
+    
+    // Initialize character counter
+    const messageInput = document.querySelector('.message-input');
+    const charCount = document.getElementById('charCount');
+    
+    if (messageInput && charCount) {
+        messageInput.addEventListener('input', function() {
+            charCount.textContent = this.value.length;
+        });
+        // Initialize count
+        messageInput.dispatchEvent(new Event('input'));
+    }
+    
+    // Initialize form steps
+    updateStepIndicator(1);
+    
+    // Initialize donor section interactions
+    initDonorSection();
+});
+
+// Form step management
+let currentStep = 1;
+
+function nextStep() {
+    if (validateStep(currentStep)) {
+        if (currentStep < 3) {
+            hideStep(currentStep);
+            currentStep++;
+            showStep(currentStep);
+            updateProgress();
+            updateStepIndicator(currentStep);
+        }
+    }
+}
+
+function previousStep() {
+    if (currentStep > 1) {
+        hideStep(currentStep);
+        currentStep--;
+        showStep(currentStep);
+        updateProgress();
+        updateStepIndicator(currentStep);
+    }
+}
+
+function hideStep(step) {
+    const stepElement = document.getElementById('step-' + step);
+    if (stepElement) {
+        stepElement.classList.remove('active');
+    }
+}
+
+function showStep(step) {
+    const stepElement = document.getElementById('step-' + step);
+    if (stepElement) {
+        stepElement.classList.add('active');
+    }
+    
+    // Update navigation buttons
+    const btnPrev = document.querySelector('.btn-prev');
+    const btnNext = document.querySelector('.btn-next');
+    const btnSubmit = document.querySelector('.btn-submit');
+    
+    btnPrev.disabled = step === 1;
+    
+    if (step === 3) {
+        btnNext.style.display = 'none';
+        btnSubmit.style.display = 'flex';
+        updateReviewContent();
+    } else {
+        btnNext.style.display = 'flex';
+        btnSubmit.style.display = 'none';
+    }
+}
+
+function updateProgress() {
+    const progressFill = document.querySelector('.progress-fill');
+    const progressPercent = ((currentStep - 1) / 2) * 100;
+    if (progressFill) {
+        progressFill.style.width = progressPercent + '%';
+    }
+    
+    // Update step dots
+    document.querySelectorAll('.step').forEach((step, index) => {
+        if (index + 1 <= currentStep) {
+            step.classList.add('active');
+        } else {
+            step.classList.remove('active');
+        }
+    });
+}
+
+function updateStepIndicator(step) {
+    const stepIndicator = document.getElementById('current-step');
+    if (stepIndicator) {
+        stepIndicator.textContent = step;
+    }
+}
+
+function validateStep(step) {
+    switch(step) {
+        case 1:
+            return validateMessage();
+        case 2:
+            return true; // Details are optional
+        case 3:
+            return validateTerms();
+        default:
+            return true;
+    }
+}
+
+function validateMessage() {
+    const messageInput = document.querySelector('.message-input');
+    if (!messageInput) return false;
+    
+    if (messageInput.value.trim().length < 10) {
+        alert('Please write a more detailed message (at least 10 characters)');
+        messageInput.focus();
+        return false;
+    }
+    
+    return true;
+}
+
+function validateTerms() {
+    const termsCheckbox = document.querySelector('input[name="terms_agreed"]');
+    if (!termsCheckbox) return false;
+    
+    if (!termsCheckbox.checked) {
+        alert('Please agree to the terms and conditions');
+        return false;
+    }
+    
+    return true;
+}
+
+// Template functions
+function useTemplate(type) {
+    const itemTitle = document.querySelector('.item-info h4');
+    const title = itemTitle ? itemTitle.textContent.trim() : 'this item';
+    
+    const templates = {
+        friendly: `Hi! I'm really interested in your ${title}. It looks amazing! 😊
+
+I have a similar item in great condition that I think would be a fair exchange. I'm pretty flexible with timing - let me know what works for you!`,
+        
+        quick: `Hi! Interested in your ${title}. 
+
+I have something similar to exchange. When are you available to meet?`
+    };
+    
+    const messageInput = document.querySelector('.message-input');
+    if (messageInput) {
+        messageInput.value = templates[type] || '';
+        messageInput.dispatchEvent(new Event('input'));
+        messageInput.focus();
+        
+        showMessage('Template applied!');
+    }
+}
+
+// Location functions
+function suggestLocation() {
+    const suggestions = [
+        'Local Coffee Shop',
+        'Public Library',
+        'Shopping Mall Food Court',
+        'Community Center'
+    ];
+    const randomSuggestion = suggestions[Math.floor(Math.random() * suggestions.length)];
+    const locationInput = document.querySelector('input[name="{{ form.exchange_location.name }}"]');
+    if (locationInput) {
+        locationInput.value = randomSuggestion;
+        showMessage('Location suggestion added!');
+    }
+}
+
+function setLocation(location) {
+    const locationInput = document.querySelector('input[name="{{ form.exchange_location.name }}"]');
+    if (locationInput) {
+        locationInput.value = location;
+        showMessage(`Location set to: ${location}`);
+    }
+}
+
+// Review content update
+function updateReviewContent() {
+    const messageInput = document.querySelector('.message-input');
+    const locationInput = document.querySelector('input[name="{{ form.exchange_location.name }}"]');
+    const offeringInput = document.querySelector('textarea[name="offering_description"]');
+    
+    const reviewMessage = document.getElementById('review-message');
+    const reviewLocation = document.getElementById('review-location');
+    const reviewOffering = document.getElementById('review-offering');
+    
+    if (reviewMessage && messageInput) {
+        reviewMessage.innerHTML = messageInput.value ? 
+            `<p>${messageInput.value.replace(/\n/g, '<br>')}</p>` : 
+            '<em>No message yet</em>';
+    }
+    
+    if (reviewLocation && locationInput) {
+        reviewLocation.innerHTML = locationInput.value ? 
+            `<p>${locationInput.value}</p>` : 
+            '<em>No location set</em>';
+    }
+    
+    if (reviewOffering && offeringInput) {
+        reviewOffering.innerHTML = offeringInput.value ? 
+            `<p>${offeringInput.value.replace(/\n/g, '<br>')}</p>` : 
+            '<em>No offering described</em>';
+    }
+}
+
+// Image zoom
+function zoomImage(btn) {
+    const img = btn.closest('.item-image').querySelector('img');
+    if (img && img.src) {
+        const modal = document.getElementById('imageModal');
+        const modalImg = document.getElementById('modalImage');
+        if (modal && modalImg) {
+            modalImg.src = img.src;
+            modal.style.display = 'flex';
+        }
+    }
+}
+
+function closeModal() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
+}
+
+// Simple message display
+function showMessage(text) {
+    // Create a simple toast message
+    const toast = document.createElement('div');
+    toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: var(--success);
+        color: white;
+        padding: 1rem 1.5rem;
+        border-radius: 0.5rem;
+        z-index: 1000;
+        animation: slideIn 0.3s ease;
+    `;
+    toast.textContent = text;
+    
+    document.body.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.remove();
+    }, 3000);
+}
+
+// Enhanced donor section interactions
+function initDonorSection() {
+    // Add hover effects to stat items
+    const statItems = document.querySelectorAll('.stat-item');
+    statItems.forEach(item => {
+        item.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-2px)';
+            this.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.15)';
+        });
+        item.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = 'none';
+        });
+    });
+
+    // Tooltip for verification badges
+    const badges = document.querySelectorAll('.verification-badge');
+    badges.forEach(badge => {
+        badge.addEventListener('mouseenter', function() {
+            const title = this.getAttribute('title');
+            if (title) {
+                showTooltip(this, title);
+            }
+        });
+        badge.addEventListener('mouseleave', function() {
+            hideTooltip();
+        });
+    });
+
+    // Animate trust score on scroll into view
+    const trustScore = document.querySelector('.trust-score');
+    if (trustScore) {
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    animateTrustScore();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        observer.observe(trustScore);
+    }
+
+    // Add click effect to donor avatar
+    const donorAvatar = document.querySelector('.donor-avatar');
+    if (donorAvatar) {
+        donorAvatar.addEventListener('click', function() {
+            this.style.transform = 'scale(0.95)';
+            setTimeout(() => {
+                this.style.transform = 'scale(1)';
+            }, 150);
+        });
+    }
+}
+
+function showTooltip(element, text) {
+    // Remove any existing tooltip first
+    hideTooltip();
+
+    const tooltip = document.createElement('div');
+    tooltip.className = 'custom-tooltip';
+    tooltip.textContent = text;
+    tooltip.style.cssText = `
+        position: fixed;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.375rem;
+        font-size: 0.8rem;
+        z-index: 10000;
+        white-space: nowrap;
+        pointer-events: none;
+        font-family: inherit;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    `;
+    
+    const rect = element.getBoundingClientRect();
+    const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+    
+    tooltip.style.top = (rect.top + scrollTop - 40) + 'px';
+    tooltip.style.left = (rect.left + rect.width / 2) + 'px';
+    tooltip.style.transform = 'translateX(-50%)';
+    
+    document.body.appendChild(tooltip);
+}
+
+function hideTooltip() {
+    const tooltips = document.querySelectorAll('.custom-tooltip');
+    tooltips.forEach(tooltip => {
+        tooltip.remove();
+    });
+}
+
+function animateTrustScore() {
+    const scoreCircle = document.querySelector('.score-circle');
+    const scoreElement = document.querySelector('.score');
+    
+    if (scoreCircle && scoreElement) {
+        // Add animation class
+        scoreCircle.style.animation = 'pulse 2s ease-in-out';
+        
+        // Animate number count if needed
+        const finalScore = parseInt(scoreElement.textContent);
+        if (finalScore > 0) {
+            let currentScore = 0;
+            const duration = 1500;
+            const increment = finalScore / (duration / 16);
+            
+            const timer = setInterval(() => {
+                currentScore += increment;
+                if (currentScore >= finalScore) {
+                    currentScore = finalScore;
+                    clearInterval(timer);
+                }
+                scoreElement.textContent = Math.round(currentScore);
+            }, 16);
+        }
+    }
+}
+
+// Add CSS animations for donor section
+const donorStyles = document.createElement('style');
+donorStyles.textContent = `
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.05); }
+        100% { transform: scale(1); }
+    }
+    
+    @keyframes slideIn {
+        from { transform: translateX(100%); opacity: 0; }
+        to { transform: translateX(0); opacity: 1; }
+    }
+    
+    .stat-item {
+        transition: all 0.3s ease;
+    }
+    
+    .donor-avatar {
+        transition: transform 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .score-circle {
+        transition: all 0.5s ease;
+    }
+    
+    /* Trust score animation */
+    @keyframes trustScoreGrow {
+        from { 
+            transform: scale(0.8);
+            opacity: 0;
+        }
+        to { 
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+    
+    .trust-score.animate {
+        animation: trustScoreGrow 0.6s ease-out;
+    }
+    
+    /* Verification badge hover effects */
+    .verification-badge {
+        transition: all 0.3s ease;
+    }
+    
+    .verification-badge:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Online status pulse animation */
+    .online-status.online {
+        animation: statusPulse 2s infinite;
+    }
+    
+    @keyframes statusPulse {
+        0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+        70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+`;
+document.head.appendChild(donorStyles);
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('imageModal');
+    if (e.target === modal) {
+        closeModal();
+    }
+});
+
+// Keyboard accessibility for donor section
+document.addEventListener('keydown', function(e) {
+    // Close modal with Escape key
+    if (e.key === 'Escape') {
+        closeModal();
+        hideTooltip();
+    }
+    
+    // Navigate form steps with arrow keys
+    if (e.key === 'ArrowRight' && currentStep < 3) {
+        nextStep();
+    } else if (e.key === 'ArrowLeft' && currentStep > 1) {
+        previousStep();
+    }
+});
+
+// Form submission enhancement
+const exchangeForm = document.getElementById('exchangeForm');
+if (exchangeForm) {
+    exchangeForm.addEventListener('submit', function(e) {
+        // Add loading state to submit button
+        const submitBtn = this.querySelector('.btn-submit');
+        if (submitBtn) {
+            const originalText = submitBtn.innerHTML;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+            submitBtn.disabled = true;
+            
+            // Revert after 3 seconds if still on page (fallback)
+            setTimeout(() => {
+                if (submitBtn.disabled) {
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.disabled = false;
+                }
+            }, 3000);
+        }
+    });
+}
+
+// Initialize trust score animation on page load
+window.addEventListener('load', function() {
+    const trustScore = document.querySelector('.trust-score');
+    if (trustScore) {
+        trustScore.classList.add('animate');
+    }
+});
+</script>
+{% endblock %}

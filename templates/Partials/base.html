@@ -1,0 +1,1651 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ClothShare | Community Clothing Donation & Exchange</title>
+    <link rel="stylesheet" href="/static/assets/css/styles.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+     <style>
+        /* CSS Variables */
+        :root {
+            --primary-color: #4a6fa5;
+            --primary-dark: #3a5982;
+            --primary-light: #6b8cbc;
+            --secondary-color: #6b8cbc;
+            --accent-color: #ff7e5f;
+            --accent-dark: #e86a4d;
+            --accent-light: #ff9e88;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --gray-color: #6c757d;
+            --light-gray: #e9ecef;
+            --medium-gray: #adb5bd;
+            --border-color: #dee2e6;
+            
+            --border-radius: 12px;
+            --border-radius-sm: 8px;
+            --border-radius-lg: 16px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --box-shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.15);
+            --box-shadow-lg: 0 15px 35px rgba(0, 0, 0, 0.1);
+            
+            --transition: all 0.3s ease;
+            --transition-slow: all 0.5s ease;
+        }
+
+        /* Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #fff;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            line-height: 1.3;
+            margin-bottom: 1rem;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        ul {
+            list-style: none;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Container */
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Sections */
+        .section {
+            padding: 5rem 0;
+        }
+
+        .section__title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+            position: relative;
+        }
+
+        .section__subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--gray-color);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .section__title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 2px;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            outline: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 5px;
+            height: 5px;
+            background: rgba(255, 255, 255, 0.5);
+            opacity: 0;
+            border-radius: 100%;
+            transform: scale(1, 1) translate(-50%);
+            transform-origin: 50% 50%;
+        }
+
+        .btn:focus:not(:active)::after {
+            animation: ripple 1s ease-out;
+        }
+
+        @keyframes ripple {
+            0% {
+                transform: scale(0, 0);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(20, 20);
+                opacity: 0;
+            }
+        }
+
+        .btn--primary {
+            background: var(--primary-color);
+            color: white;
+            box-shadow: 0 4px 15px rgba(74, 111, 165, 0.3);
+        }
+
+        .btn--primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(74, 111, 165, 0.4);
+        }
+
+        .btn--secondary {
+            background: var(--secondary-color);
+            color: white;
+            box-shadow: 0 4px 15px rgba(107, 140, 188, 0.3);
+        }
+
+        .btn--secondary:hover {
+            background: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(107, 140, 188, 0.4);
+        }
+
+        .btn--accent {
+            background: var(--accent-color);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 126, 95, 0.3);
+        }
+
+        .btn--accent:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 126, 95, 0.4);
+        }
+
+        .btn--outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn--outline:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn--full {
+            width: 100%;
+        }
+
+        .btn--small {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+
+        /* Header & Navigation */
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: var(--box-shadow);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            transition: var(--transition);
+        }
+
+        .header.scrolled {
+            background: rgba(255, 255, 255, 0.98);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+
+        .nav__logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .nav__logo i {
+            color: var(--accent-color);
+            font-size: 1.8rem;
+        }
+
+        .nav__menu {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        .nav__link {
+            font-weight: 500;
+            padding: 0.5rem 0;
+            position: relative;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav__link:hover,
+        .nav__link.active {
+            color: var(--accent-color);
+        }
+
+        .nav__link.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--accent-color);
+        }
+
+        .nav__cta {
+            background: var(--accent-color);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .nav__cta:hover {
+            background: var(--accent-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 126, 95, 0.4);
+        }
+
+        .nav__toggle {
+            display: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--primary-color);
+            transition: var(--transition);
+        }
+
+        .nav__toggle:hover {
+            color: var(--accent-color);
+        }
+
+        /* Enhanced Navigation Styles */
+        .nav__protected {
+            position: relative;
+        }
+
+        .nav__link--protected {
+            position: relative;
+            padding-right: 2rem;
+        }
+
+        .nav__lock-icon {
+            position: absolute;
+            right: 0.75rem;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.7rem;
+            color: var(--medium-gray);
+            transition: var(--transition);
+            opacity: 0.7;
+        }
+
+        .nav__link--protected:hover .nav__lock-icon {
+            color: var(--accent-color);
+            opacity: 1;
+            transform: translateY(-50%) scale(1.1);
+        }
+
+        /* Tooltip for protected features */
+        .nav__link--protected::after {
+            content: attr(title);
+            position: absolute;
+            bottom: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--dark-color);
+            color: white;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 1001;
+            pointer-events: none;
+        }
+
+        .nav__link--protected::before {
+            content: '';
+            position: absolute;
+            bottom: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            border: 6px solid transparent;
+            border-bottom-color: var(--dark-color);
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 1001;
+        }
+
+        .nav__link--protected:hover::after,
+        .nav__link--protected:hover::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Guest mode badge alternative */
+        .nav__guest-badge {
+            background: var(--accent-color);
+            color: white;
+            font-size: 0.6rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 10px;
+            margin-left: 0.5rem;
+            font-weight: 600;
+        }
+
+        /* Notification and Messaging Styles */
+        .nav__dropdown {
+            position: relative;
+        }
+
+        .nav__link--dropdown {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-badge {
+            background: var(--accent-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+        }
+
+        .dropdown__menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-lg);
+            min-width: 320px;
+            max-height: 400px;
+            overflow-y: auto;
+            display: none;
+            z-index: 1001;
+        }
+
+        .nav__dropdown:hover .dropdown__menu {
+            display: block;
+        }
+
+        .dropdown__header {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dropdown__header h4 {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--dark-color);
+        }
+
+        .dropdown__content {
+            padding: 0.5rem;
+        }
+
+        .notification-item {
+            padding: 0.75rem;
+            border-radius: var(--border-radius-sm);
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            border-left: 3px solid transparent;
+        }
+
+        .notification-item:hover {
+            background: var(--light-color);
+        }
+
+        .notification-item.unread {
+            background: rgba(74, 111, 165, 0.05);
+            border-left-color: var(--primary-color);
+        }
+
+        .notification-item__title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+            color: var(--dark-color);
+        }
+
+        .notification-item__message {
+            font-size: 0.8rem;
+            color: var(--gray-color);
+            margin-bottom: 0.25rem;
+            line-height: 1.4;
+        }
+
+        .notification-item__time {
+            font-size: 0.7rem;
+            color: var(--medium-gray);
+        }
+
+        .dropdown__link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--dark-color);
+            transition: var(--transition);
+            border-radius: var(--border-radius-sm);
+            font-size: 0.9rem;
+        }
+
+        .dropdown__link:hover {
+            background: var(--light-color);
+            color: var(--primary-color);
+        }
+
+        .dropdown__divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: 0.5rem 0;
+        }
+
+        /* Messaging Styles */
+        .messages-container {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            z-index: 1000;
+            max-width: 400px;
+        }
+
+        .alert {
+            padding: 1rem 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 8px;
+            box-shadow: var(--box-shadow);
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .alert-close {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            margin-left: 1rem;
+            opacity: 0.7;
+            transition: var(--transition);
+        }
+
+        .alert-close:hover {
+            opacity: 1;
+        }
+
+        /* Main content area */
+        .main {
+            margin-top: 70px; /* Account for fixed header */
+            min-height: calc(100vh - 200px);
+        }
+
+        /* Footer Styles */
+        .footer {
+            background: var(--dark-color);
+            color: white;
+            padding: 3rem 0 1rem;
+        }
+
+        .footer__content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer__logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .footer__logo i {
+            color: var(--accent-color);
+        }
+
+        .footer__description {
+            color: #bbb;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer__social {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            color: white;
+        }
+
+        .social-link:hover {
+            background: var(--accent-color);
+            transform: translateY(-3px);
+        }
+
+        .footer__title {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+            color: white;
+        }
+
+        .footer__links {
+            list-style: none;
+        }
+
+        .footer__links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer__links a {
+            color: #bbb;
+            transition: var(--transition);
+        }
+
+        .footer__links a:hover {
+            color: white;
+        }
+
+        .footer__links i {
+            margin-right: 0.5rem;
+            color: var(--accent-color);
+            width: 20px;
+        }
+
+        .footer__bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 2rem;
+            border-top: 1px solid #444;
+            color: #bbb;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .footer__legal {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .footer__legal a {
+            color: #bbb;
+            transition: var(--transition);
+        }
+
+        .footer__legal a:hover {
+            color: white;
+        }
+
+        /* Enhanced Newsletter Styles */
+        .newsletter {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.12) 100%);
+            border-radius: var(--border-radius-lg);
+            padding: 2rem;
+            margin-top: 0;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--box-shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .newsletter::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-color), var(--primary-color));
+        }
+
+        .newsletter__title {
+            font-size: 1.3rem;
+            margin-bottom: 0.75rem;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .newsletter__title i {
+            color: var(--accent-color);
+        }
+
+        .newsletter__description {
+            color: #ddd;
+            font-size: 0.9rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .newsletter__form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .newsletter__input {
+            padding: 1rem 1.25rem;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: var(--border-radius);
+            background: rgba(255, 255, 255, 0.08);
+            color: white;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .newsletter__input:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            background: rgba(255, 255, 255, 0.12);
+            box-shadow: 0 0 0 3px rgba(255, 126, 95, 0.1);
+        }
+
+        .newsletter__input::placeholder {
+            color: #aaa;
+        }
+
+        .newsletter__btn {
+            background: linear-gradient(135deg, var(--accent-color), var(--accent-dark));
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .newsletter__btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(255, 126, 95, 0.3);
+        }
+
+        .newsletter__btn:active {
+            transform: translateY(0);
+        }
+
+        .newsletter__message {
+            margin-top: 1rem;
+            padding: 0.75rem;
+            border-radius: var(--border-radius-sm);
+            font-size: 0.9rem;
+            text-align: center;
+            display: none;
+            animation: slideIn 0.3s ease;
+        }
+
+        .newsletter__message.success {
+            background: rgba(40, 167, 69, 0.15);
+            color: #8affa8;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+            display: block;
+        }
+
+        .newsletter__message.error {
+            background: rgba(220, 53, 69, 0.15);
+            color: #ff8a8a;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            display: block;
+        }
+
+        .newsletter__message.info {
+            background: rgba(23, 162, 184, 0.15);
+            color: #7fd1e7;
+            border: 1px solid rgba(23, 162, 184, 0.3);
+            display: block;
+        }
+
+        .newsletter__unsubscribe {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        .newsletter__unsubscribe a {
+            color: #bbb;
+            font-size: 0.8rem;
+            text-decoration: underline;
+            transition: var(--transition);
+        }
+
+        .newsletter__unsubscribe a:hover {
+            color: var(--accent-color);
+        }
+
+        /* Enhanced Newsletter Styles for Footer */
+        .newsletter-status {
+            margin-bottom: 1rem;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background: rgba(40, 167, 69, 0.2);
+            color: #8affa8;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+
+        .status-inactive {
+            background: rgba(220, 53, 69, 0.2);
+            color: #ff8a8a;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+
+        .newsletter__btn--unsubscribe {
+            background: linear-gradient(135deg, #dc3545, #c82333) !important;
+            color: white;
+            border: none;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 1rem;
+            width: 100%;
+        }
+
+        .newsletter__btn--unsubscribe:hover {
+            background: linear-gradient(135deg, #c82333, #bd2130) !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.3);
+        }
+
+        .newsletter__btn--outline {
+            background: transparent !important;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            text-decoration: none;
+            transition: var(--transition);
+            display: block;
+            text-align: center;
+        }
+
+        .newsletter__btn--outline:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+            border-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .newsletter-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        /* Contact Links Styles */
+        .contact-link {
+            display: flex;
+            align-items: center;
+            transition: var(--transition);
+            cursor: pointer;
+            padding: 0.25rem 0;
+        }
+
+        .contact-link:hover {
+            color: white;
+            transform: translateX(5px);
+        }
+
+        /* Loading States */
+        .nav__link--loading {
+            position: relative;
+            pointer-events: none;
+        }
+        
+        .nav__link--loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 16px;
+            height: 16px;
+            margin: -8px 0 0 -8px;
+            border: 2px solid transparent;
+            border-top: 2px solid currentColor;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav__menu {
+                position: fixed;
+                top: 70px;
+                left: -100%;
+                width: 100%;
+                background: white;
+                flex-direction: column;
+                padding: 2rem;
+                box-shadow: var(--box-shadow);
+                transition: var(--transition);
+                gap: 1rem;
+                height: calc(100vh - 70px);
+                overflow-y: auto;
+            }
+
+            .nav__menu.active {
+                left: 0;
+            }
+
+            .nav__toggle {
+                display: block;
+            }
+            
+            .section {
+                padding: 3rem 0;
+            }
+            
+            .section__title {
+                font-size: 2rem;
+            }
+            
+            .footer__bottom {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .footer__legal {
+                justify-content: center;
+            }
+            
+            .messages-container {
+                left: 20px;
+                right: 20px;
+                max-width: none;
+            }
+
+            .dropdown__menu {
+                position: fixed;
+                top: 70px;
+                left: 0;
+                right: 0;
+                width: 100%;
+                max-height: 50vh;
+            }
+
+            .nav__link {
+                justify-content: flex-start;
+                padding: 0.75rem 0;
+            }
+
+            /* Enhanced mobile styles */
+            .nav__link--protected {
+                padding-right: 1rem;
+            }
+            
+            .nav__lock-icon {
+                right: 0.5rem;
+            }
+            
+            .nav__link--protected::after,
+            .nav__link--protected::before {
+                display: none; /* Hide tooltips on mobile */
+            }
+
+            /* Newsletter responsive */
+            .newsletter {
+                padding: 1.5rem;
+            }
+            
+            .newsletter__form {
+                flex-direction: column;
+            }
+            
+            .footer__content {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 0 1rem;
+            }
+            
+            .section__title {
+                font-size: 1.75rem;
+            }
+            
+            .btn {
+                padding: 0.625rem 1.25rem;
+                font-size: 0.9rem;
+            }
+
+            .dropdown__menu {
+                min-width: 280px;
+            }
+
+            .nav__menu {
+                gap: 0.5rem;
+            }
+
+            .newsletter {
+                padding: 1.25rem;
+            }
+            
+            .newsletter__title {
+                font-size: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+<!-- Header & Navigation -->
+    <header class="header">
+        <nav class="nav container">
+            <div class="nav__logo">
+                <i class="fas fa-tshirt"></i>
+                <span>ClothShare</span>
+            </div>
+            
+            <ul class="nav__menu" id="navMenu">
+                <!-- Main Navigation Links -->
+                <li class="nav__item">
+                    <a href="{% url 'core:index' %}" class="nav__link {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                </li>
+                <li class="nav__item">
+                    <a href="{% url 'core:browse' %}" class="nav__link {% if request.resolver_match.url_name == 'browse' %}active{% endif %}">
+                        <i class="fas fa-search"></i> Browse Items
+                    </a>
+                </li>
+                
+                <!-- Donate and Request Links - Enhanced Authentication Handling -->
+                {% if user.is_authenticated %}
+                <li class="nav__item">
+                    <a href="{% url 'core:donate' %}" class="nav__link {% if request.resolver_match.url_name == 'donate' %}active{% endif %}">
+                        <i class="fas fa-hands-helping"></i> Donate
+                    </a>
+                </li>
+                <li class="nav__item">
+                    <a href="{% url 'core:request' %}" class="nav__link {% if request.resolver_match.url_name == 'request' %}active{% endif %}">
+                        <i class="fas fa-hand-holding-heart"></i> Request
+                    </a>
+                </li>
+                {% else %}
+                <li class="nav__item nav__protected">
+                    <a href="{% url 'userauths:sign-in' %}?next={% url 'core:donate' %}" 
+                       class="nav__link nav__link--protected" 
+                       data-feature="donate"
+                       title="Sign in to donate items">
+                        <i class="fas fa-hands-helping"></i> Donate
+                        <span class="nav__lock-icon">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                    </a>
+                </li>
+                <li class="nav__item nav__protected">
+                    <a href="{% url 'userauths:sign-in' %}?next={% url 'core:request' %}" 
+                       class="nav__link nav__link--protected" 
+                       data-feature="request"
+                       title="Sign in to request items">
+                        <i class="fas fa-hand-holding-heart"></i> Request
+                        <span class="nav__lock-icon">
+                            <i class="fas fa-lock"></i>
+                        </span>
+                    </a>
+                </li>
+                {% endif %}
+                
+                <li class="nav__item">
+                    <a href="{% url 'core:impact' %}" class="nav__link {% if request.resolver_match.url_name == 'impact' %}active{% endif %}">
+                        <i class="fas fa-chart-line"></i> Impact
+                    </a>
+                </li>
+                
+                <!-- Help Section - Added as requested -->
+                <li class="nav__item">
+                    <a href="{% url 'core:help' %}" class="nav__link {% if request.resolver_match.url_name == 'help' %}active{% endif %}">
+                        <i class="fas fa-question-circle"></i> Help
+                    </a>
+                </li>
+
+                <!-- Messages Dropdown - Only for authenticated users 
+                {% if user.is_authenticated %}
+                <li class="nav__item nav__dropdown">
+                    <button class="nav__link nav__link--dropdown">
+                        <i class="fas fa-envelope"></i> Messages
+                        <span class="notification-badge">2</span>
+                    </button>
+                    <div class="dropdown__menu">
+                        <div class="dropdown__header">
+                            <h4>Messages</h4>
+                            <a href="{% url 'core:notifications' %}" class="dropdown__link">View All</a>
+                        </div>
+                        <div class="dropdown__content">
+                            <div class="notification-item unread">
+                                <div class="notification-item__title">Sarah Johnson</div>
+                                <div class="notification-item__message">Hi! I'm interested in your winter jacket...</div>
+                                <div class="notification-item__time">5 minutes ago</div>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="notification-item__title">Mike Chen</div>
+                                <div class="notification-item__message">When can I pick up the jeans?</div>
+                                <div class="notification-item__time">2 hours ago</div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-item__title">Community Support</div>
+                                <div class="notification-item__message">Welcome to our community!</div>
+                                <div class="notification-item__time">1 day ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+
+                <!-- Notifications Dropdown - Only for authenticated users -->
+                <li class="nav__item nav__dropdown">
+                    <button class="nav__link nav__link--dropdown">
+                        <i class="fas fa-bell"></i> Notifications
+                        <span class="notification-badge">3</span>
+                    </button>
+                    <div class="dropdown__menu">
+                        <div class="dropdown__header">
+                            <h4>Notifications</h4>
+                            <a href="{% url 'core:notifications' %}" class="dropdown__link">View All</a>
+                        </div>
+                        <div class="dropdown__content">
+                            <div class="notification-item unread">
+                                <div class="notification-item__title">New Item Request</div>
+                                <div class="notification-item__message">Someone requested your winter jacket</div>
+                                <div class="notification-item__time">2 minutes ago</div>
+                            </div>
+                            <div class="notification-item unread">
+                                <div class="notification-item__title">Request Accepted</div>
+                                <div class="notification-item__message">Your request for jeans was accepted</div>
+                                <div class="notification-item__time">1 hour ago</div>
+                            </div>
+                            <div class="notification-item">
+                                <div class="notification-item__title">Welcome to ClothShare!</div>
+                                <div class="notification-item__message">Start sharing clothes with your community</div>
+                                <div class="notification-item__time">1 day ago</div>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+                {% endif %}
+
+                <!-- Profile/Login Section - Always Last -->
+                {% if user.is_authenticated %}
+                <li class="nav__item nav__dropdown">
+                    <button class="nav__link nav__link--dropdown">
+                        <i class="fas fa-user"></i> Profile
+                    </button>
+                    <div class="dropdown__menu">
+                        <a href="{% url 'core:profile' %}" class="dropdown__link">
+                            <i class="fas fa-user-circle"></i> My Profile
+                        </a>
+                        <a href="{% url 'core:profile' %}" class="dropdown__link">
+                            <i class="fas fa-tshirt"></i> My Items
+                        </a>
+                        <a href="{% url 'core:my_requests' %}" class="dropdown__link">
+                            <i class="fas fa-hand-holding-heart"></i> My Requests
+                        </a>
+                        <a href="{% url 'core:my_exchanges' %}" class="dropdown__link">
+                            <i class="fas fa-exchange-alt"></i> My Exchanges
+                        </a>
+                        <div class="dropdown__divider"></div>
+                        <a href="{% url 'userauths:sign-out' %}" class="dropdown__link">
+                            <i class="fas fa-sign-out-alt"></i> Logout
+                        </a>
+                    </div>
+                </li>
+                {% else %}
+                <li class="nav__item">
+                    <a href="{% url 'userauths:sign-in' %}" class="nav__link">
+                        <i class="fas fa-sign-in-alt"></i> Login
+                    </a>
+                </li>
+                <li class="nav__item">
+                    <a href="{% url 'userauths:sign-up' %}" class="nav__link nav__cta">
+                        <i class="fas fa-user-plus"></i> Sign Up
+                    </a>
+                </li>
+                {% endif %}
+            </ul>
+
+            <div class="nav__toggle" id="navToggle">
+                <i class="fas fa-bars"></i>
+            </div>
+        </nav>
+    </header>
+
+    <!-- Messages Container -->
+    <div class="messages-container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                    <span>{{ message }}</span>
+                    <button class="alert-close">&times;</button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <main class="main">
+        {% block content %}
+        {% endblock content %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer__content">
+                <div class="footer__section">
+                    <div class="footer__logo">
+                        <i class="fas fa-tshirt"></i>
+                        <span>ClothShare</span>
+                    </div>
+                    <p class="footer__description">
+                        Building sustainable communities through clothing donation and exchange.
+                    </p>
+                    <div class="footer__social">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer__section">
+                    <h3 class="footer__title">Quick Links</h3>
+                    <ul class="footer__links">
+                        <li><a href="{% url 'core:index' %}"><i class="fas fa-home"></i> Home</a></li>
+                        <li><a href="{% url 'core:browse' %}"><i class="fas fa-search"></i> Browse Items</a></li>
+                        <li><a href="{% url 'core:donate' %}"><i class="fas fa-hands-helping"></i> Donate</a></li>
+                        <li><a href="{% url 'core:request' %}"><i class="fas fa-hand-holding-heart"></i> Request</a></li>
+                        <li><a href="{% url 'core:help' %}"><i class="fas fa-question-circle"></i> Help</a></li>
+                        {% if user.is_authenticated %}
+                        <li><a href="{% url 'core:notifications' %}"><i class="fas fa-envelope"></i> Messages</a></li>
+                        <li><a href="{% url 'core:notifications' %}"><i class="fas fa-bell"></i> Notifications</a></li>
+                        {% endif %}
+                    </ul>
+                </div>
+                
+                <div class="footer__section">
+                    <h3 class="footer__title">Community</h3>
+                    <ul class="footer__links">
+                        <li><a href="{% url 'core:impact' %}"><i class="fas fa-chart-line"></i> Community Impact</a></li>
+                        <li><a href="#"><i class="fas fa-trophy"></i> Success Stories</a></li>
+                        <li><a href="#"><i class="fas fa-book"></i> Community Guidelines</a></li>
+                        <li><a href="#"><i class="fas fa-calendar"></i> Events</a></li>
+                    </ul>
+                </div>
+                
+                <!-- Newsletter Section - Only visible to logged-in users -->
+                {% if user.is_authenticated %}
+                <div class="footer__section">
+                    <h3 class="footer__title">Stay Updated</h3>
+                    <div class="newsletter">
+                        <h4 class="newsletter__title">
+                            <i class="fas fa-newspaper"></i> Newsletter
+                        </h4>
+                        
+                        <!-- Dynamic status display -->
+                        <div class="newsletter-status" id="footerNewsletterStatus">
+                            {% if user.newsletter_subscription and user.newsletter_subscription.is_active %}
+                                <div class="status-badge status-active">
+                                    <i class="fas fa-check-circle"></i>
+                                    Subscribed
+                                </div>
+                            {% else %}
+                                <div class="status-badge status-inactive">
+                                    <i class="fas fa-times-circle"></i>
+                                    Not Subscribed
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <p class="newsletter__description" id="footerNewsletterDescription">
+                            {% if user.newsletter_subscription and user.newsletter_subscription.is_active %}
+                                You're receiving updates about new donations and community news.
+                            {% else %}
+                                Get updates on new donations and community news. Stay informed about clothing exchanges.
+                            {% endif %}
+                        </p>
+                        
+                        <!-- Fixed Newsletter Actions - Using Django Forms -->
+                        <div class="newsletter-actions" id="footerNewsletterActions">
+                            {% if user.newsletter_subscription and user.newsletter_subscription.is_active %}
+                                <!-- Unsubscribe Form -->
+                                <form method="post" action="{% url 'core:edit_profile' %}" class="newsletter-form" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="form_type" value="newsletter">
+                                    <input type="hidden" name="action" value="unsubscribe_newsletter">
+                                    <button type="submit" class="newsletter__btn newsletter__btn--unsubscribe" onclick="return confirm('Are you sure you want to unsubscribe from all newsletters?')">
+                                        <i class="fas fa-ban"></i> Unsubscribe
+                                    </button>
+                                </form>
+                                <a href="{% url 'core:edit_profile' %}#newsletter" class="newsletter__btn newsletter__btn--outline">
+                                    <i class="fas fa-cog"></i> Manage Preferences
+                                </a>
+                            {% else %}
+                                <!-- Subscribe Form -->
+                                <form method="post" action="{% url 'core:edit_profile' %}" class="newsletter-form" style="margin: 0;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="form_type" value="newsletter">
+                                    <input type="hidden" name="action" value="subscribe_newsletter">
+                                    <button type="submit" class="newsletter__btn">
+                                        <i class="fas fa-paper-plane"></i> Subscribe Now
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                        
+                        {% if user.newsletter_subscription and user.newsletter_subscription.is_active %}
+                        <div class="newsletter__unsubscribe">
+                            <a href="{% url 'core:edit_profile' %}#newsletter">
+                                <i class="fas fa-cog"></i> Manage all preferences in profile
+                            </a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                {% endif %}
+                
+                <div class="footer__section">
+                    <h3 class="footer__title">Contact Info</h3>
+                    <ul class="footer__links">
+                        <li>
+                            <a href="mailto:info@clothshare.org" class="contact-link">
+                                <i class="fas fa-envelope"></i> info@clothshare.org
+                            </a>
+                        </li>
+                        <li>
+                            <a href="tel:+254123456789" class="contact-link">
+                                <i class="fas fa-phone"></i> +254 123 456 789
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://maps.google.com/?q=Nakuru,Kenya" target="_blank" class="contact-link">
+                                <i class="fas fa-map-marker-alt"></i> Nakuru, Kenya
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="footer__bottom">
+                <p>&copy; 2024 ClothShare. All rights reserved.</p>
+                <div class="footer__legal">
+                    <a href="{% url 'core:privacy_policy' %}">Privacy Policy</a>
+                    <a href="{% url 'core:terms_of_service' %}">Terms of Service</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const navToggle = document.getElementById('navToggle');
+            const navMenu = document.getElementById('navMenu');
+            
+            if (navToggle && navMenu) {
+                navToggle.addEventListener('click', function() {
+                    navMenu.classList.toggle('active');
+                    // Toggle hamburger icon
+                    const icon = navToggle.querySelector('i');
+                    if (navMenu.classList.contains('active')) {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                    } else {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                    }
+                });
+            }
+            
+            // Auto-hide messages after 5 seconds
+            const messagesContainer = document.querySelector('.messages-container');
+            if (messagesContainer) {
+                setTimeout(() => {
+                    messagesContainer.style.opacity = '0';
+                    messagesContainer.style.transform = 'translateX(100%)';
+                    setTimeout(() => {
+                        messagesContainer.style.display = 'none';
+                    }, 300);
+                }, 5000);
+                
+                // Close button functionality for alerts
+                document.querySelectorAll('.alert-close').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const alert = this.closest('.alert');
+                        alert.style.opacity = '0';
+                        alert.style.transform = 'translateX(100%)';
+                        setTimeout(() => {
+                            alert.style.display = 'none';
+                        }, 300);
+                    });
+                });
+            }
+            
+            // Header scroll effect
+            window.addEventListener('scroll', function() {
+                const header = document.querySelector('.header');
+                if (window.scrollY > 100) {
+                    header.classList.add('scrolled');
+                } else {
+                    header.classList.remove('scrolled');
+                }
+            });
+            
+            // Close mobile menu when clicking on a link
+            document.querySelectorAll('.nav__link').forEach(link => {
+                link.addEventListener('click', function() {
+                    if (this.closest('.nav__dropdown')) {
+                        return; // Don't close menu for dropdown clicks
+                    }
+                    navMenu.classList.remove('active');
+                    const icon = navToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                });
+            });
+            
+            // Close mobile menu when clicking outside
+            document.addEventListener('click', function(event) {
+                if (!event.target.closest('.nav') && navMenu.classList.contains('active')) {
+                    navMenu.classList.remove('active');
+                    const icon = navToggle.querySelector('i');
+                    icon.classList.remove('fa-times');
+                    icon.classList.add('fa-bars');
+                }
+            });
+
+            // Notification and messaging dropdown functionality
+            document.querySelectorAll('.nav__dropdown').forEach(dropdown => {
+                const button = dropdown.querySelector('.nav__link--dropdown');
+                const menu = dropdown.querySelector('.dropdown__menu');
+                
+                if (button && menu) {
+                    button.addEventListener('click', function(e) {
+                        e.stopPropagation();
+                        // Close other dropdowns
+                        document.querySelectorAll('.dropdown__menu').forEach(otherMenu => {
+                            if (otherMenu !== menu) {
+                                otherMenu.style.display = 'none';
+                            }
+                        });
+                        // Toggle current dropdown
+                        menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                    });
+                }
+            });
+
+            // Close dropdowns when clicking outside
+            document.addEventListener('click', function() {
+                document.querySelectorAll('.dropdown__menu').forEach(menu => {
+                    menu.style.display = 'none';
+                });
+            });
+
+            // Mark notifications as read when clicked
+            document.querySelectorAll('.notification-item').forEach(item => {
+                item.addEventListener('click', function() {
+                    if (this.classList.contains('unread')) {
+                        this.classList.remove('unread');
+                        // Update badge count for the parent dropdown
+                        const dropdown = this.closest('.nav__dropdown');
+                        if (dropdown) {
+                            const badge = dropdown.querySelector('.notification-badge');
+                            if (badge) {
+                                let count = parseInt(badge.textContent) || 0;
+                                if (count > 0) {
+                                    count--;
+                                    badge.textContent = count > 0 ? count : '';
+                                    if (count === 0) {
+                                        badge.style.display = 'none';
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+
+            // Prevent dropdown links from closing mobile menu immediately
+            document.querySelectorAll('.dropdown__link').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                });
+            });
+
+            // Enhanced authentication handling and analytics
+            document.querySelectorAll('.nav__link--protected').forEach(link => {
+                link.addEventListener('click', function(e) {
+                    const feature = this.getAttribute('data-feature');
+                    const nextUrl = new URLSearchParams(this.href.split('?')[1]).get('next');
+                    
+                    // You can send this data to your analytics service
+                    console.log(`User clicked on protected feature: ${feature}`);
+                    console.log(`Intended destination: ${nextUrl}`);
+                    
+                    // Optional: Show a brief loading indicator
+                    this.classList.add('nav__link--loading');
+                    
+                    // The page will redirect to login, so we don't need to prevent default
+                });
+            });
+            
+            // Enhanced tooltip functionality
+            let tooltipTimer;
+            document.querySelectorAll('.nav__link--protected').forEach(link => {
+                link.addEventListener('mouseenter', function() {
+                    clearTimeout(tooltipTimer);
+                    // Tooltip is handled by CSS, but we can add additional behaviors here
+                });
+                
+                link.addEventListener('mouseleave', function() {
+                    tooltipTimer = setTimeout(() => {
+                        // Additional cleanup if needed
+                    }, 300);
+                });
+            });
+            
+            // Check if user just logged in and show welcome message
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('login_success') || urlParams.has('next')) {
+                // You could show a welcome toast or update the UI
+                console.log('User successfully logged in');
+            }
+            
+            // Handle mobile menu for protected links
+            if (navMenu) {
+                // Add specific handling for protected links in mobile view
+                const protectedLinks = navMenu.querySelectorAll('.nav__link--protected');
+                protectedLinks.forEach(link => {
+                    link.addEventListener('click', function() {
+                        // Close mobile menu after clicking protected link
+                        if (navMenu.classList.contains('active')) {
+                            navMenu.classList.remove('active');
+                            const navToggle = document.getElementById('navToggle');
+                            if (navToggle) {
+                                const icon = navToggle.querySelector('i');
+                                icon.classList.remove('fa-times');
+                                icon.classList.add('fa-bars');
+                            }
+                        }
+                    });
+                });
+            }
+
+            // Enhanced newsletter form handling
+            document.querySelectorAll('.newsletter-form').forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    const button = this.querySelector('button[type="submit"]');
+                    const originalText = button.innerHTML;
+                    
+                    // Show loading state
+                    button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                    button.disabled = true;
+                    
+                    // The form will submit normally to your Django view
+                    // The loading state is just for better UX
+                    
+                    // Re-enable button after 5 seconds in case submission fails
+                    setTimeout(() => {
+                        button.innerHTML = originalText;
+                        button.disabled = false;
+                    }, 5000);
+                });
+            });
+        });
+    </script>
+    
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,1430 @@
+{% extends 'core/base.html' %}
+{% load static %}
+
+{% block title %}Notifications | ClothShare{% endblock %}
+
+{% block extra_css %}
+<style>
+    /* Enhanced Notifications Styles */
+    .notifications-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 4rem 0 3rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .notifications-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.1' fill-rule='evenodd'/%3E%3C/svg%3E");
+        animation: float 20s infinite linear;
+    }
+
+    @keyframes float {
+        0% { transform: translateX(0) translateY(0); }
+        100% { transform: translateX(-100px) translateY(-100px); }
+    }
+
+    .notifications-title {
+        font-size: 3rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+        text-shadow: 0 2px 10px rgba(0,0,0,0.3);
+    }
+
+    .notifications-subtitle {
+        font-size: 1.2rem;
+        opacity: 0.9;
+        margin-bottom: 2rem;
+        max-width: 600px;
+    }
+
+    .notifications-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    /* Enhanced Button Styles */
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        font-size: 0.95rem;
+    }
+
+    .btn--primary {
+        background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        color: white;
+        box-shadow: 0 4px 15px rgba(79, 172, 254, 0.4);
+    }
+
+    .btn--primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 25px rgba(79, 172, 254, 0.6);
+    }
+
+    .btn--outline {
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+    }
+
+    .btn--outline:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateY(-2px);
+    }
+
+    .btn--small {
+        padding: 0.5rem 1rem;
+        font-size: 0.85rem;
+    }
+
+    /* Notifications Container */
+    .notifications-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 2rem 0;
+    }
+
+    /* Bulk Actions */
+    .bulk-actions {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        color: white;
+        padding: 1.5rem;
+        border-radius: 16px;
+        margin-bottom: 2rem;
+        display: none;
+        justify-content: space-between;
+        align-items: center;
+        animation: slideDown 0.3s ease;
+        box-shadow: 0 8px 25px rgba(245, 87, 108, 0.3);
+    }
+
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .bulk-actions-left,
+    .bulk-actions-right {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .select-all {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        font-weight: 600;
+    }
+
+    .filter-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        backdrop-filter: blur(10px);
+    }
+
+    /* Filters */
+    .notifications-filters {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .filters-left {
+        display: flex;
+        align-items: center;
+        gap: 2rem;
+    }
+
+    .filter-options {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .filter-option {
+        padding: 0.5rem 1rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 25px;
+        background: white;
+        color: #64748b;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .filter-option:hover {
+        border-color: #667eea;
+        color: #667eea;
+    }
+
+    .filter-option.active {
+        background: #667eea;
+        border-color: #667eea;
+        color: white;
+    }
+
+    /* Notifications List */
+    .notifications-list {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .notification-item {
+        background: white;
+        border-radius: 16px;
+        padding: 1.5rem;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        transition: all 0.3s ease;
+        border-left: 4px solid transparent;
+        position: relative;
+        overflow: hidden;
+        animation: slideInUp 0.5s ease;
+    }
+
+    @keyframes slideInUp {
+        from { 
+            opacity: 0;
+            transform: translateY(30px);
+        }
+        to { 
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .notification-item:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    }
+
+    .notification-item.unread {
+        border-left-color: #667eea;
+        background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
+    }
+
+    .notification-item.unread::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: -8px;
+        width: 12px;
+        height: 12px;
+        background: #667eea;
+        border-radius: 50%;
+        transform: translateY(-50%);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7); }
+        70% { box-shadow: 0 0 0 10px rgba(102, 126, 234, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(102, 126, 234, 0); }
+    }
+
+    .bulk-mode .notification-item {
+        padding-left: 3rem;
+    }
+
+    .notification-checkbox {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 20px;
+        height: 20px;
+        opacity: 0;
+        transition: all 0.3s ease;
+    }
+
+    .bulk-mode .notification-checkbox {
+        opacity: 1;
+    }
+
+    .notification-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 1rem;
+    }
+
+    .notification-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: #1a202c;
+        margin: 0;
+    }
+
+    .notification-meta {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .notification-type {
+        padding: 0.25rem 0.75rem;
+        border-radius: 15px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .type-exchange { background: #e3f2fd; color: #1976d2; }
+    .type-donation { background: #e8f5e8; color: #2e7d32; }
+    .type-request { background: #fff3e0; color: #f57c00; }
+    .type-system { background: #f3e5f5; color: #7b1fa2; }
+    .type-new_donation { background: #e1f5fe; color: #0288d1; }
+
+    .notification-time {
+        color: #64748b;
+        font-size: 0.85rem;
+    }
+
+    .notification-body {
+        color: #4a5568;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+    }
+
+    .notification-actions {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .notification-action {
+        padding: 0.5rem 1rem;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .notification-action:not(.primary) {
+        background: #f7fafc;
+        color: #4a5568;
+        border: 1px solid #e2e8f0;
+    }
+
+    .notification-action:not(.primary):hover {
+        background: #edf2f7;
+        transform: translateY(-1px);
+    }
+
+    .notification-action.primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .notification-action.primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+    }
+
+    /* Empty State */
+    .notifications-empty {
+        text-align: center;
+        padding: 4rem 2rem;
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        color: #cbd5e0;
+        margin-bottom: 1.5rem;
+        animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+        0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-10px); }
+        60% { transform: translateY(-5px); }
+    }
+
+    .empty-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2d3748;
+        margin-bottom: 1rem;
+    }
+
+    .empty-message {
+        color: #718096;
+        font-size: 1.1rem;
+        max-width: 500px;
+        margin: 0 auto 2rem;
+        line-height: 1.6;
+    }
+
+    .empty-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    /* Toast Notifications */
+    .toast {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 12px;
+        color: white;
+        font-weight: 600;
+        z-index: 1000;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        transform: translateX(400px);
+        transition: transform 0.3s ease;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .toast.show {
+        transform: translateX(0);
+    }
+
+    .toast.success { background: linear-gradient(135deg, #4CAF50, #45a049); }
+    .toast.error { background: linear-gradient(135deg, #f44336, #da190b); }
+    .toast.info { background: linear-gradient(135deg, #2196F3, #0b7dda); }
+
+    /* Loading States */
+    .loading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .loading::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+        animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+        0% { left: -100%; }
+        100% { left: 100%; }
+    }
+
+    /* Statistics Cards */
+    .notifications-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .stat-card {
+        background: white;
+        padding: 1.5rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        transition: transform 0.3s ease;
+    }
+    
+    .stat-card:hover {
+        transform: translateY(-2px);
+    }
+    
+    .stat-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.2rem;
+    }
+    
+    .stat-icon.unread {
+        background: linear-gradient(135deg, #f093fb, #f5576c);
+    }
+    
+    .stat-number {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #2d3748;
+    }
+    
+    .stat-label {
+        color: #718096;
+        font-size: 0.9rem;
+    }
+    
+    .search-box {
+        position: relative;
+        display: flex;
+        align-items: center;
+    }
+    
+    .search-box input {
+        padding: 0.5rem 1rem 0.5rem 2.5rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 25px;
+        font-size: 0.9rem;
+        width: 200px;
+        transition: all 0.3s ease;
+    }
+    
+    .search-box input:focus {
+        border-color: #667eea;
+        outline: none;
+        width: 250px;
+    }
+    
+    .search-box i {
+        position: absolute;
+        left: 1rem;
+        color: #a0aec0;
+    }
+    
+    .load-more-container {
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .notifications-title {
+            font-size: 2rem;
+        }
+        
+        .notifications-filters {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: stretch;
+        }
+        
+        .filters-left {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .filter-options {
+            flex-wrap: wrap;
+        }
+        
+        .notification-header {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        
+        .notification-meta {
+            flex-wrap: wrap;
+        }
+        
+        .bulk-actions {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .bulk-actions-left,
+        .bulk-actions-right {
+            width: 100%;
+            justify-content: space-between;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Notifications Header -->
+<section class="notifications-header">
+    <div class="container">
+        <h1 class="notifications-title">📬 Notifications</h1>
+        <p class="notifications-subtitle">
+            Stay updated with new donations, clothing exchanges, and community activities. Never miss an important update!
+        </p>
+        <div class="notifications-actions">
+            <button type="button" class="btn btn--primary" onclick="markAllAsRead()" id="markAllBtn">
+                <i class="fas fa-check-double"></i> Mark All as Read
+            </button>
+            <button class="btn btn--outline" onclick="toggleBulkMode()" id="bulkActionsBtn">
+                <i class="fas fa-list-check"></i> Bulk Actions
+            </button>
+            <button type="button" class="btn btn--outline" onclick="clearAllNotifications()" id="clearAllBtn">
+                <i class="fas fa-broom"></i> Clear All
+            </button>
+            <button class="btn btn--outline" onclick="toggleSound()" id="soundBtn">
+                <i class="fas fa-volume-up"></i> Sound On
+            </button>
+        </div>
+    </div>
+</section>
+
+<!-- Notifications Container -->
+<section class="section">
+    <div class="container">
+        <div class="notifications-container">
+            <!-- Bulk Actions (Hidden by default) -->
+            <div class="bulk-actions" id="bulkActions">
+                <div class="bulk-actions-left">
+                    <label class="select-all">
+                        <input type="checkbox" id="selectAll" onchange="toggleSelectAll()">
+                        Select All
+                    </label>
+                    <span class="filter-badge">
+                        <i class="fas fa-layer-group"></i>
+                        <span id="selectedCount">0</span> selected
+                    </span>
+                </div>
+                <div class="bulk-actions-right">
+                    <button type="button" class="btn btn--outline btn--small" onclick="markSelectedAsRead()">
+                        <i class="fas fa-check"></i> Mark as Read
+                    </button>
+                    <button type="button" class="btn btn--outline btn--small" onclick="archiveSelected()">
+                        <i class="fas fa-archive"></i> Archive
+                    </button>
+                    <button type="button" class="btn btn--outline btn--small" onclick="deleteSelectedNotifications()">
+                        <i class="fas fa-trash"></i> Delete
+                    </button>
+                    <button class="btn btn--outline btn--small" onclick="toggleBulkMode()">
+                        <i class="fas fa-times"></i> Cancel
+                    </button>
+                </div>
+            </div>
+
+            <!-- Quick Stats -->
+            <div class="notifications-stats">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number">{{ notifications.count }}</div>
+                        <div class="stat-label">Total Notifications</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon unread">
+                        <i class="fas fa-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="unreadCount">{{ unread_count }}</div>
+                        <div class="stat-label">Unread</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-exchange-alt"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="exchangeCount">{{ exchange_count }}</div>
+                        <div class="stat-label">Exchanges</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-gift"></i>
+                    </div>
+                    <div class="stat-info">
+                        <div class="stat-number" id="donationCount">{{ donation_count }}</div>
+                        <div class="stat-label">New Donations</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Filters -->
+            <div class="notifications-filters">
+                <div class="filters-left">
+                    <div class="filter-options">
+                        <button class="filter-option active" data-filter="all">
+                            <i class="fas fa-th-list"></i> All
+                        </button>
+                        <button class="filter-option" data-filter="unread">
+                            <i class="fas fa-envelope"></i> Unread
+                        </button>
+                        <button class="filter-option" data-filter="exchange">
+                            <i class="fas fa-exchange-alt"></i> Exchanges
+                        </button>
+                        <button class="filter-option" data-filter="new_donation">
+                            <i class="fas fa-gift"></i> New Donations
+                        </button>
+                        <button class="filter-option" data-filter="request">
+                            <i class="fas fa-hands-helping"></i> Requests
+                        </button>
+                    </div>
+                </div>
+                <div class="filters-right">
+                    <div class="search-box">
+                        <input type="text" id="notificationSearch" placeholder="Search notifications...">
+                        <i class="fas fa-search"></i>
+                    </div>
+                    <button class="btn btn--outline btn--small" onclick="refreshNotifications()" id="refreshBtn">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notifications List -->
+            {% if notifications %}
+            <div class="notifications-list" id="notificationsList">
+                {% for notification in notifications %}
+                <div class="notification-item {% if not notification.is_read %}unread{% endif %}" 
+                     data-type="{{ notification.type }}" 
+                     data-id="{{ notification.id }}"
+                     data-search="{{ notification.title }} {{ notification.message }}">
+                    <input type="checkbox" class="notification-checkbox" value="{{ notification.id }}">
+                    
+                    <div class="notification-header">
+                        <h3 class="notification-title">
+                            {% if notification.type == 'exchange' %}
+                            <i class="fas fa-exchange-alt"></i>
+                            {% elif notification.type == 'new_donation' %}
+                            <i class="fas fa-gift"></i>
+                            {% elif notification.type == 'request' %}
+                            <i class="fas fa-hands-helping"></i>
+                            {% else %}
+                            <i class="fas fa-info-circle"></i>
+                            {% endif %}
+                            {{ notification.title }}
+                        </h3>
+                        <div class="notification-meta">
+                            <span class="notification-type type-{{ notification.type }}">
+                                <i class="fas fa-{% if notification.type == 'exchange' %}exchange-alt{% elif notification.type == 'new_donation' %}gift{% elif notification.type == 'request' %}hands-helping{% else %}info-circle{% endif %}"></i>
+                                {{ notification.get_type_display }}
+                            </span>
+                            <span class="notification-time" data-time="{{ notification.created_at|date:'c' }}">
+                                {{ notification.created_at|timesince }} ago
+                            </span>
+                        </div>
+                    </div>
+                    
+                    <div class="notification-body">
+                        {{ notification.message }}
+                    </div>
+                    
+                    <div class="notification-actions">
+                        {% if not notification.is_read %}
+                        <button type="button" class="notification-action" onclick="markNotificationRead('{{ notification.id }}')">
+                            <i class="fas fa-check"></i> Mark Read
+                        </button>
+                        {% endif %}
+                        
+                        {% if notification.related_item %}
+                        <a href="{% url 'core:item_detail' notification.related_item.id %}" class="notification-action primary">
+                            <i class="fas fa-eye"></i> View Item
+                        </a>
+                        {% elif notification.type == 'exchange_request' %}
+                        <a href="{% url 'core:my_exchanges' %}" class="notification-action primary">
+                            <i class="fas fa-handshake"></i> Manage Exchange
+                        </a>
+                        {% elif notification.type == 'new_donation' %}
+                        <a href="{% url 'core:browse' %}" class="notification-action primary">
+                            <i class="fas fa-tshirt"></i> Browse New Items
+                        </a>
+                        {% endif %}
+                        
+                        <button type="button" class="notification-action" onclick="archiveNotification('{{ notification.id }}')">
+                            <i class="fas fa-archive"></i> Archive
+                        </button>
+                        
+                        <button type="button" class="notification-action" onclick="deleteNotification('{{ notification.id }}')">
+                            <i class="fas fa-trash"></i> Delete
+                        </button>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Load More Button -->
+            <div class="load-more-container">
+                <button class="btn btn--outline" onclick="loadMoreNotifications()" id="loadMoreBtn">
+                    <i class="fas fa-chevron-down"></i> Load More
+                </button>
+            </div>
+            
+            {% else %}
+            <!-- No Results Message -->
+            <div class="notifications-empty">
+                <div class="empty-icon">
+                    <i class="fas fa-bell-slash"></i>
+                </div>
+                <h3 class="empty-title">No Notifications Yet</h3>
+                <p class="empty-message">
+                    You're all caught up! When new donations are made, exchanges happen, or community activities occur, 
+                    they'll appear here. Stay active in the community to get notifications!
+                </p>
+                <div class="empty-actions">
+                    <a href="{% url 'core:browse' %}" class="btn btn--primary">
+                        <i class="fas fa-tshirt"></i> Browse Items
+                    </a>
+                    <a href="{% url 'core:donate' %}" class="btn btn--outline">
+                        <i class="fas fa-hands-helping"></i> Donate Items
+                    </a>
+                    <a href="{% url 'core:view_requests' %}" class="btn btn--outline">
+                        <i class="fas fa-search"></i> View Requests
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Sound Element -->
+<audio id="notificationSound" preload="auto">
+    <source src="{% static 'sounds/notification.mp3' %}" type="audio/mpeg">
+</audio>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Enhanced Notifications JavaScript
+    let bulkMode = false;
+    let selectedNotifications = new Set();
+    let soundEnabled = true;
+    let currentPage = 1;
+    let isLoading = false;
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', function() {
+        initializeNotifications();
+        startAutoRefresh();
+        updateTimeAgo();
+        checkForNewDonations();
+    });
+
+    function initializeNotifications() {
+        // Add hover effects
+        document.querySelectorAll('.notification-item').forEach(item => {
+            item.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-2px)';
+            });
+            
+            item.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0)';
+            });
+        });
+
+        // Initialize filter functionality
+        initializeFilters();
+        
+        // Initialize search functionality
+        initializeSearch();
+        
+        // Update statistics
+        updateStatistics();
+    }
+
+    function initializeFilters() {
+        const filterOptions = document.querySelectorAll('.filter-option');
+        
+        filterOptions.forEach(option => {
+            option.addEventListener('click', function() {
+                const filter = this.getAttribute('data-filter');
+                
+                // Update active filter
+                filterOptions.forEach(opt => opt.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Apply filter with animation
+                applyFilter(filter);
+            });
+        });
+    }
+
+    function applyFilter(filter) {
+        const notifications = document.querySelectorAll('.notification-item');
+        
+        notifications.forEach((notification, index) => {
+            setTimeout(() => {
+                if (filter === 'all') {
+                    notification.style.display = 'flex';
+                    notification.style.animation = 'slideInUp 0.5s ease';
+                } else if (filter === 'unread') {
+                    notification.style.display = notification.classList.contains('unread') ? 'flex' : 'none';
+                    if (notification.classList.contains('unread')) {
+                        notification.style.animation = 'slideInUp 0.5s ease';
+                    }
+                } else {
+                    notification.style.display = notification.getAttribute('data-type') === filter ? 'flex' : 'none';
+                    if (notification.getAttribute('data-type') === filter) {
+                        notification.style.animation = 'slideInUp 0.5s ease';
+                    }
+                }
+            }, index * 50);
+        });
+    }
+
+    function initializeSearch() {
+        const searchInput = document.getElementById('notificationSearch');
+        searchInput.addEventListener('input', debounce(searchNotifications, 300));
+    }
+
+    function searchNotifications() {
+        const searchTerm = document.getElementById('notificationSearch').value.toLowerCase();
+        const notifications = document.querySelectorAll('.notification-item');
+        
+        notifications.forEach(notification => {
+            const searchableText = notification.getAttribute('data-search').toLowerCase();
+            if (searchableText.includes(searchTerm)) {
+                notification.style.display = 'flex';
+                notification.style.animation = 'slideInUp 0.3s ease';
+            } else {
+                notification.style.display = 'none';
+            }
+        });
+    }
+
+    // Enhanced notification actions
+    function markAllAsRead() {
+        if (confirm('Mark all notifications as read?')) {
+            const btn = document.getElementById('markAllBtn');
+            btn.classList.add('loading');
+            
+            // Send AJAX request to mark all as read
+            fetch('/notifications/mark-all-read/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelectorAll('.notification-item.unread').forEach(item => {
+                        item.classList.remove('unread');
+                        item.style.borderLeftColor = 'transparent';
+                    });
+                    
+                    updateStatistics();
+                    showToast('All notifications marked as read!', 'success');
+                } else {
+                    showToast('Failed to mark notifications as read', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Failed to mark notifications as read', 'error');
+            })
+            .finally(() => {
+                btn.classList.remove('loading');
+            });
+        }
+    }
+
+    function clearAllNotifications() {
+        if (confirm('Are you sure you want to clear all notifications? This cannot be undone.')) {
+            const btn = document.getElementById('clearAllBtn');
+            btn.classList.add('loading');
+            
+            // Send AJAX request to clear all notifications
+            fetch('/notifications/clear-all/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.querySelectorAll('.notification-item').forEach(item => {
+                        item.style.animation = 'slideOut 0.5s ease';
+                        setTimeout(() => item.remove(), 500);
+                    });
+                    
+                    showToast('All notifications cleared!', 'success');
+                    
+                    // Show empty state after animation
+                    setTimeout(() => {
+                        if (!document.querySelector('.notification-item')) {
+                            window.location.reload();
+                        }
+                    }, 600);
+                } else {
+                    showToast('Failed to clear notifications', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Failed to clear notifications', 'error');
+            })
+            .finally(() => {
+                btn.classList.remove('loading');
+            });
+        }
+    }
+
+    function markNotificationRead(notificationId) {
+        // Send AJAX request to mark as read
+        fetch(`/notifications/mark-read/${notificationId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const notification = document.querySelector(`[data-id="${notificationId}"]`);
+                if (notification) {
+                    notification.classList.remove('unread');
+                    notification.style.borderLeftColor = 'transparent';
+                    updateStatistics();
+                    showToast('Notification marked as read!', 'success');
+                    playSound();
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Failed to mark notification as read', 'error');
+        });
+    }
+
+    function deleteNotification(notificationId) {
+        if (confirm('Are you sure you want to delete this notification?')) {
+            // Send AJAX request to delete
+            fetch(`/notifications/delete/${notificationId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const notification = document.querySelector(`[data-id="${notificationId}"]`);
+                    if (notification) {
+                        notification.style.animation = 'slideOut 0.5s ease';
+                        setTimeout(() => {
+                            notification.remove();
+                            updateStatistics();
+                            showToast('Notification deleted!', 'success');
+                            playSound();
+                        }, 500);
+                    }
+                } else {
+                    showToast('Failed to delete notification', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Failed to delete notification', 'error');
+            });
+        }
+    }
+
+    function archiveNotification(notificationId) {
+        // Send AJAX request to archive
+        fetch(`/notifications/archive/${notificationId}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                const notification = document.querySelector(`[data-id="${notificationId}"]`);
+                if (notification) {
+                    notification.style.opacity = '0.6';
+                    showToast('Notification archived!', 'info');
+                    playSound();
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Failed to archive notification', 'error');
+        });
+    }
+
+    // Bulk Actions
+    function toggleBulkMode() {
+        bulkMode = !bulkMode;
+        const bulkActions = document.getElementById('bulkActions');
+        const notificationsList = document.getElementById('notificationsList');
+        const btn = document.getElementById('bulkActionsBtn');
+        
+        if (bulkMode) {
+            bulkActions.style.display = 'flex';
+            notificationsList.classList.add('bulk-mode');
+            btn.innerHTML = '<i class="fas fa-times"></i> Cancel Bulk';
+            btn.classList.add('btn--primary');
+        } else {
+            bulkActions.style.display = 'none';
+            notificationsList.classList.remove('bulk-mode');
+            selectedNotifications.clear();
+            updateSelectedCount();
+            document.getElementById('selectAll').checked = false;
+            btn.innerHTML = '<i class="fas fa-list-check"></i> Bulk Actions';
+            btn.classList.remove('btn--primary');
+        }
+    }
+
+    function toggleSelectAll() {
+        const selectAll = document.getElementById('selectAll').checked;
+        const checkboxes = document.querySelectorAll('.notification-checkbox');
+        
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = selectAll;
+            if (selectAll) {
+                selectedNotifications.add(checkbox.value);
+            } else {
+                selectedNotifications.delete(checkbox.value);
+            }
+        });
+        
+        updateSelectedCount();
+    }
+
+    function markSelectedAsRead() {
+        if (selectedNotifications.size === 0) {
+            showToast('Please select notifications to mark as read.', 'error');
+            return;
+        }
+
+        // Send AJAX request for bulk mark as read
+        fetch('/notifications/bulk-mark-read/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                notification_ids: Array.from(selectedNotifications)
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                selectedNotifications.forEach(id => {
+                    const notification = document.querySelector(`[data-id="${id}"]`);
+                    if (notification) {
+                        notification.classList.remove('unread');
+                    }
+                });
+                
+                showToast(`${selectedNotifications.size} notification(s) marked as read!`, 'success');
+                toggleBulkMode();
+                updateStatistics();
+                playSound();
+            } else {
+                showToast('Failed to mark notifications as read', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Failed to mark notifications as read', 'error');
+        });
+    }
+
+    function archiveSelected() {
+        if (selectedNotifications.size === 0) {
+            showToast('Please select notifications to archive.', 'error');
+            return;
+        }
+
+        // Send AJAX request for bulk archive
+        fetch('/notifications/bulk-archive/', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken'),
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                notification_ids: Array.from(selectedNotifications)
+            }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                selectedNotifications.forEach(id => {
+                    const notification = document.querySelector(`[data-id="${id}"]`);
+                    if (notification) {
+                        notification.style.opacity = '0.6';
+                    }
+                });
+                
+                showToast(`${selectedNotifications.size} notification(s) archived!`, 'info');
+                toggleBulkMode();
+                playSound();
+            } else {
+                showToast('Failed to archive notifications', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Failed to archive notifications', 'error');
+        });
+    }
+
+    function deleteSelectedNotifications() {
+        if (selectedNotifications.size === 0) {
+            showToast('Please select notifications to delete.', 'error');
+            return;
+        }
+
+        if (confirm(`Are you sure you want to delete ${selectedNotifications.size} notification(s)?`)) {
+            // Send AJAX request for bulk delete
+            fetch('/notifications/bulk-delete/', {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': getCookie('csrftoken'),
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    notification_ids: Array.from(selectedNotifications)
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    selectedNotifications.forEach(id => {
+                        const notification = document.querySelector(`[data-id="${id}"]`);
+                        if (notification) {
+                            notification.style.animation = 'slideOut 0.5s ease';
+                            setTimeout(() => notification.remove(), 500);
+                        }
+                    });
+                    
+                    showToast(`${selectedNotifications.size} notification(s) deleted!`, 'success');
+                    toggleBulkMode();
+                    updateStatistics();
+                    playSound();
+                } else {
+                    showToast('Failed to delete notifications', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showToast('Failed to delete notifications', 'error');
+            });
+        }
+    }
+
+    function updateSelectedCount() {
+        document.getElementById('selectedCount').textContent = selectedNotifications.size;
+    }
+
+    // Handle individual checkbox changes
+    document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('notification-checkbox')) {
+            if (e.target.checked) {
+                selectedNotifications.add(e.target.value);
+            } else {
+                selectedNotifications.delete(e.target.value);
+                document.getElementById('selectAll').checked = false;
+            }
+            updateSelectedCount();
+        }
+    });
+
+    // Enhanced functionality
+    function toggleSound() {
+        soundEnabled = !soundEnabled;
+        const btn = document.getElementById('soundBtn');
+        if (soundEnabled) {
+            btn.innerHTML = '<i class="fas fa-volume-up"></i> Sound On';
+            showToast('Sound enabled', 'info');
+        } else {
+            btn.innerHTML = '<i class="fas fa-volume-mute"></i> Sound Off';
+            showToast('Sound disabled', 'info');
+        }
+    }
+
+    function playSound() {
+        if (soundEnabled) {
+            const sound = document.getElementById('notificationSound');
+            sound.currentTime = 0;
+            sound.play().catch(e => console.log('Audio play failed:', e));
+        }
+    }
+
+    function refreshNotifications() {
+        const btn = document.getElementById('refreshBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Refreshing';
+        btn.disabled = true;
+        
+        // Check for new notifications
+        checkForNewDonations();
+        
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000);
+    }
+
+    function loadMoreNotifications() {
+        if (isLoading) return;
+        
+        isLoading = true;
+        const btn = document.getElementById('loadMoreBtn');
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+        btn.disabled = true;
+        
+        // Simulate API call
+        setTimeout(() => {
+            // In a real app, you would fetch more notifications from the server
+            showToast('No more notifications to load', 'info');
+            btn.style.display = 'none';
+            isLoading = false;
+        }, 1500);
+    }
+
+    function updateStatistics() {
+        const unreadCount = document.querySelectorAll('.notification-item.unread').length;
+        const exchangeCount = document.querySelectorAll('.notification-item[data-type="exchange"]').length;
+        const donationCount = document.querySelectorAll('.notification-item[data-type="new_donation"]').length;
+        
+        document.getElementById('unreadCount').textContent = unreadCount;
+        document.getElementById('exchangeCount').textContent = exchangeCount;
+        document.getElementById('donationCount').textContent = donationCount;
+    }
+
+    function updateTimeAgo() {
+        // This would update relative times in real-time
+        setInterval(() => {
+            document.querySelectorAll('.notification-time').forEach(element => {
+                const time = new Date(element.getAttribute('data-time'));
+                const now = new Date();
+                const diff = now - time;
+                
+                const minutes = Math.floor(diff / 60000);
+                const hours = Math.floor(diff / 3600000);
+                const days = Math.floor(diff / 86400000);
+                
+                if (days > 0) {
+                    element.textContent = `${days}d ago`;
+                } else if (hours > 0) {
+                    element.textContent = `${hours}h ago`;
+                } else {
+                    element.textContent = `${minutes}m ago`;
+                }
+            });
+        }, 60000); // Update every minute
+    }
+
+    function startAutoRefresh() {
+        // Auto-refresh every 5 minutes to check for new donations
+        setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                checkForNewDonations();
+            }
+        }, 300000);
+    }
+
+    function checkForNewDonations() {
+        // Check for new donations via AJAX
+        fetch('/notifications/check-new-donations/')
+        .then(response => response.json())
+        .then(data => {
+            if (data.has_new_donations) {
+                showToast('New donations available! Check them out.', 'info');
+                playSound();
+            }
+        })
+        .catch(error => console.error('Error checking for new donations:', error));
+    }
+
+    // Utility functions
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        toast.className = `toast ${type}`;
+        toast.innerHTML = `
+            <i class="fas fa-${type === 'success' ? 'check' : type === 'error' ? 'exclamation-triangle' : 'info-circle'}"></i>
+            ${message}
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => toast.classList.add('show'), 100);
+        
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Add CSS for new animations
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideOut {
+            to {
+                opacity: 0;
+                transform: translateX(100px);
+            }
+        }
+    `;
+    document.head.appendChild(style);
+</script>
+{% endblock %}

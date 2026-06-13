@@ -1,0 +1,851 @@
+{% extends 'core/base.html' %}
+{% block title %}Edit Profile{% endblock %}
+
+{% block content %}
+<section class="profile section">
+    <div class="container">
+        <h2 class="section__title">Edit Profile</h2>
+        <p class="section__subtitle">Update your personal information and account settings</p>
+        
+        <div class="profile__container">
+            <div class="profile__sidebar">
+                <div class="profile__avatar">
+                    {% if profile.avatar %}
+                        <img src="{{ profile.avatar.url }}" alt="Profile Avatar" style="width: 100px; height: 100px; border-radius: 50%; object-fit: cover;">
+                    {% else %}
+                        <i class="fas fa-user-circle" style="font-size: 100px; color: #4a6fa5;"></i>
+                    {% endif %}
+                </div>
+                <h3 class="profile__name">{{ user.get_full_name|default:user.username }}</h3>
+                <p class="profile__location">
+                    <i class="fas fa-map-marker-alt"></i> {{ profile.location|default:"Not specified" }}
+                </p>
+                <p class="profile__affiliation">
+                    <i class="fas fa-university"></i> {{ profile.affiliation|default:"Not specified" }}
+                </p>
+                
+                <div class="profile__stats">
+                    <div class="stat">
+                        <span class="stat__number">{{ profile.items_donated|default:0 }}</span>
+                        <span class="stat__label">Items Donated</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat__number">{{ profile.items_received|default:0 }}</span>
+                        <span class="stat__label">Items Received</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat__number">{{ profile.exchanges_completed|default:0 }}</span>
+                        <span class="stat__label">Exchanges</span>
+                    </div>
+                </div>
+                
+                <div class="sidebar-actions" style="margin-top: 2rem;">
+                    <a href="{% url 'core:profile' %}" class="btn btn--outline" style="width: 100%; margin-bottom: 0.5rem;">
+                        <i class="fas fa-arrow-left"></i> Back to Profile
+                    </a>
+                    <a href="{% url 'userauths:sign-out' %}" class="btn btn--outline" style="width: 100%;" onclick="return confirm('Are you sure you want to sign out?');">
+                        <i class="fas fa-sign-out-alt"></i> Sign Out
+                    </a>
+                </div>
+            </div>
+            
+            <div class="profile__content">
+                <div class="profile__tabs">
+                    <button class="tab-btn active" data-tab="personal-info">
+                        <i class="fas fa-user"></i> Personal Info
+                    </button>
+                    <button class="tab-btn" data-tab="preferences">
+                        <i class="fas fa-cog"></i> Preferences
+                    </button>
+                    <button class="tab-btn" data-tab="newsletter">
+                        <i class="fas fa-envelope"></i> Newsletter
+                    </button>
+                </div>
+                
+                <!-- Personal Info Tab -->
+                <div class="tab-content active" id="personal-info">
+                    <div class="tab-header">
+                        <h3>Personal Information</h3>
+                        <p class="text-muted">Update your basic profile information</p>
+                    </div>
+                    
+                    <form class="settings-form" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_type" value="personal_info">
+                        
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="first_name" class="form-label">First Name</label>
+                                <input type="text" id="first_name" name="first_name" class="form-input" value="{{ user.first_name|default:'' }}">
+                                {% if form.first_name.errors %}
+                                <div class="error-message">
+                                    {{ form.first_name.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="last_name" class="form-label">Last Name</label>
+                                <input type="text" id="last_name" name="last_name" class="form-input" value="{{ user.last_name|default:'' }}">
+                                {% if form.last_name.errors %}
+                                <div class="error-message">
+                                    {{ form.last_name.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" id="email" class="form-input" value="{{ user.email }}" readonly>
+                                <small style="color: #6c757d; font-size: 0.875rem;">Contact admin to change email</small>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input type="tel" id="phone" name="phone" class="form-input" value="{{ profile.phone|default:'' }}">
+                                {% if form.phone.errors %}
+                                <div class="error-message">
+                                    {{ form.phone.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="location" class="form-label">Location</label>
+                                <input type="text" id="location" name="location" class="form-input" value="{{ profile.location|default:'' }}">
+                                {% if form.location.errors %}
+                                <div class="error-message">
+                                    {{ form.location.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group">
+                                <label for="affiliation" class="form-label">Affiliation</label>
+                                <input type="text" id="affiliation" name="affiliation" class="form-input" value="{{ profile.affiliation|default:'' }}" placeholder="School, company, or organization">
+                                {% if form.affiliation.errors %}
+                                <div class="error-message">
+                                    {{ form.affiliation.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="avatar" class="form-label">Profile Picture</label>
+                                <input type="file" id="avatar" name="avatar" class="form-input" accept="image/*">
+                                {% if profile.avatar %}
+                                <div style="margin-top: 0.5rem;">
+                                    <img src="{{ profile.avatar.url }}" alt="Current avatar" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover;">
+                                    <div style="margin-top: 0.5rem;">
+                                        <input type="checkbox" id="clear_avatar" name="clear_avatar">
+                                        <label for="clear_avatar" style="font-size: 0.875rem;">Remove current profile picture</label>
+                                    </div>
+                                </div>
+                                {% endif %}
+                                {% if form.avatar.errors %}
+                                <div class="error-message">
+                                    {{ form.avatar.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                            <div class="form-group full-width">
+                                <label for="bio" class="form-label">Bio</label>
+                                <textarea id="bio" name="bio" class="form-input form-textarea" rows="3" placeholder="Tell us about yourself...">{{ profile.bio|default:'' }}</textarea>
+                                {% if form.bio.errors %}
+                                <div class="error-message">
+                                    {{ form.bio.errors }}
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn--primary">
+                                <i class="fas fa-save"></i> Save Changes
+                            </button>
+                            <a href="{% url 'core:profile' %}" class="btn btn--outline">
+                                <i class="fas fa-times"></i> Cancel
+                            </a>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Preferences Tab -->
+                <div class="tab-content" id="preferences">
+                    <div class="tab-header">
+                        <h3>Notification Preferences</h3>
+                        <p class="text-muted">Manage how you receive notifications and updates</p>
+                    </div>
+                    
+                    <form class="settings-form" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_type" value="preferences">
+                        
+                        <div class="preferences-list">
+                            <div class="preference-item">
+                                <div>
+                                    <h4>Email Notifications</h4>
+                                    <p>Receive updates about your exchanges and requests via email</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="email_notifications" {% if profile.email_notifications %}checked{% endif %}>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                            
+                            <div class="preference-item">
+                                <div>
+                                    <h4>Community Updates</h4>
+                                    <p>Receive news and updates from the ClothShare community</p>
+                                </div>
+                                <label class="toggle-switch">
+                                    <input type="checkbox" name="community_updates" {% if profile.community_updates %}checked{% endif %}>
+                                    <span class="toggle-slider"></span>
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn--primary">
+                                <i class="fas fa-save"></i> Save Preferences
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Newsletter Tab -->
+                <div class="tab-content" id="newsletter">
+                    <div class="tab-header">
+                        <h3>Newsletter Preferences</h3>
+                        <p class="text-muted">Manage your email subscription preferences</p>
+                    </div>
+                    
+                    <div class="newsletter-status">
+                        {% if newsletter_subscription %}
+                            <div class="status-badge status-active">
+                                <i class="fas fa-check-circle"></i>
+                                Subscribed to Newsletter
+                            </div>
+                            <p class="status-info">You are currently receiving newsletter emails based on your preferences below.</p>
+                        {% else %}
+                            <div class="status-badge status-inactive">
+                                <i class="fas fa-times-circle"></i>
+                                Not Subscribed
+                            </div>
+                            <p class="status-info">Subscribe to receive updates about new donations, community news, and clothing requests.</p>
+                        {% endif %}
+                    </div>
+                    
+                    <form class="settings-form" method="post">
+                        {% csrf_token %}
+                        <input type="hidden" name="form_type" value="newsletter">
+                        
+                        {% if newsletter_subscription %}
+                         <!-- In the newsletter preferences section, add the missing fields -->
+<div class="preferences-list">
+    <div class="preference-item">
+        <div>
+            <h4>Donation Updates</h4>
+            <p>Receive updates about new donation opportunities and community impact</p>
+        </div>
+        <label class="toggle-switch">
+            <input type="checkbox" name="receive_donation_updates" {% if newsletter_subscription.receive_donation_updates %}checked{% endif %}>
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+    
+    <div class="preference-item">
+        <div>
+            <h4>Community News</h4>
+            <p>Get the latest news and events from the ClothShare community</p>
+        </div>
+        <label class="toggle-switch">
+            <input type="checkbox" name="receive_community_news" {% if newsletter_subscription.receive_community_news %}checked{% endif %}>
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+    
+    <div class="preference-item">
+        <div>
+            <h4>New Items Alerts</h4>
+            <p>Get notified when new items matching your interests are available</p>
+        </div>
+        <label class="toggle-switch">
+            <input type="checkbox" name="receive_new_items_alerts" {% if newsletter_subscription.receive_new_items_alerts %}checked{% endif %}>
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+    
+    <!-- ADD THESE MISSING FIELDS -->
+    <div class="preference-item">
+        <div>
+            <h4>Exchange Notifications</h4>
+            <p>Get notified about exchange requests and updates</p>
+        </div>
+        <label class="toggle-switch">
+            <input type="checkbox" name="receive_exchange_notifications" {% if newsletter_subscription.receive_exchange_notifications %}checked{% endif %}>
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+    
+    <div class="preference-item">
+        <div>
+            <h4>Request Updates</h4>
+            <p>Receive notifications about new clothing requests in the community</p>
+        </div>
+        <label class="toggle-switch">
+            <input type="checkbox" name="receive_request_updates" {% if newsletter_subscription.receive_request_updates %}checked{% endif %}>
+            <span class="toggle-slider"></span>
+        </label>
+    </div>
+</div>
+
+<div class="form-actions">
+    <button type="submit" name="action" value="update_newsletter" class="btn btn--primary">
+        <i class="fas fa-sync-alt"></i> Update Preferences
+    </button>
+    <button type="submit" name="action" value="unsubscribe_newsletter" class="btn btn--danger" onclick="return confirm('Are you sure you want to unsubscribe from all newsletters? You will stop receiving all email updates.');">
+        <i class="fas fa-ban"></i> Unsubscribe
+    </button>
+</div>  
+                        {% else %}
+                            <!-- Show subscription options when NOT subscribed -->
+                            <div class="subscription-options">
+                                <div class="option-card">
+                                    <div class="option-icon">
+                                        <i class="fas fa-tshirt"></i>
+                                    </div>
+                                    <div class="option-content">
+                                        <h4>New Item Alerts</h4>
+                                        <p>Be the first to know when new clothing items are available in your area</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="option-card">
+                                    <div class="option-icon">
+                                        <i class="fas fa-hands-helping"></i>
+                                    </div>
+                                    <div class="option-content">
+                                        <h4>Donation Opportunities</h4>
+                                        <p>Get updates on donation drives and community impact stories</p>
+                                    </div>
+                                </div>
+                                
+                                <div class="option-card">
+                                    <div class="option-icon">
+                                        <i class="fas fa-users"></i>
+                                    </div>
+                                    <div class="option-content">
+                                        <h4>Community Updates</h4>
+                                        <p>Stay informed about community events, success stories, and news</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="subscription-benefits">
+                                <h4>What to expect:</h4>
+                                <ul>
+                                    <li>📬 1-2 emails per month with the most relevant updates</li>
+                                    <li>🎯 Personalized content based on your interests</li>
+                                    <li>🚫 No spam - just valuable community updates</li>
+                                    <li>🔔 Unsubscribe anytime with one click</li>
+                                </ul>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="submit" name="action" value="subscribe_newsletter" class="btn btn--primary btn--large">
+                                    <i class="fas fa-envelope"></i> Subscribe to Newsletter
+                                </button>
+                                <p class="subscription-note">
+                                    By subscribing, you agree to receive email updates from ClothShare. You can unsubscribe at any time.
+                                </p>
+                            </div>
+                        {% endif %}
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .subscription-options {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+
+    .option-card {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1.5rem;
+        border: 2px solid #e9ecef;
+        border-radius: 12px;
+        transition: all 0.3s ease;
+    }
+
+    .option-card:hover {
+        border-color: #4a6fa5;
+        box-shadow: 0 4px 12px rgba(74, 111, 165, 0.1);
+    }
+
+    .option-icon {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #4a6fa5, #6b8cbc);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5rem;
+    }
+
+    .option-content h4 {
+        margin-bottom: 0.5rem;
+        color: #343a40;
+    }
+
+    .option-content p {
+        color: #6c757d;
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .subscription-benefits {
+        background: #f8f9fa;
+        padding: 1.5rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+    }
+
+    .subscription-benefits h4 {
+        margin-bottom: 1rem;
+        color: #343a40;
+    }
+
+    .subscription-benefits ul {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+
+    .subscription-benefits li {
+        padding: 0.5rem 0;
+        color: #495057;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .btn--large {
+        padding: 1rem 2rem;
+        font-size: 1.1rem;
+    }
+
+    .subscription-note {
+        text-align: center;
+        color: #6c757d;
+        font-size: 0.875rem;
+        margin-top: 1rem;
+        line-height: 1.5;
+    }
+
+    /* Enhanced status badges */
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 25px;
+        font-weight: 600;
+        margin-bottom: 1rem;
+        font-size: 1rem;
+    }
+
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+        border: 2px solid #c3e6cb;
+    }
+
+    .status-inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 2px solid #f5c6cb;
+    }
+
+    .status-info {
+        color: #495057;
+        margin: 0;
+        font-size: 1rem;
+        line-height: 1.5;
+    }
+
+    .profile__container {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .profile__sidebar {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        height: fit-content;
+    }
+    
+    .profile__avatar {
+        text-align: center;
+        margin-bottom: 1rem;
+    }
+    
+    .profile__name {
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+    
+    .profile__location, .profile__affiliation {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        margin-bottom: 0.5rem;
+        color: #6c757d;
+        justify-content: center;
+    }
+    
+    .profile__stats {
+        display: flex;
+        justify-content: space-between;
+        margin: 1.5rem 0;
+        padding: 1rem 0;
+        border-top: 1px solid #e9ecef;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .stat {
+        text-align: center;
+    }
+    
+    .stat__number {
+        display: block;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #4a6fa5;
+    }
+    
+    .stat__label {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+    
+    .profile__content {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    }
+    
+    .tab-content {
+        display: none;
+    }
+    
+    .tab-content.active {
+        display: block;
+    }
+    
+    .profile__tabs {
+        display: flex;
+        border-bottom: 2px solid #e9ecef;
+        margin-bottom: 2rem;
+    }
+    
+    .tab-btn {
+        background: none;
+        border: none;
+        padding: 1rem 1.5rem;
+        font-size: 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border-bottom: 3px solid transparent;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: #6c757d;
+    }
+    
+    .tab-btn.active {
+        color: #4a6fa5;
+        border-bottom-color: #4a6fa5;
+    }
+    
+    .tab-btn:hover:not(.active) {
+        color: #4a6fa5;
+    }
+    
+    .tab-header {
+        margin-bottom: 1.5rem;
+    }
+    
+    .tab-header h3 {
+        margin-bottom: 0.5rem;
+    }
+    
+    .text-muted {
+        color: #6c757d;
+        margin: 0;
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+    }
+    
+    .form-group {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .form-group.full-width {
+        grid-column: 1 / -1;
+    }
+    
+    .form-label {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: #343a40;
+    }
+    
+    .form-input {
+        padding: 0.75rem;
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+    }
+    
+    .form-input:focus {
+        outline: none;
+        border-color: #4a6fa5;
+        box-shadow: 0 0 0 3px rgba(74, 111, 165, 0.1);
+    }
+    
+    .form-textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: flex-start;
+        align-items: center;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+    }
+    
+    .preferences-list {
+        margin-bottom: 2rem;
+    }
+    
+    .preference-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .preference-item h4 {
+        margin-bottom: 0.25rem;
+        color: #343a40;
+    }
+    
+    .preference-item p {
+        color: #6c757d;
+        margin: 0;
+        font-size: 0.875rem;
+    }
+    
+    .toggle-switch {
+        position: relative;
+        display: inline-block;
+        width: 50px;
+        height: 24px;
+    }
+    
+    .toggle-switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+    
+    .toggle-slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: .4s;
+        border-radius: 24px;
+    }
+    
+    .toggle-slider:before {
+        position: absolute;
+        content: "";
+        height: 16px;
+        width: 16px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: .4s;
+        border-radius: 50%;
+    }
+    
+    input:checked + .toggle-slider {
+        background-color: #4a6fa5;
+    }
+    
+    input:checked + .toggle-slider:before {
+        transform: translateX(26px);
+    }
+    
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+    
+    .btn--primary {
+        background-color: #4a6fa5;
+        color: white;
+        border-color: #4a6fa5;
+    }
+    
+    .btn--primary:hover {
+        background-color: #3a5a80;
+        border-color: #3a5a80;
+    }
+    
+    .btn--outline {
+        background-color: transparent;
+        color: #4a6fa5;
+        border-color: #4a6fa5;
+    }
+    
+    .btn--outline:hover {
+        background-color: #4a6fa5;
+        color: white;
+    }
+    
+    .btn--danger {
+        background-color: #dc3545;
+        color: white;
+        border-color: #dc3545;
+    }
+    
+    .btn--danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+    
+    .error-message {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    @media (max-width: 768px) {
+        .subscription-options {
+            gap: 0.75rem;
+        }
+        
+        .option-card {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .option-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.25rem;
+        }
+        
+        .btn--large {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .profile__container {
+            grid-template-columns: 1fr;
+        }
+        
+        .profile__sidebar {
+            text-align: center;
+        }
+        
+        .profile__stats {
+            justify-content: center;
+        }
+        
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .profile__tabs {
+            flex-direction: column;
+        }
+        
+        .tab-btn {
+            justify-content: center;
+        }
+        
+        .preference-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tab functionality
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        tabBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active class from all buttons and contents
+                tabBtns.forEach(b => b.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked button
+                btn.classList.add('active');
+                
+                // Show corresponding content
+                const tabId = btn.getAttribute('data-tab');
+                document.getElementById(tabId).classList.add('active');
+            });
+        });
+    });
+</script>
+{% endblock %}

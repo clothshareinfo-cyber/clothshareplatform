@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - ClothShare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --primary-dark: #3a5982;
+            --accent-color: #ff7e5f;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --gray-color: #6c757d;
+            --border-color: #dee2e6;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--box-shadow);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            list-style: none;
+        }
+        
+        .nav-menu a {
+            text-decoration: none;
+            color: inherit;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .nav-menu a:hover {
+            color: var(--accent-color);
+        }
+        
+        .main {
+            margin-top: 80px;
+            padding: 2rem 0;
+        }
+        
+        .section__title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .section__subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--gray-color);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .policy-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .policy-section {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .policy-section:last-child {
+            border-bottom: none;
+        }
+
+        .policy-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .policy-section p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .policy-section ul {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .policy-section ul li {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn--primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn--primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .back-home {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .policy-section {
+                padding: 1rem;
+            }
+            
+            .policy-section ul {
+                margin-left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav container">
+            <div class="nav-logo">
+                <i class="fas fa-tshirt"></i>
+                <span>ClothShare</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/browse/">Browse</a></li>
+                <li><a href="/help/">Help</a></li>
+                <li><a href="/terms-of-service/">Terms</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <h1 class="section__title">Privacy Policy</h1>
+            <p class="section__subtitle">Last updated: <span id="currentDate"></span></p>
+
+            <div class="policy-content">
+                <div class="policy-section">
+                    <h2>1. Information We Collect</h2>
+                    <p>We collect information you provide directly to us when you:</p>
+                    <ul>
+                        <li>Create an account</li>
+                        <li>List items for donation</li>
+                        <li>Request clothing items</li>
+                        <li>Communicate with other users</li>
+                        <li>Subscribe to our newsletter</li>
+                    </ul>
+                </div>
+
+                <div class="policy-section">
+                    <h2>2. How We Use Your Information</h2>
+                    <p>We use the information we collect to:</p>
+                    <ul>
+                        <li>Facilitate clothing exchanges between users</li>
+                        <li>Provide, maintain, and improve our services</li>
+                        <li>Send you technical notices and support messages</li>
+                        <li>Respond to your comments and questions</li>
+                        <li>Send you newsletters and promotional communications</li>
+                    </ul>
+                </div>
+
+                <div class="policy-section">
+                    <h2>3. Information Sharing</h2>
+                    <p>We do not sell, trade, or rent your personal information to third parties. We may share information:</p>
+                    <ul>
+                        <li>With other users to facilitate exchanges (limited contact information)</li>
+                        <li>With service providers who assist our operations</li>
+                        <li>When required by law or to protect our rights</li>
+                    </ul>
+                </div>
+
+                <div class="policy-section">
+                    <h2>4. Data Security</h2>
+                    <p>We implement appropriate security measures to protect your personal information. However, no method of transmission over the Internet is 100% secure.</p>
+                </div>
+
+                <div class="policy-section">
+                    <h2>5. Your Rights</h2>
+                    <p>You have the right to:</p>
+                    <ul>
+                        <li>Access and update your personal information</li>
+                        <li>Delete your account and associated data</li>
+                        <li>Opt-out of promotional communications</li>
+                        <li>Request a copy of your data</li>
+                    </ul>
+                </div>
+
+                <div class="policy-section">
+                    <h2>6. Contact Us</h2>
+                    <p>If you have any questions about this Privacy Policy, please contact us at:</p>
+                    <p style="margin: 1rem 0;">
+                        <strong>Email:</strong> privacy@clothshare.org<br>
+                        <strong>Address:</strong> Nakuru, Kenya
+                    </p>
+                </div>
+
+                <div class="back-home">
+                    <a href="/" class="btn btn--primary">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Add current date to the page
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentDate = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('currentDate').textContent = currentDate;
+        });
+    </script>
+</body>
+</html>

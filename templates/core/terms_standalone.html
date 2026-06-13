@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - ClothShare</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --primary-dark: #3a5982;
+            --accent-color: #ff7e5f;
+            --light-color: #f8f9fa;
+            --dark-color: #343a40;
+            --gray-color: #6c757d;
+            --border-color: #dee2e6;
+            --border-radius: 12px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark-color);
+            background-color: #fff;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+        
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: var(--box-shadow);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 0;
+        }
+        
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            list-style: none;
+        }
+        
+        .nav-menu a {
+            text-decoration: none;
+            color: inherit;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        
+        .nav-menu a:hover {
+            color: var(--accent-color);
+        }
+        
+        .main {
+            margin-top: 80px;
+            padding: 2rem 0;
+        }
+        
+        .section__title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--primary-color);
+        }
+        
+        .section__subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: var(--gray-color);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .terms-content {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .terms-section {
+            margin-bottom: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .terms-section:last-child {
+            border-bottom: none;
+        }
+
+        .terms-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+
+        .terms-section p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .terms-section ul {
+            margin-left: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .terms-section ul li {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: var(--border-radius);
+            font-family: inherit;
+            font-size: 1rem;
+            font-weight: 600;
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+
+        .btn--primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn--primary:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .btn--outline {
+            background: transparent;
+            color: var(--primary-color);
+            border: 2px solid var(--primary-color);
+        }
+
+        .btn--outline:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .back-home {
+            text-align: center;
+            margin-top: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .terms-section {
+                padding: 1rem;
+            }
+            
+            .terms-section ul {
+                margin-left: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav container">
+            <div class="nav-logo">
+                <i class="fas fa-tshirt"></i>
+                <span>ClothShare</span>
+            </div>
+            <ul class="nav-menu">
+                <li><a href="/">Home</a></li>
+                <li><a href="/browse/">Browse</a></li>
+                <li><a href="/help/">Help</a></li>
+                <li><a href="/privacy-policy/">Privacy</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="main">
+        <div class="container">
+            <h1 class="section__title">Terms of Service</h1>
+            <p class="section__subtitle">Last updated: {{ current_date }}</p>
+
+            <div class="terms-content">
+                <div class="terms-section">
+                    <h2>1. Acceptance of Terms</h2>
+                    <p>By accessing and using ClothShare, you accept and agree to be bound by the terms and provision of this agreement.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h2>2. User Accounts</h2>
+                    <p>To use certain features of ClothShare, you must register for an account. You agree to:</p>
+                    <ul>
+                        <li>Provide accurate and complete information</li>
+                        <li>Maintain the security of your password</li>
+                        <li>Accept responsibility for all activities under your account</li>
+                        <li>Be at least 13 years of age</li>
+                    </ul>
+                </div>
+
+                <div class="terms-section">
+                    <h2>3. Clothing Exchange Guidelines</h2>
+                    <p>When using ClothShare, you agree to:</p>
+                    <ul>
+                        <li>Only list items that are clean and in good condition</li>
+                        <li>Accurately describe the condition of your items</li>
+                        <li>Respond to exchange requests in a timely manner</li>
+                        <li>Complete exchanges as agreed upon</li>
+                        <li>Not list prohibited or dangerous items</li>
+                    </ul>
+                </div>
+
+                <div class="terms-section">
+                    <h2>4. Prohibited Activities</h2>
+                    <p>You may not use ClothShare to:</p>
+                    <ul>
+                        <li>Engage in any illegal activities</li>
+                        <li>Harass, abuse, or harm another person</li>
+                        <li>List counterfeit or stolen items</li>
+                        <li>Use the service for commercial purposes without permission</li>
+                        <li>Interfere with the proper functioning of the service</li>
+                    </ul>
+                </div>
+
+                <div class="terms-section">
+                    <h2>5. Intellectual Property</h2>
+                    <p>The ClothShare service and original content, features, and functionality are owned by ClothShare and are protected by international copyright, trademark, and other intellectual property laws.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h2>6. Limitation of Liability</h2>
+                    <p>ClothShare acts as a platform to connect donors and recipients. We are not responsible for:</p>
+                    <ul>
+                        <li>The condition or quality of exchanged items</li>
+                        <li>User interactions and agreements</li>
+                        <li>Any damages resulting from exchanges</li>
+                        <li>Content posted by users</li>
+                    </ul>
+                </div>
+
+                <div class="terms-section">
+                    <h2>7. Termination</h2>
+                    <p>We may terminate or suspend your account immediately, without prior notice, for conduct that we believe violates these Terms of Service or is harmful to other users.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h2>8. Changes to Terms</h2>
+                    <p>We reserve the right to modify these terms at any time. We will notify users of any material changes via email or through the service.</p>
+                </div>
+
+                <div class="terms-section">
+                    <h2>9. Contact Information</h2>
+                    <p>Questions about these Terms of Service should be sent to us at:</p>
+                    <p style="margin: 1rem 0;">
+                        <strong>Email:</strong> legal@clothshare.org<br>
+                        <strong>Address:</strong> Nakuru, Kenya
+                    </p>
+                </div>
+
+                <div class="back-home">
+                    <a href="/" class="btn btn--primary">
+                        <i class="fas fa-home"></i> Back to Home
+                    </a>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        // Add current date to the page
+        document.addEventListener('DOMContentLoaded', function() {
+            const currentDate = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Update any element that should show the current date
+            const dateElements = document.querySelectorAll('[data-current-date]');
+            dateElements.forEach(element => {
+                element.textContent = currentDate;
+            });
+        });
+    </script>
+</body>
+</html>

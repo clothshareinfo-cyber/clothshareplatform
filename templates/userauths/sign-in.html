@@ -1,0 +1,473 @@
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block content %}
+<main class="main-pages">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <!--<a href="index.html" rel="nofollow"><i class="fi-rs-home mr-5"></i>Home</a>
+                <span></span> Pages <span></span> My Account-->
+            </div>
+        </div>
+    </div>
+
+    <div class="page-content pt-150 pb-150">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-8 col-lg-10 col-md-12 m-auto">
+                    <div class="row">
+                        <div class="col-lg-6 pr-30 d-none d-lg-block">
+                            <div class="login-hero">
+                               
+                                <div class="hero-content">
+                                    <h3>Welcome Back!</h3>
+                                    <p>Continue your sustainable fashion journey</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-md-8">
+                            <div class="login-card">
+                                <div class="card-header">
+                                    <div class="logo">
+                                        <i class="fas fa-tshirt"></i>
+                                        <span>ClothShare</span>
+                                    </div>
+                                    <h1>Welcome Back</h1>
+                                    <p>Sign in to your account</p>
+                                </div>
+
+                                <div class="card-body">
+                                    <!-- Error Messages -->
+                                    {% if form.errors %}
+                                    <div class="alert alert-danger">
+                                        <strong>Please correct the errors below:</strong>
+                                        <ul class="mb-0 mt-2">
+                                            {% for field in form %}
+                                                {% for error in field.errors %}
+                                                    <li>{{ error }}</li>
+                                                {% endfor %}
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                    {% endif %}
+
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                        <div class="alert alert-{{ message.tags }}">
+                                            {{ message }}
+                                        </div>
+                                        {% endfor %}
+                                    {% endif %}
+
+                                    <form method="POST" action="{% url 'userauths:sign-in' %}">
+                                        {% csrf_token %}
+                                        
+                                        <div class="form-group">
+                                            <label>Email</label>
+                                            <div class="input-with-icon">
+                                                <i class="fas fa-envelope"></i>
+                                                <input type="email" 
+                                                       name="email" 
+                                                       required 
+                                                       placeholder="Enter your Email"
+                                                       value="{{ form.email.value|default:'' }}"
+                                                       autofocus
+                                                       class="{% if form.email.errors %}is-invalid{% endif %}">
+                                            </div>
+                                            {% if form.email.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {% for error in form.email.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Password</label>
+                                            <div class="input-with-icon">
+                                                <i class="fas fa-lock"></i>
+                                                <input type="password" 
+                                                       name="password" 
+                                                       required 
+                                                       placeholder="Enter your password"
+                                                       class="{% if form.password.errors %}is-invalid{% endif %}">
+                                                <button type="button" class="password-toggle" onclick="togglePassword()">
+                                                    <i class="fas fa-eye"></i>
+                                                </button>
+                                            </div>
+                                            {% if form.password.errors %}
+                                            <div class="text-danger small mt-1">
+                                                {% for error in form.password.errors %}
+                                                    {{ error }}
+                                                {% endfor %}
+                                            </div>
+                                            {% endif %}
+                                        </div>
+
+                                        <div class="login-options">
+                                            <div class="remember-me">
+                                                <div class="custome-checkbox">
+                                                    <input class="form-check-input" type="checkbox" name="remember_me" id="rememberMe" />
+                                                    <label class="form-check-label" for="rememberMe">
+                                                        <span>Remember me</span>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <!-- UPDATED: Functional Forgot Password Link -->
+                                            <a class="forgot-password" href="{% url 'userauths:password_reset' %}">Forgot password?</a>
+                                        </div>
+
+                                        <button type="submit" class="btn btn-primary btn-block" name="login">
+                                            <i class="fas fa-sign-in-alt"></i>
+                                            Sign In
+                                        </button>
+
+                                        <div class="auth-footer">
+                                            <p>Don't have an account? </p><a href="{% url 'userauths:sign-up' %}">Create one</a>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+    .login-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 15px 50px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: linear-gradient(135deg, #4a6fa5 0%, #6b8cbc 100%);
+        color: white;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        position: relative;
+    }
+
+    .card-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, #ff7e5f, #4a6fa5);
+    }
+
+    .logo {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        font-size: 1.75rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+    }
+
+    .logo i {
+        color: #ff7e5f;
+        font-size: 2rem;
+    }
+
+    .card-header h1 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+    }
+
+    .card-header p {
+        opacity: 0.9;
+        margin: 0;
+        font-size: 1.1rem;
+    }
+
+    .card-body {
+        padding: 2.5rem 2rem;
+    }
+
+    .login-hero {
+        position: relative;
+        height: 100%;
+        border-radius: 15px;
+        overflow: hidden;
+    }
+
+    .login-hero img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .hero-content {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0,0,0,0.8));
+        color: white;
+        padding: 2rem;
+    }
+
+    .hero-content h3 {
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+    }
+
+    .form-group {
+        margin-bottom: 1.75rem;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 0.75rem;
+        font-weight: 600;
+        color: #2d3748;
+        font-size: 0.95rem;
+    }
+
+    .input-with-icon {
+        position: relative;
+    }
+
+    .input-with-icon i {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a0aec0;
+        z-index: 2;
+    }
+
+    .input-with-icon input {
+        width: 100%;
+        padding: 1.25rem 1.25rem 1.25rem 3.5rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .input-with-icon input:focus {
+        outline: none;
+        border-color: #4a6fa5;
+        box-shadow: 0 0 0 4px rgba(74, 111, 165, 0.1);
+    }
+
+    .input-with-icon input.is-invalid {
+        border-color: #dc3545;
+    }
+
+    .password-toggle {
+        position: absolute;
+        right: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        color: #a0aec0;
+        cursor: pointer;
+        padding: 0.5rem;
+        border-radius: 6px;
+        transition: all 0.3s ease;
+    }
+
+    .password-toggle:hover {
+        color: #4a6fa5;
+        background: #f7fafc;
+    }
+
+    .login-options {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin: 2rem 0;
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+    }
+
+    .custome-checkbox {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .custome-checkbox input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        border: 2px solid #e2e8f0;
+        border-radius: 4px;
+        cursor: pointer;
+    }
+
+    .custome-checkbox label {
+        margin: 0;
+        font-weight: 500;
+        color: #4a5568;
+        cursor: pointer;
+    }
+
+    .forgot-password {
+        color: #4a6fa5;
+        font-weight: 500;
+        text-decoration: none;
+    }
+
+    .forgot-password:hover {
+        color: #3a5982;
+        text-decoration: underline;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, #4a6fa5 0%, #6b8cbc 100%);
+        color: white;
+        border: none;
+        padding: 1.25rem 2rem;
+        border-radius: 12px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 30px rgba(74, 111, 165, 0.4);
+    }
+
+    .btn-block {
+        width: 100%;
+    }
+
+    .auth-footer {
+        text-align: center;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid #e2e8f0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .auth-footer p {
+        color: #718096;
+        margin: 0;
+    }
+
+    .auth-footer a {
+        color: #4a6fa5;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .auth-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .alert {
+        padding: 1.25rem;
+        border-radius: 12px;
+        margin-bottom: 2rem;
+        border: 1px solid transparent;
+    }
+
+    .alert-danger {
+        color: #721c24;
+        background-color: #f8d7da;
+        border-color: #f5c6cb;
+    }
+
+    .alert-success {
+        color: #155724;
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+    }
+
+    .text-danger {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+
+    .small {
+        font-size: 0.875rem;
+    }
+
+    @media (max-width: 768px) {
+        .login-hero {
+            display: none;
+        }
+        
+        .card-header {
+            padding: 2rem 1.5rem;
+        }
+        
+        .card-body {
+            padding: 2rem 1.5rem;
+        }
+        
+        .logo {
+            font-size: 1.5rem;
+        }
+        
+        .card-header h1 {
+            font-size: 2rem;
+        }
+        
+        .login-options {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: flex-start;
+        }
+
+        .auth-footer {
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+    }
+</style>
+
+<script>
+    // Auto-focus on email field when page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        const emailField = document.querySelector('input[name="email"]');
+        if (emailField) {
+            emailField.focus();
+        }
+    });
+
+    function togglePassword() {
+        const passwordInput = document.querySelector('input[name="password"]');
+        const toggleIcon = document.querySelector('.password-toggle i');
+        
+        if (passwordInput.type === 'password') {
+            passwordInput.type = 'text';
+            toggleIcon.classList.remove('fa-eye');
+            toggleIcon.classList.add('fa-eye-slash');
+        } else {
+            passwordInput.type = 'password';
+            toggleIcon.classList.remove('fa-eye-slash');
+            toggleIcon.classList.add('fa-eye');
+        }
+    }
+</script>
+
+{% endblock content %}

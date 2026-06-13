@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Clothing Request Notification</title>
+    <style>
+        body { 
+            font-family: 'Arial', sans-serif; 
+            line-height: 1.6; 
+            margin: 0; 
+            padding: 0; 
+            background-color: #f9f9f9;
+        }
+        .container { 
+            max-width: 600px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header { 
+            background: linear-gradient(135deg, #2196F3, #1976D2);
+            padding: 20px; 
+            text-align: center; 
+            border-radius: 8px 8px 0 0;
+            color: white;
+        }
+        .content { 
+            padding: 25px; 
+        }
+        .request-details {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #2196F3;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            color: #666;
+            font-size: 14px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #2196F3;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .button:hover {
+            background-color: #1976D2;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .urgency-badge {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .urgency-high {
+            background-color: #ffebee;
+            color: #c62828;
+        }
+        .urgency-medium {
+            background-color: #fff3e0;
+            color: #ef6c00;
+        }
+        .urgency-low {
+            background-color: #e8f5e8;
+            color: #2e7d32;
+        }
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+        }
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            color: #6c757d;
+            font-weight: bold;
+        }
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stats-box {
+            background: #f0f7ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #4A90E2;
+        }
+        .matching-items {
+            background: #f0fff0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #4CAF50;
+        }
+        .description-box {
+            background: #fff9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #ff6b6b;
+        }
+        .quick-actions {
+            background: #fff3e0;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            border-left: 4px solid #ff9800;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin: 15px 0;
+        }
+        .stat-item {
+            text-align: center;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2196F3;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            .action-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>🆕 New Clothing Request</h2>
+        </div>
+        
+        <div class="content">
+            <p>Hello Admin,</p>
+            
+            <p>A new clothing request has been submitted to the platform!</p>
+            
+            <div class="request-details">
+                <h3>Request Details:</h3>
+                
+                <div class="user-info">
+                    <div class="user-avatar">
+                        {{ requester.username|first|upper }}
+                    </div>
+                    <div>
+                        <p><strong>Requester:</strong> {{ requester.username }}</p>
+                        <p><strong>Member Since:</strong> {{ requester.date_joined|date:"F j, Y" }}</p>
+                        <p><strong>Previous Requests:</strong> {{ requester.request_count }}</p>
+                    </div>
+                </div>
+                
+                <p><strong>Title:</strong> {{ clothing_request.title }}</p>
+                <p><strong>Category:</strong> {{ clothing_request.category.name }}</p>
+                <p><strong>Size:</strong> {{ clothing_request.size.name }}</p>
+                <p><strong>Urgency:</strong> 
+                    {{ clothing_request.urgency }}
+                    <span class="urgency-badge urgency-{{ clothing_request.urgency|lower }}">
+                        {{ clothing_request.urgency }}
+                    </span>
+                </p>
+                <p><strong>Submitted:</strong> {{ clothing_request.created_at|date:"F j, Y \\a\\t g:i A" }}</p>
+            </div>
+
+            {% if clothing_request.description %}
+            <div class="description-box">
+                <h4>Description:</h4>
+                <p><em>"{{ clothing_request.description }}"</em></p>
+            </div>
+            {% endif %}
+
+            <div class="stats-box">
+                <h4>Platform Statistics:</h4>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value">{{ total_requests_today }}</div>
+                        <div class="stat-label">Requests Today</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ matching_items_count }}</div>
+                        <div class="stat-label">Potential Matches</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ active_donors_count }}</div>
+                        <div class="stat-label">Active Donors</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">{{ fulfillment_rate }}%</div>
+                        <div class="stat-label">Fulfillment Rate</div>
+                    </div>
+                </div>
+            </div>
+
+            {% if matching_items_count > 0 %}
+            <div class="matching-items">
+                <h4>🎯 Potential Matches Found!</h4>
+                <p>We found <strong>{{ matching_items_count }}</strong> items that match this request criteria.</p>
+                <p>Consider notifying relevant donors or suggesting matches to the requester.</p>
+            </div>
+            {% else %}
+            <div class="matching-items" style="background: #ffebee; border-left-color: #f44336;">
+                <h4>⚠️ No Immediate Matches</h4>
+                <p>No items currently match this request criteria.</p>
+                <p>Consider reaching out to donors who frequently contribute {{ clothing_request.category.name }} items.</p>
+            </div>
+            {% endif %}
+
+            <div class="quick-actions">
+                <h4>Quick Actions:</h4>
+                <ul>
+                    <li>Review similar available items in inventory</li>
+                    <li>Check donor activity for this category</li>
+                    <li>Monitor request fulfillment progress</li>
+                    <li>Update request status if needed</li>
+                </ul>
+            </div>
+
+            <div class="action-buttons">
+                <a href="{{ protocol }}://{{ domain }}{% url 'admin:core_clothingrequest_change' clothing_request.id %}" class="button">
+                    Manage Request
+                </a>
+                <a href="{{ protocol }}://{{ domain }}{% url 'admin:core_item_changelist' %}?category__id__exact={{ clothing_request.category.id }}&size__id__exact={{ clothing_request.size.id }}" class="button" style="background-color: #4CAF50;">
+                    View Matching Items
+                </a>
+                <a href="{{ protocol }}://{{ domain }}{% url 'admin:core_user_changelist' %}?q={{ requester.username }}" class="button" style="background-color: #6c757d;">
+                    View Requester Profile
+                </a>
+            </div>
+
+            <p style="text-align: center; margin-top: 20px;">
+                <small>Request ID: #{{ clothing_request.id }} • Submitted {{ clothing_request.created_at|timesince }} ago</small>
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>Thank you for supporting the ClothShare community! 🌱</p>
+            <p><small>This is an automated message. Please do not reply to this email.</small></p>
+            <p><small>Manage notification preferences in your <a href="{{ protocol }}://{{ domain }}{% url 'admin:index' %}" style="color: #2196F3;">admin panel</a>.</small></p>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,103 @@
+// Load More Items Functionality
+let currentPage = 1;
+let isLoading = false;
+let hasMore = true;
+
+function initLoadMore() {
+    const loadMoreBtn = document.getElementById('loadMore');
+    const itemsGrid = document.getElementById('itemsGrid');
+    
+    if (loadMoreBtn) {
+        loadMoreBtn.addEventListener('click', loadMoreItems);
+    }
+    
+    // Infinite scroll
+    window.addEventListener('scroll', handleScroll);
+}
+
+function handleScroll() {
+    if (isLoading || !hasMore) return;
+    
+    const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    
+    // Load more when 80% from bottom
+    if (scrollTop + windowHeight >= documentHeight * 0.8) {
+        loadMoreItems();
+    }
+}
+
+function loadMoreItems() {
+    if (isLoading || !hasMore) return;
+    
+    isLoading = true;
+    currentPage++;
+    
+    // Show loading state
+    const loadMoreBtn = document.getElementById('loadMore');
+    if (loadMoreBtn) {
+        loadMoreBtn.disabled = true;
+        loadMoreBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+    }
+    
+    // Get current filters
+    const searchQuery = document.getElementById('searchInput')?.value || '';
+    const categoryFilter = document.getElementById('categoryFilter')?.value || '';
+    const sizeFilter = document.getElementById('sizeFilter')?.value || '';
+    const conditionFilter = document.getElementById('conditionFilter')?.value || '';
+    const modeFilter = document.getElementById('modeFilter')?.value || '';
+    const genderFilter = document.getElementById('genderFilter')?.value || '';
+    const sortBy = document.getElementById('sortFilter')?.value || '-created_at';
+    
+    // Build URL with parameters
+    const params = new URLSearchParams({
+        page: currentPage,
+        search: searchQuery,
+        category: categoryFilter,
+        size: sizeFilter,
+        condition: conditionFilter,
+        mode: modeFilter,
+        gender: genderFilter,
+        sort: sortBy
+    });
+    
+    fetch(`/browse/load-more/?${params}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                if (data.items.length > 0) {
+                    // Append new items
+                    const itemsGrid = document.getElementById('itemsGrid');
+                    itemsGrid.insertAdjacentHTML('beforeend', data.html);
+                    
+                    // Update hasMore flag
+                    hasMore = data.has_more;
+                    
+                    // Hide load more button if no more items
+                    if (!data.has_more && loadMoreBtn) {
+                        loadMoreBtn.style.display = 'none';
+                    }
+                } else {
+                    hasMore = false;
+                    if (loadMoreBtn) {
+                        loadMoreBtn.style.display = 'none';
+                    }
+                }
+            }
+        })
+        .catch(error => {
+            console.error('Error loading more items:', error);
+            currentPage--; // Revert page on error
+        })
+        .finally(() => {
+            isLoading = false;
+            if (loadMoreBtn) {
+                loadMoreBtn.disabled = false;
+                loadMoreBtn.innerHTML = '<i class="fas fa-plus"></i> Load More Items';
+            }
+        });
+}
+
+// Initialize when DOM is loaded
+document.addEventListener('DOMContentLoaded', initLoadMore);

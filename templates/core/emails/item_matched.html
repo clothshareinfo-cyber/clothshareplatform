@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; }
+        .container { max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #FF9800; color: white; padding: 20px; text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>🎯 Item Match Found!</h2>
+        </div>
+        <p>Hello {{ clothing_request.requester.username }},</p>
+        <p>Great news! We found an item that matches your clothing request!</p>
+        
+        <h3>Your Request:</h3>
+        <p><strong>{{ clothing_request.title }}</strong></p>
+        <p>{{ clothing_request.description }}</p>
+        
+        <h3>Matching Item:</h3>
+        <p><strong>{{ item.title }}</strong></p>
+        <p>Category: {{ item.category.name }}</p>
+        <p>Size: {{ item.size.name }}</p>
+        <p>Condition: {{ item.condition.name }}</p>
+        
+        <p><a href="{{ protocol }}://{{ domain }}{% url 'core:item_detail' item.id %}">View this item</a></p>
+    </div>
+</body>
+</html>

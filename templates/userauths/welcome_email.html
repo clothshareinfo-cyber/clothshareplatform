@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome to ClothShare!</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f7f9fc;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .email-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .email-header {
+            background: linear-gradient(135deg, #4a6fa5 0%, #6b8cbc 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+            position: relative;
+        }
+        
+        .email-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #ff7e5f, #4a6fa5);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .logo-icon {
+            color: #ff7e5f;
+            font-size: 32px;
+        }
+        
+        .welcome-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0;
+            color: white;
+        }
+        
+        .email-body {
+            padding: 40px 30px;
+        }
+        
+        .greeting {
+            font-size: 20px;
+            color: #2d3748;
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+        
+        .message {
+            font-size: 16px;
+            color: #4a5568;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 15px;
+            margin: 30px 0;
+        }
+        
+        .feature {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #4a6fa5;
+        }
+        
+        .feature-icon {
+            color: #4a6fa5;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .feature-content h4 {
+            margin: 0 0 8px 0;
+            color: #2d3748;
+            font-size: 16px;
+        }
+        
+        .feature-content p {
+            margin: 0;
+            color: #4a5568;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #4a6fa5 0%, #6b8cbc 100%);
+            color: white;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 16px;
+            text-align: center;
+            margin: 20px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(74, 111, 165, 0.4);
+        }
+        
+        .footer {
+            text-align: center;
+            padding: 25px;
+            background: #f8f9fa;
+            color: #6c757d;
+            font-size: 14px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .footer-links {
+            margin: 15px 0;
+        }
+        
+        .footer-link {
+            color: #4a6fa5;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        
+        .footer-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="email-container">
+        <div class="email-header">
+            <div class="logo">
+                <span class="logo-icon">👕</span>
+                <span>ClothShare</span>
+            </div>
+            <h1 class="welcome-title">Welcome Aboard!</h1>
+        </div>
+        
+        <div class="email-body">
+            <p class="greeting">Hello {{ user.username }},</p>
+            
+            <p class="message">
+                Welcome to ClothShare! We're thrilled to have you join our community of eco-conscious fashion lovers. 
+                Your journey towards sustainable fashion starts now.
+            </p>
+            
+            <div class="features-grid">
+                <div class="feature">
+                    <span class="feature-icon">🔄</span>
+                    <div class="feature-content">
+                        <h4>Share & Exchange</h4>
+                        <p>Give your pre-loved clothes a new life and discover unique pieces from other community members.</p>
+                    </div>
+                </div>
+                
+                <div class="feature">
+                    <span class="feature-icon">🌱</span>
+                    <div class="feature-content">
+                        <h4>Sustainable Fashion</h4>
+                        <p>Reduce fashion waste and contribute to a more sustainable future for our planet.</p>
+                    </div>
+                </div>
+                
+                <div class="feature">
+                    <span class="feature-icon">🤝</span>
+                    <div class="feature-content">
+                        <h4>Community Driven</h4>
+                        <p>Connect with like-minded individuals who share your passion for sustainable fashion.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="text-align: center;">
+                <a href="http://127.0.0.1:8000/browse/" class="cta-button">
+                    Start Exploring Clothes
+                </a>
+            </div>
+            
+            <p class="message">
+                Ready to make a difference? Browse available items, list your own clothes for sharing, 
+                or connect with other members to start exchanging.
+            </p>
+            
+            <p class="message">
+                If you have any questions or need help getting started, don't hesitate to reach out to our support team.
+            </p>
+            
+            <p class="message">
+                Happy sharing!<br>
+                <strong>The ClothShare Team</strong>
+            </p>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-links">
+                <a href="http://127.0.0.1:8000/" class="footer-link">Visit Website</a>
+                <a href="http://127.0.0.1:8000/help/" class="footer-link">Get Help</a>
+                <a href="http://127.0.0.1:8000/privacy-policy/" class="footer-link">Privacy Policy</a>
+            </div>
+            <p>
+                This is an automated welcome message. Please do not reply to this email.<br>
+                Need assistance? Contact us at support@clothshare.com
+            </p>
+            <p>
+                &copy; {% now "Y" %} ClothShare. All rights reserved.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

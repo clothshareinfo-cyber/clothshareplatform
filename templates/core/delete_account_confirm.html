@@ -1,0 +1,688 @@
+<!-- templates/core/delete_account_confirm.html -->
+{% extends 'partials/base.html' %}
+{% load static %}
+{% block content %}
+<main class="main-pages">
+    <div class="page-header breadcrumb-wrap">
+        <div class="container">
+            <div class="breadcrumb">
+                <a href="{% url 'core:index' %}" rel="nofollow"><i class="fi-rs-home mr-5"></i>Home</a>
+                <span></span> Profile <span></span> Delete Account
+            </div>
+        </div>
+    </div>
+
+    <div class="page-content pt-100 pb-150">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-xl-8 col-lg-10">
+                    <div class="delete-account-card">
+                        <!-- Animated Header Section -->
+                        <div class="card-header-section">
+                            <div class="header-background">
+                                <div class="floating-shapes">
+                                    <div class="shape shape-1"></div>
+                                    <div class="shape shape-2"></div>
+                                    <div class="shape shape-3"></div>
+                                </div>
+                            </div>
+                            <div class="header-content text-center text-white py-5">
+                                <div class="warning-icon mb-4">
+                                    <div class="icon-container">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <div class="pulse-ring"></div>
+                                        <div class="pulse-ring ring-2"></div>
+                                    </div>
+                                </div>
+                                <h1 class="display-5 fw-bold mb-3">Account Deletion</h1>
+                                <p class="lead opacity-90 mb-0">This action is permanent and cannot be reversed</p>
+                            </div>
+                        </div>
+
+                        <!-- Main Content -->
+                        <div class="card-body-section p-5">
+                            <!-- Critical Warning Alert -->
+                            <div class="critical-alert">
+                                <div class="alert-content">
+                                    <div class="alert-icon">
+                                        <i class="fas fa-radiation"></i>
+                                    </div>
+                                    <div class="alert-text">
+                                        <h4 class="alert-title">Critical Warning</h4>
+                                        <p class="alert-description">
+                                            You are about to permanently erase your account from our system. 
+                                            This action will immediately remove all your data and cannot be recovered.
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="alert-glow"></div>
+                            </div>
+
+                            <!-- Data Loss Visualization -->
+                            <div class="data-loss-section mb-5">
+                                <h5 class="section-title mb-4">
+                                    <i class="fas fa-database me-2"></i>
+                                    Data That Will Be Lost Forever
+                                </h5>
+                                <div class="data-grid">
+                                    <div class="data-item" data-count="1">
+                                        <div class="data-icon">
+                                            <i class="fas fa-user-circle"></i>
+                                        </div>
+                                        <div class="data-content">
+                                            <span class="data-title">Profile & Identity</span>
+                                            <span class="data-subtitle">Personal information and account settings</span>
+                                        </div>
+                                        <div class="data-badge">
+                                            <span class="badge-count">1</span>
+                                        </div>
+                                    </div>
+                                    <div class="data-item" data-count="{{ user_items_count }}">
+                                        <div class="data-icon">
+                                            <i class="fas fa-tshirt"></i>
+                                        </div>
+                                        <div class="data-content">
+                                            <span class="data-title">Active Listings</span>
+                                            <span class="data-subtitle">Clothing items available for exchange</span>
+                                        </div>
+                                        <div class="data-badge">
+                                            <span class="badge-count">{{ user_items_count }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="data-item" data-count="{{ user_requests_count }}">
+                                        <div class="data-icon">
+                                            <i class="fas fa-hands-helping"></i>
+                                        </div>
+                                        <div class="data-content">
+                                            <span class="data-title">Clothing Requests</span>
+                                            <span class="data-subtitle">Your active and pending requests</span>
+                                        </div>
+                                        <div class="data-badge">
+                                            <span class="badge-count">{{ user_requests_count }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="data-item" data-count="{{ user_exchanges_count }}">
+                                        <div class="data-icon">
+                                            <i class="fas fa-exchange-alt"></i>
+                                        </div>
+                                        <div class="data-content">
+                                            <span class="data-title">Exchange History</span>
+                                            <span class="data-subtitle">Your complete trading history</span>
+                                        </div>
+                                        <div class="data-badge">
+                                            <span class="badge-count">{{ user_exchanges_count }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Confirmation Form -->
+                            <div class="confirmation-section">
+                                <form method="POST" action="{% url 'core:delete_account' %}" class="confirmation-form">
+                                    {% csrf_token %}
+                                    <div class="password-input-group">
+                                        <label for="password" class="form-label">
+                                            <i class="fas fa-key me-2"></i>
+                                            Verify Your Identity
+                                        </label>
+                                        <div class="input-container">
+                                            <input type="password" 
+                                                   class="form-control password-input" 
+                                                   id="password" 
+                                                   name="password" 
+                                                   required 
+                                                   placeholder="Enter your current password to confirm">
+                                            <div class="input-decoration">
+                                                <i class="fas fa-lock"></i>
+                                            </div>
+                                        </div>
+                                        <div class="form-note">
+                                            <i class="fas fa-info-circle me-1"></i>
+                                            Password verification is required for security purposes
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Action Buttons -->
+                                    <div class="action-buttons">
+                                        <a href="{% url 'core:profile' %}" class="btn btn-safety">
+                                            <i class="fas fa-shield-alt me-2"></i>
+                                            Keep My Account Safe
+                                        </a>
+                                        <button type="submit" class="btn btn-destruction" id="deleteButton">
+                                            <i class="fas fa-fire me-2"></i>
+                                            Delete Everything Forever
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+
+                            <!-- Final Warning -->
+                            <div class="final-warning mt-5">
+                                <div class="warning-content text-center">
+                                    <i class="fas fa-ghost warning-ghost"></i>
+                                    <p class="warning-text">
+                                        Once deleted, your account will be gone forever. 
+                                        <strong>There is no undo button.</strong>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<style>
+    .delete-account-card {
+        background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        border-radius: 24px;
+        box-shadow: 
+            0 25px 50px -12px rgba(220, 53, 69, 0.25),
+            inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+        overflow: hidden;
+        border: 1px solid rgba(220, 53, 69, 0.1);
+        backdrop-filter: blur(10px);
+        transform: translateY(0);
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .delete-account-card:hover {
+        transform: translateY(-8px);
+        box-shadow: 
+            0 35px 60px -12px rgba(220, 53, 69, 0.35),
+            inset 0 1px 0 0 rgba(255, 255, 255, 0.1);
+    }
+
+    /* Header Section */
+    .card-header-section {
+        background: linear-gradient(135deg, #dc3545 0%, #c53030 50%, #9b2c2c 100%);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .header-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0.1;
+    }
+
+    .floating-shapes {
+        position: relative;
+        width: 100%;
+        height: 100%;
+    }
+
+    .shape {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        animation: float 6s ease-in-out infinite;
+    }
+
+    .shape-1 {
+        width: 80px;
+        height: 80px;
+        top: 20%;
+        left: 10%;
+        animation-delay: 0s;
+    }
+
+    .shape-2 {
+        width: 120px;
+        height: 120px;
+        top: 60%;
+        right: 10%;
+        animation-delay: 2s;
+    }
+
+    .shape-3 {
+        width: 60px;
+        height: 60px;
+        bottom: 20%;
+        left: 20%;
+        animation-delay: 4s;
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0) rotate(0deg); }
+        50% { transform: translateY(-20px) rotate(180deg); }
+    }
+
+    .icon-container {
+        position: relative;
+        display: inline-block;
+    }
+
+    .warning-icon i {
+        font-size: 4rem;
+        color: #fed7d7;
+        animation: shake 2s ease-in-out infinite;
+    }
+
+    .pulse-ring {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 120px;
+        height: 120px;
+        border: 2px solid #fed7d7;
+        border-radius: 50%;
+        animation: pulse 2s ease-out infinite;
+    }
+
+    .ring-2 {
+        animation-delay: 1s;
+    }
+
+    @keyframes pulse {
+        0% { 
+            width: 80px; 
+            height: 80px; 
+            opacity: 1; 
+        }
+        100% { 
+            width: 160px; 
+            height: 160px; 
+            opacity: 0; 
+        }
+    }
+
+    @keyframes shake {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-5deg); }
+        75% { transform: rotate(5deg); }
+    }
+
+    /* Critical Alert */
+    .critical-alert {
+        background: linear-gradient(135deg, #fff5f5 0%, #fed7d7 100%);
+        border: 2px solid #feb2b2;
+        border-radius: 16px;
+        padding: 2rem;
+        margin-bottom: 2.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .alert-glow {
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(254, 178, 178, 0.4), transparent);
+        animation: glow 3s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+        0% { left: -100%; }
+        50% { left: 100%; }
+        100% { left: 100%; }
+    }
+
+    .alert-content {
+        display: flex;
+        align-items: flex-start;
+        gap: 1.5rem;
+        position: relative;
+        z-index: 2;
+    }
+
+    .alert-icon {
+        flex-shrink: 0;
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #e53e3e 0%, #c53030 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        animation: rotate 4s linear infinite;
+    }
+
+    .alert-icon i {
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    .alert-title {
+        color: #c53030;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        font-size: 1.25rem;
+    }
+
+    .alert-description {
+        color: #742a2a;
+        margin: 0;
+        line-height: 1.6;
+    }
+
+    /* Data Grid */
+    .data-grid {
+        display: grid;
+        gap: 1rem;
+    }
+
+    .data-item {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        padding: 1.5rem;
+        background: white;
+        border: 2px solid #e2e8f0;
+        border-radius: 16px;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .data-item::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        background: linear-gradient(135deg, #dc3545, #fd7e14);
+        transform: scaleY(0);
+        transition: transform 0.3s ease;
+    }
+
+    .data-item:hover {
+        transform: translateX(8px);
+        border-color: #fed7d7;
+        box-shadow: 0 8px 25px rgba(220, 53, 69, 0.15);
+    }
+
+    .data-item:hover::before {
+        transform: scaleY(1);
+    }
+
+    .data-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        flex-shrink: 0;
+    }
+
+    .data-item:nth-child(1) .data-icon { background: linear-gradient(135deg, #4a6fa5, #6b8cbc); }
+    .data-item:nth-child(2) .data-icon { background: linear-gradient(135deg, #38a169, #48bb78); }
+    .data-item:nth-child(3) .data-icon { background: linear-gradient(135deg, #3182ce, #4299e1); }
+    .data-item:nth-child(4) .data-icon { background: linear-gradient(135deg, #d69e2e, #ecc94b); }
+
+    .data-icon i {
+        color: white;
+    }
+
+    .data-content {
+        flex: 1;
+    }
+
+    .data-title {
+        display: block;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 0.25rem;
+    }
+
+    .data-subtitle {
+        display: block;
+        font-size: 0.875rem;
+        color: #718096;
+    }
+
+    .data-badge {
+        flex-shrink: 0;
+    }
+
+    .badge-count {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #dc3545, #c53030);
+        color: white;
+        border-radius: 50%;
+        font-weight: 700;
+        font-size: 0.875rem;
+    }
+
+    /* Password Input */
+    .password-input-group {
+        margin-bottom: 2.5rem;
+    }
+
+    .password-input-group .form-label {
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 1rem;
+        font-size: 1.1rem;
+    }
+
+    .input-container {
+        position: relative;
+    }
+
+    .password-input {
+        padding: 1.25rem 1.25rem 1.25rem 4rem;
+        border: 2px solid #e2e8f0;
+        border-radius: 12px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background: white;
+    }
+
+    .password-input:focus {
+        border-color: #dc3545;
+        box-shadow: 0 0 0 4px rgba(220, 53, 69, 0.1);
+        transform: translateY(-2px);
+    }
+
+    .input-decoration {
+        position: absolute;
+        left: 1.25rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #a0aec0;
+        transition: color 0.3s ease;
+    }
+
+    .password-input:focus + .input-decoration {
+        color: #dc3545;
+    }
+
+    .form-note {
+        font-size: 0.875rem;
+        color: #718096;
+        margin-top: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+
+    /* Action Buttons */
+    .action-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+    }
+
+    .btn {
+        padding: 1.25rem 2rem;
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 1.1rem;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        text-decoration: none;
+        cursor: pointer;
+    }
+
+    .btn-safety {
+        background: linear-gradient(135deg, #38a169 0%, #2f855a 100%);
+        color: white;
+    }
+
+    .btn-safety:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(56, 161, 105, 0.4);
+        color: white;
+    }
+
+    .btn-destruction {
+        background: linear-gradient(135deg, #dc3545 0%, #c53030 100%);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .btn-destruction::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+        transition: left 0.5s ease;
+    }
+
+    .btn-destruction:hover::before {
+        left: 100%;
+    }
+
+    .btn-destruction:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 12px 30px rgba(220, 53, 69, 0.4);
+    }
+
+    /* Final Warning */
+    .final-warning {
+        background: linear-gradient(135deg, #fed7d7 0%, #feb2b2 100%);
+        border: 2px solid #fc8181;
+        border-radius: 16px;
+        padding: 2rem;
+        text-align: center;
+    }
+
+    .warning-ghost {
+        font-size: 3rem;
+        color: #c53030;
+        margin-bottom: 1rem;
+        animation: float-ghost 3s ease-in-out infinite;
+    }
+
+    @keyframes float-ghost {
+        0%, 100% { transform: translateY(0px); }
+        50% { transform: translateY(-10px); }
+    }
+
+    .warning-text {
+        color: #742a2a;
+        font-size: 1.1rem;
+        margin: 0;
+        font-weight: 500;
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .action-buttons {
+            grid-template-columns: 1fr;
+        }
+        
+        .data-item {
+            flex-direction: column;
+            text-align: center;
+            gap: 1rem;
+        }
+        
+        .alert-content {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .header-content h1 {
+            font-size: 2rem;
+        }
+        
+        .card-body-section {
+            padding: 2rem !important;
+        }
+    }
+
+    /* Section Titles */
+    .section-title {
+        color: #2d3748;
+        font-weight: 700;
+        font-size: 1.25rem;
+        display: flex;
+        align-items: center;
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteForm = document.querySelector('form');
+        const passwordInput = document.getElementById('password');
+        
+        // Remove any existing event listeners
+        const newDeleteButton = deleteButton.cloneNode(true);
+        deleteButton.parentNode.replaceChild(newDeleteButton, deleteButton);
+        
+        // Use form submission instead of button click
+        deleteForm.addEventListener('submit', function(e) {
+            // Check if password is empty
+            if (!passwordInput.value.trim()) {
+                e.preventDefault();
+                alert('Please enter your password to confirm account deletion.');
+                passwordInput.focus();
+                return;
+            }
+            
+            // Simple confirmation - if user clicks OK, form submits normally
+            const confirmed = confirm(
+                '🚨 FINAL CONFIRMATION 🚨\n\n' +
+                'You are about to PERMANENTLY DELETE your account.\n\n' +
+                'This will delete:\n' +
+                '• Your profile (' + {{ user_items_count }} + ' items)\n' +
+                '• Your requests (' + {{ user_requests_count }} + ' requests)\n' +
+                '• Your exchange history (' + {{ user_exchanges_count }} + ' exchanges)\n\n' +
+                'THIS ACTION CANNOT BE UNDONE!\n\n' +
+                'Click OK to delete your account forever.'
+            );
+            
+            // Only prevent submission if user cancels
+            if (!confirmed) {
+                e.preventDefault();
+                alert('Account deletion cancelled. Your data is safe.');
+            }
+            // If user clicks OK, form submits normally and account gets deleted
+        });
+        
+        // Auto-focus on password field
+        setTimeout(() => {
+            passwordInput.focus();
+        }, 500);
+    });
+</script>
+
+{% endblock %}

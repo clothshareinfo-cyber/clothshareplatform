@@ -1,0 +1,1177 @@
+{% extends 'core/base.html' %}
+{% block title %}{{ item.title }}{% endblock %}
+
+{% block content %}
+<section class="item-detail section">
+    <div class="container">
+        <!-- Back Button -->
+        <div style="margin-bottom: 2rem;">
+            <a href="{% url 'core:browse' %}" class="btn btn--outline back-btn" id="backToBrowse">
+                <i class="fas fa-arrow-left"></i> Back to Browse
+            </a>
+        </div>
+
+        <div class="item-detail__container">
+            <!-- Image Gallery -->
+            <div class="item-detail__gallery">
+                <div class="main-image">
+                    {% if item.images.all %}
+                        {% with item.images.all|first as first_image %}
+                        <img src="{{ first_image.image.url }}" alt="{{ item.title }}" id="mainImage">
+                        {% endwith %}
+                    {% else %}
+                        <div class="no-image">
+                            <i class="fas fa-tshirt"></i>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                {% if item.images.all|length > 1 %}
+                <div class="image-thumbnails">
+                    {% for image in item.images.all %}
+                    <div class="thumbnail {% if forloop.first %}active{% endif %}" data-image="{{ image.image.url }}">
+                        <img src="{{ image.image.url }}" alt="{{ image.alt_text|default:item.title }}">
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Item Information -->
+            <div class="item-detail__info">
+                <div class="item-header">
+                    <div class="item-badges">
+                        {% if item.mode == 'donation' %}
+                        <span class="badge donation">Free Donation</span>
+                        {% else %}
+                        <span class="badge exchange">Exchange</span>
+                        {% endif %}
+                        <span class="badge status {{ item.status }}">{{ item.get_status_display }}</span>
+                        {% if item.featured %}
+                        <span class="badge featured">Featured</span>
+                        {% endif %}
+                    </div>
+                    <h1 class="item-title">{{ item.title }}</h1>
+                    <div class="item-donor">
+                        <div class="donor-avatar">
+                            <i class="fas fa-user-circle"></i>
+                        </div>
+                        <p>Donated by <strong>{{ item.donor.username }}</strong></p>
+                    </div>
+                </div>
+
+                <div class="item-description">
+                    <h3><i class="fas fa-align-left"></i> Description</h3>
+                    <p>{{ item.description|linebreaks }}</p>
+                </div>
+
+                <div class="item-specs">
+                    <h3><i class="fas fa-info-circle"></i> Item Details</h3>
+                    <div class="specs-grid">
+                        <div class="spec-item">
+                            <div class="spec-icon">
+                                <i class="fas fa-tag"></i>
+                            </div>
+                            <div class="spec-content">
+                                <span class="spec-label">Category</span>
+                                <span class="spec-value">{{ item.category.name }}</span>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-icon">
+                                <i class="fas fa-star"></i>
+                            </div>
+                            <div class="spec-content">
+                                <span class="spec-label">Condition</span>
+                                <span class="spec-value">{{ item.condition.name }}</span>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-icon">
+                                <i class="fas fa-ruler"></i>
+                            </div>
+                            <div class="spec-content">
+                                <span class="spec-label">Size</span>
+                                <span class="spec-value">{{ item.size.name|default:"One Size" }}</span>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-icon">
+                                <i class="fas fa-venus-mars"></i>
+                            </div>
+                            <div class="spec-content">
+                                <span class="spec-label">Gender</span>
+                                <span class="spec-value">{{ item.gender.name|default:"Unisex" }}</span>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="spec-content">
+                                <span class="spec-label">Location</span>
+                                <span class="spec-value">{{ item.location|default:"Not specified" }}</span>
+                            </div>
+                        </div>
+                        <div class="spec-item">
+                            <div class="spec-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <div class="spec-content">
+                                <span class="spec-label">Listed</span>
+                                <span class="spec-value">{{ item.created_at|date:"M d, Y" }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if item.tags %}
+                <div class="item-tags">
+                    <h3><i class="fas fa-tags"></i> Tags</h3>
+                    <div class="tags-list">
+                        {% for tag in item.tags.split %}
+                        <span class="tag">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Action Buttons -->
+                <div class="item-actions">
+                    {% if item.status == 'available' %}
+                        {% if user.is_authenticated %}
+                            {% if user != item.donor %}
+                                <!-- Exchange Request Section -->
+                                <div class="exchange-section">
+                                    {% if user_has_pending_exchange %}
+                                        <!-- User already has a pending request -->
+                                        <div class="alert alert-info border-0">
+                                            <div class="d-flex align-items-start">
+                                                <i class="fas fa-info-circle me-3 mt-1 fs-5 text-primary"></i>
+                                                <div class="flex-grow-1">
+                                                    <h5 class="alert-heading mb-2 text-dark">Exchange Request Sent</h5>
+                                                    <p class="mb-2 text-dark">You have already requested an exchange for <strong>"{{ item.title }}"</strong>.</p>
+                                                    <small class="text-muted d-block mb-3">Wait for {{ item.donor.username }} to respond to your request.</small>
+                                                    
+                                                    <div class="d-flex gap-2 flex-wrap">
+                                                        <a href="{% url 'core:my_exchanges' %}" class="btn btn-outline-primary btn-sm">
+                                                            <i class="fas fa-eye me-1"></i>View My Requests
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    {% else %}
+                                        <!-- User can make a new request -->
+                                        <div class="text-center">
+                                            <a href="{% url 'core:initiate_exchange' item.id %}" class="btn btn--primary btn--full request-btn">
+                                                <i class="fas fa-exchange-alt"></i> 
+                                                {% if item.mode == 'donation' %}
+                                                    Request This Item
+                                                {% else %}
+                                                    Propose Exchange
+                                                {% endif %}
+                                            </a>
+                                            <p class="text-muted small mt-2 mb-0">
+                                                Send a request to exchange for this item with {{ item.donor.username }}
+                                            </p>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="owner-actions">
+                                    <p class="owner-notice">
+                                        <i class="fas fa-info-circle"></i> This is your listed item
+                                    </p>
+                                    <div class="owner-buttons">
+                                        <a href="{% url 'core:edit_item' item.id %}" class="btn btn--outline">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <a href="{% url 'core:delete_item' item.id %}" class="btn btn--outline">
+                                            <i class="fas fa-trash"></i> Remove
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endif %}
+                        {% else %}
+                            <div class="auth-required">
+                                <p class="login-notice">
+                                    <i class="fas fa-lock"></i> Please log in to request this item
+                                </p>
+                                <a href="{% url 'userauths:sign-in' %}?next={{ request.path }}" class="btn btn--primary btn--full">
+                                    <i class="fas fa-sign-in-alt"></i> Login to Continue
+                                </a>
+                            </div>
+                        {% endif %}
+                    {% else %}
+                        <div class="unavailable-notice">
+                            <p>
+                                <i class="fas fa-info-circle"></i> This item is no longer available
+                            </p>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <!-- Cancel Exchange Modal -->
+                {% if user_has_pending_exchange %}
+                <div class="modal fade" id="cancelExchangeModal" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title text-danger">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Cancel Exchange Request
+                                </h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>Are you sure you want to cancel your exchange request for:</p>
+                                <div class="alert alert-warning border-0 bg-light">
+                                    <strong>"{{ item.title }}"</strong>
+                                </div>
+                                <p class="text-muted small mb-0">This action cannot be undone.</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                                    <i class="fas fa-arrow-left me-1"></i>Keep Request
+                                </button>
+                                <form method="post" action="{% url 'core:cancel_exchange' item.id %}">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-danger">
+                                        <i class="fas fa-times me-1"></i>Yes, Cancel Request
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <!-- Safety Tips -->
+                <div class="safety-tips">
+                    <h4><i class="fas fa-shield-alt"></i> Safety Tips</h4>
+                    <ul>
+                        <li>Meet in a public place during daylight hours</li>
+                        <li>Bring a friend or family member with you</li>
+                        <li>Inspect the item thoroughly before accepting</li>
+                        <li>Trust your instincts - if something feels wrong, walk away</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Related Items -->
+        {% if related_items %}
+        <div class="related-items">
+            <h2 class="section__title">Similar Items</h2>
+            <div class="items-grid">
+                {% for related_item in related_items %}
+                <div class="item-card">
+                    <div class="item-card__image">
+                        {% if related_item.images.all %}
+                            {% with related_item.images.all|first as first_image %}
+                            <img src="{{ first_image.image.url }}" alt="{{ related_item.title }}">
+                            {% endwith %}
+                        {% else %}
+                            <div class="no-image-small">
+                                <i class="fas fa-tshirt"></i>
+                            </div>
+                        {% endif %}
+                        
+                        {% if related_item.mode == 'donation' %}
+                        <div class="item-badge donation">Free</div>
+                        {% else %}
+                        <div class="item-badge exchange">Exchange</div>
+                        {% endif %}
+                    </div>
+                    <div class="item-card__content">
+                        <h3 class="item-card__title">{{ related_item.title }}</h3>
+                        <p class="item-card__description">{{ related_item.description|truncatewords:15 }}</p>
+                        <div class="item-card__meta">
+                            <span class="item-card__category">{{ related_item.category.name }}</span>
+                            <span class="item-card__condition">{{ related_item.condition.name }}</span>
+                        </div>
+                        <a href="{% url 'core:item_detail' related_item.id %}" class="btn btn--primary view-details-btn">
+                            View Details
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</section>
+
+<style>
+    /* Enhanced CSS with improved visual design */
+    :root {
+        --primary-color: #4a6cf7;
+        --accent-color: #ff7e5f;
+        --dark-color: #1d2144;
+        --gray-color: #6c757d;
+        --light-color: #f8f9fa;
+        --success-color: #28a745;
+        --info-color: #17a2b8;
+        --border-radius: 12px;
+        --box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        --box-shadow-hover: 0 10px 25px rgba(0, 0, 0, 0.15);
+        --transition: all 0.3s ease;
+    }
+    
+    .item-detail__container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+        margin-bottom: 3rem;
+    }
+    
+    .item-detail__gallery {
+        position: sticky;
+        top: 100px;
+        height: fit-content;
+    }
+    
+    .main-image {
+        width: 100%;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+        margin-bottom: 1rem;
+        transition: var(--transition);
+    }
+    
+    .main-image:hover {
+        box-shadow: var(--box-shadow-hover);
+    }
+    
+    .main-image img {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        display: block;
+        transition: var(--transition);
+    }
+    
+    .no-image {
+        width: 100%;
+        height: 400px;
+        background: linear-gradient(135deg, #e9ecef, #dee2e6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--border-radius);
+        color: #6c757d;
+    }
+    
+    .no-image i {
+        font-size: 4rem;
+        opacity: 0.7;
+    }
+    
+    .image-thumbnails {
+        display: flex;
+        gap: 0.5rem;
+        overflow-x: auto;
+        padding: 0.5rem 0;
+    }
+    
+    .thumbnail {
+        width: 80px;
+        height: 80px;
+        border-radius: 8px;
+        overflow: hidden;
+        cursor: pointer;
+        border: 2px solid transparent;
+        transition: var(--transition);
+        flex-shrink: 0;
+        position: relative;
+    }
+    
+    .thumbnail::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.1);
+        opacity: 0;
+        transition: var(--transition);
+    }
+    
+    .thumbnail:hover::after {
+        opacity: 1;
+    }
+    
+    .thumbnail.active {
+        border-color: var(--primary-color);
+        transform: scale(1.05);
+    }
+    
+    .thumbnail:hover {
+        border-color: var(--accent-color);
+    }
+    
+    .thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .item-header {
+        margin-bottom: 2rem;
+        padding-bottom: 1.5rem;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .item-badges {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+    
+    .badge {
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.3rem;
+    }
+    
+    .badge.donation {
+        background: linear-gradient(135deg, #d4edda, #c3e6cb);
+        color: #155724;
+        box-shadow: 0 2px 5px rgba(40, 167, 69, 0.2);
+    }
+    
+    .badge.exchange {
+        background: linear-gradient(135deg, #ffeaa7, #f9d773);
+        color: #856404;
+        box-shadow: 0 2px 5px rgba(255, 193, 7, 0.2);
+    }
+    
+    .badge.status.available {
+        background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+        color: #0c5460;
+        box-shadow: 0 2px 5px rgba(23, 162, 184, 0.2);
+    }
+    
+    .badge.status.reserved {
+        background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+        color: #856404;
+        box-shadow: 0 2px 5px rgba(255, 193, 7, 0.2);
+    }
+    
+    .badge.status.taken {
+        background: linear-gradient(135deg, #f8d7da, #f5c6cb);
+        color: #721c24;
+        box-shadow: 0 2px 5px rgba(220, 53, 69, 0.2);
+    }
+    
+    .badge.featured {
+        background: linear-gradient(135deg, var(--accent-color), #ff6347);
+        color: white;
+        box-shadow: 0 2px 5px rgba(255, 126, 95, 0.3);
+    }
+    
+    .item-title {
+        font-size: 2.2rem;
+        color: var(--dark-color);
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+        line-height: 1.2;
+    }
+    
+    .item-donor {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        color: var(--gray-color);
+        font-size: 1.1rem;
+    }
+    
+    .donor-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--light-color);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--primary-color);
+        font-size: 1.5rem;
+    }
+    
+    .item-description {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: var(--light-color);
+        border-radius: var(--border-radius);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .item-description h3 {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .item-description p {
+        line-height: 1.7;
+        color: var(--dark-color);
+    }
+    
+    .item-specs {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: var(--light-color);
+        border-radius: var(--border-radius);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .item-specs h3 {
+        color: var(--primary-color);
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .specs-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    .spec-item {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        padding: 1rem;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
+    }
+    
+    .spec-item:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .spec-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: var(--primary-color);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+    }
+    
+    .spec-content {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .spec-label {
+        font-weight: 600;
+        color: var(--gray-color);
+        font-size: 0.85rem;
+    }
+    
+    .spec-value {
+        font-weight: 600;
+        color: var(--dark-color);
+    }
+    
+    .item-tags {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: var(--light-color);
+        border-radius: var(--border-radius);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .item-tags h3 {
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .tags-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .tag {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.4rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.875rem;
+        font-weight: 500;
+        transition: var(--transition);
+    }
+    
+    .tag:hover {
+        background: var(--accent-color);
+        transform: translateY(-2px);
+    }
+    
+    .item-actions {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: var(--light-color);
+        border-radius: var(--border-radius);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .exchange-section {
+        margin: 0;
+        padding: 0;
+        background: transparent;
+    }
+    
+    .alert-info {
+        border-left: 4px solid #0dcaf0;
+        background: linear-gradient(135deg, #d1ecf1, #bee5eb);
+        border: none;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+    }
+    
+    .request-btn {
+        position: relative;
+        overflow: hidden;
+        transition: var(--transition);
+    }
+    
+    .request-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 7px 15px rgba(74, 108, 247, 0.3);
+    }
+    
+    .owner-actions {
+        text-align: center;
+    }
+    
+    .owner-notice {
+        color: var(--gray-color);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .owner-buttons {
+        display: flex;
+        gap: 1rem;
+    }
+    
+    .owner-buttons .btn {
+        flex: 1;
+        transition: var(--transition);
+    }
+    
+    .owner-buttons .btn:hover {
+        transform: translateY(-2px);
+    }
+    
+    .auth-required {
+        text-align: center;
+    }
+    
+    .login-notice {
+        color: var(--gray-color);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .unavailable-notice {
+        text-align: center;
+    }
+    
+    .unavailable-notice p {
+        color: #dc3545;
+        padding: 1rem;
+        background: #f8d7da;
+        border-radius: var(--border-radius);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+    }
+    
+    .safety-tips {
+        padding: 1.5rem;
+        background: linear-gradient(135deg, #e7f3ff, #d4e7ff);
+        border-radius: var(--border-radius);
+        border-left: 4px solid var(--info-color);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+    
+    .safety-tips h4 {
+        color: var(--info-color);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .safety-tips ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    
+    .safety-tips li {
+        padding: 0.5rem 0;
+        color: var(--dark-color);
+        position: relative;
+        padding-left: 1.5rem;
+        transition: var(--transition);
+    }
+    
+    .safety-tips li:hover {
+        transform: translateX(5px);
+    }
+    
+    .safety-tips li::before {
+        content: '✓';
+        color: var(--info-color);
+        font-weight: bold;
+        position: absolute;
+        left: 0;
+    }
+    
+    .back-btn {
+        transition: var(--transition);
+    }
+    
+    .back-btn:hover {
+        transform: translateX(-5px);
+    }
+    
+    .related-items {
+        margin-top: 4rem;
+        padding-top: 3rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+    
+    .section__title {
+        font-size: 1.8rem;
+        color: var(--dark-color);
+        margin-bottom: 1.5rem;
+        font-weight: 700;
+        text-align: center;
+    }
+    
+    .items-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+    
+    .item-card {
+        background: white;
+        border-radius: var(--border-radius);
+        overflow: hidden;
+        box-shadow: var(--box-shadow);
+        transition: var(--transition);
+        position: relative;
+    }
+    
+    .item-card:hover {
+        transform: translateY(-8px);
+        box-shadow: var(--box-shadow-hover);
+    }
+    
+    .item-card__image {
+        position: relative;
+        height: 200px;
+        overflow: hidden;
+    }
+    
+    .item-card__image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: var(--transition);
+    }
+    
+    .item-card:hover .item-card__image img {
+        transform: scale(1.05);
+    }
+    
+    .no-image-small {
+        width: 100%;
+        height: 200px;
+        background: linear-gradient(135deg, #e9ecef, #dee2e6);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6c757d;
+    }
+    
+    .no-image-small i {
+        font-size: 3rem;
+        opacity: 0.7;
+    }
+    
+    .item-badge {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        padding: 5px 10px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        color: white;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    }
+    
+    .item-badge.donation {
+        background: linear-gradient(135deg, #28a745, #20c997);
+    }
+    
+    .item-badge.exchange {
+        background: linear-gradient(135deg, #ff7e5f, #ff6347);
+    }
+    
+    .item-card__content {
+        padding: 1.5rem;
+    }
+    
+    .item-card__title {
+        font-size: 1.2rem;
+        margin-bottom: 0.5rem;
+        color: var(--dark-color);
+        font-weight: 600;
+    }
+    
+    .item-card__description {
+        color: var(--gray-color);
+        margin-bottom: 1rem;
+        font-size: 0.9rem;
+        line-height: 1.5;
+    }
+    
+    .item-card__meta {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 1rem;
+        font-size: 0.8rem;
+    }
+    
+    .item-card__category {
+        background: var(--light-color);
+        color: var(--primary-color);
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-weight: 500;
+    }
+    
+    .item-card__condition {
+        color: var(--gray-color);
+        display: flex;
+        align-items: center;
+    }
+    
+    .view-details-btn {
+        width: 100%;
+        margin-top: 1rem;
+        transition: var(--transition);
+    }
+    
+    .view-details-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 10px rgba(74, 108, 247, 0.3);
+    }
+    
+    @media (max-width: 768px) {
+        .item-detail__container {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+        
+        .item-detail__gallery {
+            position: static;
+        }
+        
+        .specs-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .items-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+        
+        .item-title {
+            font-size: 1.8rem;
+        }
+        
+        .owner-buttons {
+            flex-direction: column;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .item-title {
+            font-size: 1.5rem;
+        }
+        
+        .items-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Enhanced image gallery functionality
+        const mainImage = document.getElementById('mainImage');
+        const thumbnails = document.querySelectorAll('.thumbnail');
+        
+        if (thumbnails.length > 0 && mainImage) {
+            thumbnails.forEach(thumb => {
+                thumb.addEventListener('click', function() {
+                    // Remove active class from all thumbnails
+                    thumbnails.forEach(t => {
+                        t.classList.remove('active');
+                        t.style.transform = 'scale(1)';
+                    });
+                    
+                    // Add active class to clicked thumbnail
+                    this.classList.add('active');
+                    this.style.transform = 'scale(1.05)';
+                    
+                    // Update main image with fade effect
+                    const newImageSrc = this.getAttribute('data-image');
+                    
+                    // Create fade out effect
+                    mainImage.style.opacity = '0.3';
+                    
+                    setTimeout(() => {
+                        mainImage.src = newImageSrc;
+                        
+                        // Create fade in effect
+                        setTimeout(() => {
+                            mainImage.style.opacity = '1';
+                        }, 50);
+                    }, 200);
+                });
+            });
+        }
+        
+        // Enhanced back button functionality
+        const backButton = document.getElementById('backToBrowse');
+        if (backButton) {
+            backButton.addEventListener('click', function(e) {
+                // Add loading state for better UX
+                const originalHtml = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                this.style.pointerEvents = 'none';
+                
+                // If the href is empty or invalid, provide fallback
+                if (!this.getAttribute('href') || this.getAttribute('href') === '#') {
+                    e.preventDefault();
+                    window.location.href = '/browse/';
+                }
+                // Otherwise, let the natural navigation happen
+            });
+        }
+        
+        // Enhanced loading state for action buttons
+        const actionButtons = document.querySelectorAll('.item-actions .btn, .request-btn, .view-details-btn');
+        actionButtons.forEach(btn => {
+            if (btn.id !== 'backToBrowse') { // Don't apply to back button
+                btn.addEventListener('click', function(e) {
+                    // Don't add loading state for delete buttons (they have confirmation)
+                    if (!this.classList.contains('btn--outline') || !this.querySelector('.fa-trash')) {
+                        const originalText = this.innerHTML;
+                        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                        this.disabled = true;
+                        this.style.opacity = '0.7';
+                        
+                        // Add pulse animation
+                        this.style.animation = 'pulse 1s infinite';
+                        
+                        // Revert after 3 seconds if still on page (fallback)
+                        setTimeout(() => {
+                            if (this.disabled) {
+                                this.innerHTML = originalText;
+                                this.disabled = false;
+                                this.style.opacity = '1';
+                                this.style.animation = 'none';
+                            }
+                        }, 3000);
+                    }
+                });
+            }
+        });
+        
+        // Smooth scroll for page load with enhanced animation
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth'
+        });
+        
+        // Add entrance animations for page elements
+        const animateOnScroll = () => {
+            const elements = document.querySelectorAll('.item-detail__gallery, .item-detail__info, .related-items');
+            
+            elements.forEach(element => {
+                const elementTop = element.getBoundingClientRect().top;
+                const elementVisible = 150;
+                
+                if (elementTop < window.innerHeight - elementVisible) {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }
+            });
+        };
+        
+        // Set initial state for animation
+        const elementsToAnimate = document.querySelectorAll('.item-detail__gallery, .item-detail__info, .related-items');
+        elementsToAnimate.forEach(element => {
+            element.style.opacity = '0';
+            element.style.transform = 'translateY(20px)';
+            element.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        });
+        
+        // Trigger animations on load and scroll
+        window.addEventListener('load', () => {
+            setTimeout(animateOnScroll, 100);
+        });
+        
+        window.addEventListener('scroll', animateOnScroll);
+        
+        // Cancel exchange modal handler
+        const cancelModal = document.getElementById('cancelExchangeModal');
+        if (cancelModal) {
+            cancelModal.addEventListener('shown.bs.modal', function () {
+                const cancelBtn = this.querySelector('.btn-danger');
+                cancelBtn.focus();
+            });
+        }
+        
+        // Add hover effects for interactive elements
+        const interactiveElements = document.querySelectorAll('.spec-item, .tag, .item-card');
+        interactiveElements.forEach(element => {
+            element.addEventListener('mouseenter', function() {
+                this.style.transition = 'all 0.3s ease';
+            });
+        });
+        
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    opacity: 1;
+                    transform: translateX(0);
+                }
+                to {
+                    opacity: 0;
+                    transform: translateX(100%);
+                }
+            }
+            
+            @keyframes pulse {
+                0% {
+                    box-shadow: 0 0 0 0 rgba(74, 108, 247, 0.4);
+                }
+                70% {
+                    box-shadow: 0 0 0 10px rgba(74, 108, 247, 0);
+                }
+                100% {
+                    box-shadow: 0 0 0 0 rgba(74, 108, 247, 0);
+                }
+            }
+            
+            .main-image img {
+                transition: opacity 0.3s ease, transform 0.5s ease;
+            }
+            
+            .thumbnail {
+                transition: all 0.3s ease;
+            }
+        `;
+        document.head.appendChild(style);
+    });
+    
+    // Enhanced toast notification function
+    function showToast(message, type = 'success') {
+        const toast = document.createElement('div');
+        const bgColor = type === 'success' ? 'var(--success-color)' : 
+                        type === 'error' ? '#dc3545' : 
+                        type === 'warning' ? '#ffc107' : 'var(--info-color)';
+        
+        toast.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: ${bgColor};
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow-lg);
+            z-index: 3000;
+            animation: slideIn 0.4s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            max-width: 350px;
+            font-weight: 500;
+        `;
+        
+        const icon = type === 'success' ? 'fa-check-circle' : 
+                    type === 'error' ? 'fa-exclamation-circle' : 
+                    type === 'warning' ? 'fa-exclamation-triangle' : 'fa-info-circle';
+        
+        toast.innerHTML = `
+            <i class="fas ${icon}"></i>
+            <span>${message}</span>
+        `;
+        
+        document.body.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'slideOut 0.4s ease';
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, 400);
+        }, 4000);
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,359 @@
+{% extends 'core/base.html' %}
+
+{% block title %}Newsletter Preferences{% endblock %}
+
+{% block content %}
+<section class="newsletter-preferences section">
+    <div class="container">
+        <div class="preferences-header">
+            <h2 class="section__title">Newsletter Preferences</h2>
+            <p class="section__subtitle">Manage your email subscription settings</p>
+        </div>
+        
+        <div class="preferences-container" style="max-width: 800px; margin: 0 auto;">
+            <!-- Current Subscription Status -->
+            <div class="subscription-status">
+                {% if newsletter_subscription %}
+                    {% if newsletter_subscription.is_active %}
+                    <div class="status-badge status-active">
+                        <i class="fas fa-check-circle"></i>
+                        Currently Subscribed
+                    </div>
+                    <p>You are receiving newsletter emails at <strong>{{ newsletter_subscription.email }}</strong></p>
+                    {% else %}
+                    <div class="status-badge status-inactive">
+                        <i class="fas fa-times-circle"></i>
+                        Not Subscribed
+                    </div>
+                    <p>You are not receiving newsletter emails.</p>
+                    {% endif %}
+                {% else %}
+                    <div class="status-badge status-inactive">
+                        <i class="fas fa-times-circle"></i>
+                        Not Subscribed
+                    </div>
+                    <p>You are not subscribed to our newsletter.</p>
+                {% endif %}
+            </div>
+
+            <!-- Subscription Form -->
+            <form method="post" class="preferences-form">
+                {% csrf_token %}
+                
+                {% if newsletter_subscription and newsletter_subscription.is_active %}
+                <div class="preferences-section">
+                    <h3>Email Preferences</h3>
+                    <p class="section-description">Choose which types of emails you'd like to receive:</p>
+                    
+                    <div class="preference-options">
+                        <div class="preference-item">
+                            <label class="preference-label">
+                                <input type="checkbox" name="receive_donation_updates" 
+                                       {% if newsletter_subscription.receive_donation_updates %}checked{% endif %}>
+                                <span class="checkmark"></span>
+                                <div class="preference-content">
+                                    <h4>Donation Updates</h4>
+                                    <p>Receive updates about donation opportunities, impact stories, and community donations</p>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="preference-item">
+                            <label class="preference-label">
+                                <input type="checkbox" name="receive_community_news" 
+                                       {% if newsletter_subscription.receive_community_news %}checked{% endif %}>
+                                <span class="checkmark"></span>
+                                <div class="preference-content">
+                                    <h4>Community News</h4>
+                                    <p>Get the latest news, events, and updates from the ClothShare community</p>
+                                </div>
+                            </label>
+                        </div>
+                        
+                        <div class="preference-item">
+                            <label class="preference-label">
+                                <input type="checkbox" name="receive_new_items_alerts" 
+                                       {% if newsletter_subscription.receive_new_items_alerts %}checked{% endif %}>
+                                <span class="checkmark"></span>
+                                <div class="preference-content">
+                                    <h4>New Items Alerts</h4>
+                                    <p>Get notified when new items matching your preferences become available</p>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="form-actions">
+                    {% if newsletter_subscription and newsletter_subscription.is_active %}
+                    <button type="submit" name="update_preferences" class="btn btn--primary">
+                        <i class="fas fa-save"></i> Update Preferences
+                    </button>
+                    <button type="submit" name="unsubscribe" class="btn btn--danger" 
+                            onclick="return confirm('Are you sure you want to unsubscribe from all newsletter emails?');">
+                        <i class="fas fa-ban"></i> Unsubscribe All
+                    </button>
+                    {% else %}
+                    <button type="submit" name="subscribe" class="btn btn--primary">
+                        <i class="fas fa-envelope"></i> Subscribe to Newsletter
+                    </button>
+                    {% endif %}
+                    
+                    <a href="{% url 'core:edit_profile' %}" class="btn btn--outline">
+                        <i class="fas fa-arrow-left"></i> Back to Profile
+                    </a>
+                </div>
+            </form>
+
+            <!-- Additional Information -->
+            <div class="preferences-info">
+                <h4>About Our Newsletter</h4>
+                <ul>
+                    <li>We send 1-2 emails per month</li>
+                    <li>You can unsubscribe at any time</li>
+                    <li>Your preferences are saved immediately</li>
+                    <li>We never share your email with third parties</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<style>
+    .preferences-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        margin-top: 2rem;
+    }
+
+    .subscription-status {
+        text-align: center;
+        padding: 1.5rem;
+        margin-bottom: 2rem;
+        border-radius: 8px;
+        background: #f8f9fa;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+
+    .status-active {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-inactive {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .preferences-section {
+        margin: 2rem 0;
+        padding: 1.5rem;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+    }
+
+    .preferences-section h3 {
+        margin-bottom: 0.5rem;
+        color: #343a40;
+    }
+
+    .section-description {
+        color: #6c757d;
+        margin-bottom: 1rem;
+    }
+
+    .preference-options {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .preference-item {
+        padding: 1rem;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        transition: all 0.3s ease;
+    }
+
+    .preference-item:hover {
+        border-color: #4a6fa5;
+        background-color: #f8f9fa;
+    }
+
+    .preference-label {
+        display: flex;
+        align-items: flex-start;
+        gap: 1rem;
+        cursor: pointer;
+        margin: 0;
+    }
+
+    .preference-label input[type="checkbox"] {
+        margin-top: 0.25rem;
+    }
+
+    .preference-content h4 {
+        margin-bottom: 0.25rem;
+        color: #343a40;
+    }
+
+    .preference-content p {
+        color: #6c757d;
+        margin: 0;
+        font-size: 0.875rem;
+    }
+
+    .checkmark {
+        position: relative;
+        top: 0.25rem;
+        height: 20px;
+        width: 20px;
+        background-color: #fff;
+        border: 2px solid #ddd;
+        border-radius: 4px;
+        transition: all 0.3s ease;
+    }
+
+    .preference-label input:checked + .checkmark {
+        background-color: #4a6fa5;
+        border-color: #4a6fa5;
+    }
+
+    .preference-label input:checked + .checkmark:after {
+        content: "✓";
+        color: white;
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 12px;
+        font-weight: bold;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        justify-content: center;
+        align-items: center;
+        margin: 2rem 0;
+        padding-top: 1.5rem;
+        border-top: 1px solid #e9ecef;
+        flex-wrap: wrap;
+    }
+
+    .preferences-info {
+        margin-top: 2rem;
+        padding: 1.5rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+    }
+
+    .preferences-info h4 {
+        margin-bottom: 1rem;
+        color: #343a40;
+    }
+
+    .preferences-info ul {
+        color: #6c757d;
+        padding-left: 1.5rem;
+    }
+
+    .preferences-info li {
+        margin-bottom: 0.5rem;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: 2px solid transparent;
+        cursor: pointer;
+        font-size: 1rem;
+    }
+
+    .btn--primary {
+        background-color: #4a6fa5;
+        color: white;
+        border-color: #4a6fa5;
+    }
+
+    .btn--primary:hover {
+        background-color: #3a5a80;
+        border-color: #3a5a80;
+    }
+
+    .btn--outline {
+        background-color: transparent;
+        color: #4a6fa5;
+        border-color: #4a6fa5;
+    }
+
+    .btn--outline:hover {
+        background-color: #4a6fa5;
+        color: white;
+    }
+
+    .btn--danger {
+        background-color: #dc3545;
+        color: white;
+        border-color: #dc3545;
+    }
+
+    .btn--danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+
+    @media (max-width: 768px) {
+        .preferences-container {
+            padding: 1rem;
+            margin: 1rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .preference-label {
+            align-items: flex-start;
+        }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Add smooth transitions for preference items
+        const preferenceItems = document.querySelectorAll('.preference-item');
+        preferenceItems.forEach(item => {
+            const checkbox = item.querySelector('input[type="checkbox"]');
+            checkbox.addEventListener('change', function() {
+                if (this.checked) {
+                    item.style.borderColor = '#4a6fa5';
+                    item.style.backgroundColor = '#f0f4f8';
+                } else {
+                    item.style.borderColor = '#e9ecef';
+                    item.style.backgroundColor = 'transparent';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}
